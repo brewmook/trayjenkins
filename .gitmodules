@@ -1,0 +1,3 @@
+[submodule "submodules/pyjenkins"]
+	path = submodules/pyjenkins
+	url = git@github.com:coolhandmook/pyjenkins.git
