@@ -1,13 +1,19 @@
 class IModel(object):
 
-    def statusChangedEvent(self):
+    def status(self):
         """
-        @rtype pyjenkins.interfaces.IEvent
+        @rtype: str
         """
 
 class IView(object):
 
-    def updateStatus(self, status):
+    def statusRefreshEvent(self):
+        """
+        Event arguments: <none>
+        @rtype: pyjenkins.interfaces.IEvent
+        """
+
+    def setStatus(self, status):
         """
         @type status: str
         """

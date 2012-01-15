@@ -5,10 +5,11 @@ class Presenter(object):
         @type model: trayjenkins.status.interfaces.IModel
         @type view:  trayjenkins.status.interfaces.IView
         """
-        model.statusChangedEvent().register(self.onModelStatusChanged)
         self._model= model
         self._view= view
+        view.statusRefreshEvent().register(self.onViewStatusRefresh)
 
-    def onModelStatusChanged(self, status):
+    def onViewStatusRefresh(self):
 
-        self._view.updateStatus(status)
+        status= self._model.status()
+        self._view.setStatus(status)
