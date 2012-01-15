@@ -6,7 +6,7 @@ from pyjenkins.interfaces import IJenkins
 
 class ModelTests(TestCase):
 
-    def test_status_SomeFailingJobsNoExemptions_ReturnFailing(self):
+    def test_status_SomeFailingJobsNoneIgnored_ReturnFailing(self):
 
         mocks= mox.Mox()
 
@@ -19,7 +19,7 @@ class ModelTests(TestCase):
 
         self.assertEqual(trayjenkins.status.FAILING, model.status())
 
-    def test_status_NoFailingJobsNoExemptions_ReturnOk(self):
+    def test_status_NoFailingJobsNoneIgnored_ReturnOk(self):
 
         mocks= mox.Mox()
 
@@ -44,3 +44,43 @@ class ModelTests(TestCase):
         model= Model(jenkins)
 
         self.assertEqual(trayjenkins.status.UNKNOWN, model.status())
+
+    def test_status_FailingJobIsIgnored_ReturnOk(self):
+
+        mocks= mox.Mox()
+
+        jenkins= mocks.CreateMock(IJenkins)
+
+        jenkins.listFailingJobs().AndReturn(['spam'])
+        mocks.ReplayAll()
+
+        model= Model(jenkins, ['spam'])
+
+        self.assertEqual(trayjenkins.status.OK, model.status())
+
+    def test_status_FailingJobIsNotIgnored_ReturnFailing(self):
+
+        mocks= mox.Mox()
+
+        jenkins= mocks.CreateMock(IJenkins)
+
+        jenkins.listFailingJobs().AndReturn(['spam'])
+        mocks.ReplayAll()
+
+        model= Model(jenkins, ['eggs'])
+
+        self.assertEqual(trayjenkins.status.FAILING, model.status())
+
+    def test_status_FailingJobIsSecondInIgnoreList_ReturnOk(self):
+
+        mocks= mox.Mox()
+
+        jenkins= mocks.CreateMock(IJenkins)
+
+        jenkins.listFailingJobs().AndReturn(['spam'])
+        mocks.ReplayAll()
+
+        model= Model(jenkins, ['eggs', 'spam'])
+
+        self.assertEqual(trayjenkins.status.OK, model.status())
+

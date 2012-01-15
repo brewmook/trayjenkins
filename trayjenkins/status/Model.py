@@ -3,11 +3,13 @@ from trayjenkins.status.interfaces import IModel
 
 class Model(IModel):
 
-    def __init__(self, jenkins):
+    def __init__(self, jenkins, ignoreJobs=[]):
         """
         @type jenkins: pyjenkins.interfaces.IJenkins
+        @type ignoreJobs: [str]
         """
         self._jenkins = jenkins
+        self._ignoreJobs = ignoreJobs
 
     def status(self):
 
@@ -16,7 +18,9 @@ class Model(IModel):
 
         if failingJobs is None:
             result= trayjenkins.status.UNKNOWN
-        elif not failingJobs:
-            result= trayjenkins.status.OK
+        else:
+            failingJobs= [job for job in failingJobs if job not in self._ignoreJobs]
+            if not failingJobs:
+                result= trayjenkins.status.OK
 
         return result
