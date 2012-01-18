@@ -13,7 +13,6 @@ class TrayIconView(IView):
         self._delayInSeconds= delayInSecons
 
         self._trayIcon= QtGui.QSystemTrayIcon(parentWidget)
-        self._trayIcon.show()
 
         self._icons= {}
         self._icons[trayjenkins.status.FAILING]= QtGui.QIcon('images/status/failing.png')
@@ -21,6 +20,8 @@ class TrayIconView(IView):
         self._icons[trayjenkins.status.UNKNOWN]= QtGui.QIcon('images/status/unknown.png')
 
         self.setStatus(trayjenkins.status.UNKNOWN)
+
+        self._trayIcon.show()
 
     def statusRefreshEvent(self):
         """
