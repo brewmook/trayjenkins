@@ -16,9 +16,9 @@ class TrayIconView(IView):
         self._trayIcon.show()
 
         self._icons= {}
-        self._icons[trayjenkins.status.FAILING]= QtGui.QIcon('images/status/failing.svg')
-        self._icons[trayjenkins.status.OK]=      QtGui.QIcon('images/status/ok.svg')
-        self._icons[trayjenkins.status.UNKNOWN]= QtGui.QIcon('images/status/unknown.svg')
+        self._icons[trayjenkins.status.FAILING]= QtGui.QIcon('images/status/failing.png')
+        self._icons[trayjenkins.status.OK]=      QtGui.QIcon('images/status/ok.png')
+        self._icons[trayjenkins.status.UNKNOWN]= QtGui.QIcon('images/status/unknown.png')
 
         self.setStatus(trayjenkins.status.UNKNOWN)
 
