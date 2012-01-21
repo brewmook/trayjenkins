@@ -2,20 +2,21 @@ import sys
 import trayjenkins
 from PySide import QtGui
 from gui.status.TrayIconView import TrayIconView
+from pyjenkins.Job import JobStatus
 
 class FakeStatusModel(trayjenkins.status.interfaces.IModel):
 
     def __init__(self):
-        self._status= trayjenkins.status.FAILING
+        self._status= JobStatus.UNKNOWN
 
     def status(self):
 
-        if self._status is trayjenkins.status.FAILING:
-            self._status= trayjenkins.status.OK
-        elif self._status is trayjenkins.status.OK:
-            self._status= trayjenkins.status.UNKNOWN
-        elif self._status is trayjenkins.status.UNKNOWN:
-            self._status= trayjenkins.status.FAILING
+        if self._status is JobStatus.FAILING:
+            self._status= JobStatus.OK
+        elif self._status is JobStatus.OK:
+            self._status= JobStatus.UNKNOWN
+        elif self._status is JobStatus.UNKNOWN:
+            self._status= JobStatus.FAILING
 
         return self._status
 

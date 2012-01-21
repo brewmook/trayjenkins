@@ -1,6 +1,7 @@
 import trayjenkins
 from PySide import QtGui
 from pyjenkins.Event import Event
+from pyjenkins.Job import JobStatus
 from trayjenkins.status.interfaces import IView
 
 class TrayIconView(IView):
@@ -15,11 +16,11 @@ class TrayIconView(IView):
         self._trayIcon= QtGui.QSystemTrayIcon(parentWidget)
 
         self._icons= {}
-        self._icons[trayjenkins.status.FAILING]= QtGui.QIcon('images/status/failing.png')
-        self._icons[trayjenkins.status.OK]=      QtGui.QIcon('images/status/ok.png')
-        self._icons[trayjenkins.status.UNKNOWN]= QtGui.QIcon('images/status/unknown.png')
+        self._icons[JobStatus.FAILING]= QtGui.QIcon('images/status/failing.png')
+        self._icons[JobStatus.OK]=      QtGui.QIcon('images/status/ok.png')
+        self._icons[JobStatus.UNKNOWN]= QtGui.QIcon('images/status/unknown.png')
 
-        self.setStatus(trayjenkins.status.UNKNOWN)
+        self.setStatus(JobStatus.UNKNOWN)
 
         self._trayIcon.show()
 

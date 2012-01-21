@@ -2,6 +2,7 @@ class IModel(object):
 
     def status(self):
         """
+        @return: Status from pyjenkins.Job.JobStatus
         @rtype: str
         """
 

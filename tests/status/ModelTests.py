@@ -3,84 +3,48 @@ from unittest import TestCase
 import trayjenkins
 from trayjenkins.status.Model import Model
 from pyjenkins.interfaces import IJenkins
+from pyjenkins.Job import Job, JobStatus
 
 class ModelTests(TestCase):
 
-    def test_status_SomeFailingJobsNoneIgnored_ReturnFailing(self):
+    def test_status_OneFailingJob_ReturnFailing(self):
 
         mocks= mox.Mox()
 
         jenkins= mocks.CreateMock(IJenkins)
 
-        jenkins.listFailingJobs().AndReturn(['spam', 'eggs'])
+        jenkins.listJobs().AndReturn([Job('eric', JobStatus.UNKNOWN),
+                                      Job('john', JobStatus.FAILING),
+                                      Job('terry', JobStatus.OK)])
         mocks.ReplayAll()
 
         model= Model(jenkins)
 
-        self.assertEqual(trayjenkins.status.FAILING, model.status())
+        self.assertEqual(JobStatus.FAILING, model.status())
 
-    def test_status_NoFailingJobsNoneIgnored_ReturnOk(self):
+    def test_status_NoFailingJobs_ReturnOk(self):
 
         mocks= mox.Mox()
 
         jenkins= mocks.CreateMock(IJenkins)
 
-        jenkins.listFailingJobs().AndReturn([])
+        jenkins.listJobs().AndReturn([Job('eric', JobStatus.UNKNOWN),
+                                      Job('terry', JobStatus.OK)])
         mocks.ReplayAll()
 
         model= Model(jenkins)
 
-        self.assertEqual(trayjenkins.status.OK, model.status())
+        self.assertEqual(JobStatus.OK, model.status())
 
-    def test_status_ListFailingJobsReturnsNone_ReturnUnknown(self):
+    def test_status_ListJobsReturnsNone_ReturnUnknown(self):
 
         mocks= mox.Mox()
 
         jenkins= mocks.CreateMock(IJenkins)
 
-        jenkins.listFailingJobs().AndReturn(None)
+        jenkins.listJobs().AndReturn(None)
         mocks.ReplayAll()
 
         model= Model(jenkins)
 
-        self.assertEqual(trayjenkins.status.UNKNOWN, model.status())
-
-    def test_status_FailingJobIsIgnored_ReturnOk(self):
-
-        mocks= mox.Mox()
-
-        jenkins= mocks.CreateMock(IJenkins)
-
-        jenkins.listFailingJobs().AndReturn(['spam'])
-        mocks.ReplayAll()
-
-        model= Model(jenkins, ['spam'])
-
-        self.assertEqual(trayjenkins.status.OK, model.status())
-
-    def test_status_FailingJobIsNotIgnored_ReturnFailing(self):
-
-        mocks= mox.Mox()
-
-        jenkins= mocks.CreateMock(IJenkins)
-
-        jenkins.listFailingJobs().AndReturn(['spam'])
-        mocks.ReplayAll()
-
-        model= Model(jenkins, ['eggs'])
-
-        self.assertEqual(trayjenkins.status.FAILING, model.status())
-
-    def test_status_FailingJobIsSecondInIgnoreList_ReturnOk(self):
-
-        mocks= mox.Mox()
-
-        jenkins= mocks.CreateMock(IJenkins)
-
-        jenkins.listFailingJobs().AndReturn(['spam'])
-        mocks.ReplayAll()
-
-        model= Model(jenkins, ['eggs', 'spam'])
-
-        self.assertEqual(trayjenkins.status.OK, model.status())
-
+        self.assertEqual(JobStatus.UNKNOWN, model.status())

@@ -1,26 +1,26 @@
-import trayjenkins
 from trayjenkins.status.interfaces import IModel
+from pyjenkins.Job import JobStatus
 
 class Model(IModel):
 
-    def __init__(self, jenkins, ignoreJobs=[]):
+    def __init__(self, jenkins):
         """
         @type jenkins: pyjenkins.interfaces.IJenkins
         @type ignoreJobs: [str]
         """
         self._jenkins = jenkins
-        self._ignoreJobs = ignoreJobs
 
     def status(self):
 
-        result= trayjenkins.status.FAILING
-        failingJobs= self._jenkins.listFailingJobs()
+        result= JobStatus.OK
+        jobs= self._jenkins.listJobs()
 
-        if failingJobs is None:
-            result= trayjenkins.status.UNKNOWN
+        if jobs is None:
+            result= JobStatus.UNKNOWN
         else:
-            failingJobs= [job for job in failingJobs if job not in self._ignoreJobs]
-            if not failingJobs:
-                result= trayjenkins.status.OK
+            for job in jobs:
+                if job.status is JobStatus.FAILING:
+                    result= JobStatus.FAILING
+                    break
 
         return result
