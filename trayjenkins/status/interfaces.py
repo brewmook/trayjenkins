@@ -1,20 +1,26 @@
 class IModel(object):
 
-    def status(self):
+    def updateStatus(self):
         """
-        @return: Status from pyjenkins.Job.JobStatus
-        @rtype: str
+        @rtype: None
+        """
+
+    def statusChangedEvent(self):
+        """
+        Event arguments: status:str
+        @rtype: pyjenkins.interfaces.IEvent
         """
 
 class IView(object):
 
-    def statusRefreshEvent(self):
-        """
-        Event arguments: <none>
-        @rtype: pyjenkins.interfaces.IEvent
-        """
-
     def setStatus(self, status):
         """
         @type status: str
+        """
+
+class IStatusReader(object):
+
+    def status(self, jenkins):
+        """
+        @type jenkins: pyjenkins.interfaces.IJenkins
         """

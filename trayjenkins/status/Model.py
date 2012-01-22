@@ -1,26 +1,30 @@
+from trayjenkins.status.StatusReader import StatusReader
 from trayjenkins.status.interfaces import IModel
 from pyjenkins.Job import JobStatus
+from pyjenkins.Event import Event
 
 class Model(IModel):
 
-    def __init__(self, jenkins):
+    def __init__(self, jenkins, statusReader=StatusReader()):
         """
         @type jenkins: pyjenkins.interfaces.IJenkins
-        @type ignoreJobs: [str]
+        @type statusReader: trayjenkins.status.interfaces.IStatusReader
         """
         self._jenkins = jenkins
+        self._statusReader = statusReader
+        self._statusChangedEvent = Event()
+        self._status = JobStatus.UNKNOWN
 
-    def status(self):
+    def updateStatus(self):
 
-        result= JobStatus.OK
-        jobs= self._jenkins.listJobs()
+        newStatus = self._statusReader.status(self._jenkins)
+        if newStatus is not self._status:
+            self._statusChangedEvent.fire(newStatus)
+            self._status = newStatus
 
-        if jobs is None:
-            result= JobStatus.UNKNOWN
-        else:
-            for job in jobs:
-                if job.status is JobStatus.FAILING:
-                    result= JobStatus.FAILING
-                    break
-
-        return result
+    def statusChangedEvent(self):
+        """
+        Event arguments: status:str
+        @rtype: pyjenkins.interfaces.IEvent
+        """
+        return self._statusChangedEvent

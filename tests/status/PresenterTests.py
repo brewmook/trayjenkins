@@ -6,7 +6,7 @@ from trayjenkins.status.interfaces import IView, IModel
 
 class PresenterTests(TestCase):
 
-    def test_Constructor_ViewFiresStatusRefreshEvent_ViewSetStatusCalled(self):
+    def test_Constructor_ModelFiresStatusChangedEvent_ViewSetStatusCalled(self):
 
         mocks= mox.Mox()
 
@@ -14,13 +14,12 @@ class PresenterTests(TestCase):
         view= mocks.CreateMock(IView)
         event= Event()
 
-        model.status().AndReturn('some status string')
-        view.statusRefreshEvent().AndReturn(event)
+        model.statusChangedEvent().AndReturn(event)
         view.setStatus('some status string')
 
         mocks.ReplayAll()
 
         presenter= Presenter(model, view)
-        event.fire()
+        event.fire('some status string')
 
         mox.Verify(view)

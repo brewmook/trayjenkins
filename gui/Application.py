@@ -2,23 +2,19 @@ import sys
 import trayjenkins
 from PySide import QtGui
 from gui.status.TrayIconView import TrayIconView
+from trayjenkins.status.Model import Model as StatusModel
 from pyjenkins.Job import JobStatus
 
-class FakeStatusModel(trayjenkins.status.interfaces.IModel):
+class FakeStatusReader(trayjenkins.status.interfaces.IStatusReader):
 
     def __init__(self):
+
         self._status= JobStatus.UNKNOWN
 
-    def status(self):
-
-        if self._status is JobStatus.FAILING:
-            self._status= JobStatus.OK
-        elif self._status is JobStatus.OK:
-            self._status= JobStatus.UNKNOWN
-        elif self._status is JobStatus.UNKNOWN:
-            self._status= JobStatus.FAILING
+    def status(self, jenkins):
 
         return self._status
+
 
 class MainWindow(QtGui.QDialog):
 
@@ -32,28 +28,37 @@ class MainWindow(QtGui.QDialog):
     def layoutWidgets(self):
 
         mainLayout = QtGui.QVBoxLayout()
-        mainLayout.addWidget(self.refreshButton)
+        mainLayout.addWidget(self.statusOkButton)
+        mainLayout.addWidget(self.statusFailingButton)
+        mainLayout.addWidget(self.statusUnknownButton)
         self.setLayout(mainLayout)
 
     def createWidgets(self):
 
-        self.refreshButton= QtGui.QPushButton("Refresh")
-        self.refreshButton.clicked.connect(self.onRefreshButtonClicked)
+        self.statusOkButton= QtGui.QPushButton("Ok")
+        self.statusOkButton.clicked.connect(self.onStatusOkButtonClicked)
+        self.statusFailingButton= QtGui.QPushButton("Failing")
+        self.statusFailingButton.clicked.connect(self.onStatusFailingButtonClicked)
+        self.statusUnknownButton= QtGui.QPushButton("Unknown")
+        self.statusUnknownButton.clicked.connect(self.onStatusUnknownButtonClicked)
 
-        #self.iconComboBox = QtGui.QComboBox()
-        #self.iconComboBox.addItem(QtGui.QIcon('images/status/failing.svg'), "Failing")
-        #self.iconComboBox.addItem(QtGui.QIcon('images/status/ok.svg'),      "Ok")
-        #self.iconComboBox.addItem(QtGui.QIcon('images/status/unknown.svg'), "Unknown")
+    def onStatusOkButtonClicked(self):
+        self.fakeStatusReader._status = JobStatus.OK
+        self.statusModel.updateStatus()
 
-    def onRefreshButtonClicked(self):
-        # This is hackery. The model obviously needs fixed.
-        self.statusView.statusRefreshEvent().fire()
+    def onStatusFailingButtonClicked(self):
+        self.fakeStatusReader._status = JobStatus.FAILING
+        self.statusModel.updateStatus()
+
+    def onStatusUnknownButtonClicked(self):
+        self.fakeStatusReader._status = JobStatus.UNKNOWN
+        self.statusModel.updateStatus()
 
     def createTrayIcon(self):
         from trayjenkins.status.Presenter import Presenter
-        model= FakeStatusModel()
-        self.statusView= TrayIconView(self, 5)
-        self.statusPresenter= Presenter(model, self.statusView)
+        self.fakeStatusReader = FakeStatusReader()
+        self.statusModel = StatusModel(None, self.fakeStatusReader)
+        self.statusPresenter= Presenter(self.statusModel, TrayIconView(self, 5))
 
 
 class Application(QtGui.QDialog):

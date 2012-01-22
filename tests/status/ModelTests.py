@@ -1,50 +1,87 @@
 import mox
 from unittest import TestCase
-import trayjenkins
 from trayjenkins.status.Model import Model
-from pyjenkins.interfaces import IJenkins
-from pyjenkins.Job import Job, JobStatus
+from trayjenkins.status.interfaces import IStatusReader
+from pyjenkins.interfaces import IJenkins, IEvent
+from pyjenkins.Job import JobStatus
 
 class ModelTests(TestCase):
 
-    def test_status_OneFailingJob_ReturnFailing(self):
+    def setUp(self):
 
-        mocks= mox.Mox()
+        self.mocks = mox.Mox()
+        self.jenkins = self.mocks.CreateMock(IJenkins)
+        self.statusReader = self.mocks.CreateMock(IStatusReader)
+        self.event = self.mocks.CreateMock(IEvent)
 
-        jenkins= mocks.CreateMock(IJenkins)
+    def test_updateStatus_FirstReaderStatusCallReturnsFailing_StatusChangedEventFired(self):
 
-        jenkins.listJobs().AndReturn([Job('eric', JobStatus.UNKNOWN),
-                                      Job('john', JobStatus.FAILING),
-                                      Job('terry', JobStatus.OK)])
-        mocks.ReplayAll()
+        self.statusReader.status(self.jenkins).AndReturn(JobStatus.FAILING)
+        self.event.fire(JobStatus.FAILING)
+        self.mocks.ReplayAll()
 
-        model= Model(jenkins)
+        model= Model(self.jenkins, self.statusReader)
+        model._statusChangedEvent = self.event
 
-        self.assertEqual(JobStatus.FAILING, model.status())
+        model.updateStatus()
 
-    def test_status_NoFailingJobs_ReturnOk(self):
+        mox.Verify(self.event)
 
-        mocks= mox.Mox()
+    def test_updateStatus_FirstReaderStatusCallReturnsOk_StatusChangedEventFired(self):
 
-        jenkins= mocks.CreateMock(IJenkins)
+        self.statusReader.status(self.jenkins).AndReturn(JobStatus.OK)
+        self.event.fire(JobStatus.OK)
+        self.mocks.ReplayAll()
 
-        jenkins.listJobs().AndReturn([Job('eric', JobStatus.UNKNOWN),
-                                      Job('terry', JobStatus.OK)])
-        mocks.ReplayAll()
+        model= Model(self.jenkins, self.statusReader)
+        model._statusChangedEvent = self.event
 
-        model= Model(jenkins)
+        model.updateStatus()
 
-        self.assertEqual(JobStatus.OK, model.status())
+        mox.Verify(self.event)
 
-    def test_status_ListJobsReturnsNone_ReturnUnknown(self):
+    def test_updateStatus_FirstReaderStatusCallReturnsUnknown_StatusChangedEventNotFired(self):
 
-        mocks= mox.Mox()
+        self.statusReader.status(self.jenkins).AndReturn(JobStatus.UNKNOWN)
+        self.mocks.ReplayAll()
 
-        jenkins= mocks.CreateMock(IJenkins)
+        model= Model(self.jenkins, self.statusReader)
+        # inject fake event
+        model._statusChangedEvent = self.event
 
-        jenkins.listJobs().AndReturn(None)
-        mocks.ReplayAll()
+        model.updateStatus()
 
-        model= Model(jenkins)
+        mox.Verify(self.event)
 
-        self.assertEqual(JobStatus.UNKNOWN, model.status())
+    def test_updateStatus_TwoStatusCallsReturnFailing_StatusChangedEventFiredOnceWithFailing(self):
+
+        self.statusReader.status(self.jenkins).AndReturn(JobStatus.FAILING)
+        self.statusReader.status(self.jenkins).AndReturn(JobStatus.FAILING)
+        self.event.fire(JobStatus.FAILING)
+        self.mocks.ReplayAll()
+
+        model= Model(self.jenkins, self.statusReader)
+        # inject fake event
+        model._statusChangedEvent = self.event
+
+        model.updateStatus()
+        model.updateStatus()
+
+        mox.Verify(self.event)
+
+    def test_updateStatus_StatusCallsReturnFailingThenOk_StatusChangedEventFiredOnceWithFailingOnceWithOk(self):
+
+        self.statusReader.status(self.jenkins).AndReturn(JobStatus.FAILING)
+        self.statusReader.status(self.jenkins).AndReturn(JobStatus.OK)
+        self.event.fire(JobStatus.FAILING)
+        self.event.fire(JobStatus.OK)
+        self.mocks.ReplayAll()
+
+        model= Model(self.jenkins, self.statusReader)
+        # inject fake event
+        model._statusChangedEvent = self.event
+
+        model.updateStatus()
+        model.updateStatus()
+
+        mox.Verify(self.event)

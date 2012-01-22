@@ -7,9 +7,8 @@ class Presenter(object):
         """
         self._model= model
         self._view= view
-        view.statusRefreshEvent().register(self.onViewStatusRefresh)
+        model.statusChangedEvent().register(self.onModelStatusChanged)
 
-    def onViewStatusRefresh(self):
+    def onModelStatusChanged(self, status):
 
-        status= self._model.status()
         self._view.setStatus(status)
