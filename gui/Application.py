@@ -37,7 +37,7 @@ class MainWindow(QtGui.QDialog):
         super(MainWindow, self).__init__()
 
         self.createTrayIcon()
-        self.createWidgets()
+        self.createFakeStatusGroup()
         self.layoutWidgets()
 
         self.statusThread = StatusUpdateThread(self.statusModel)
@@ -46,19 +46,24 @@ class MainWindow(QtGui.QDialog):
     def layoutWidgets(self):
 
         mainLayout = QtGui.QVBoxLayout()
-        mainLayout.addWidget(self.statusOkButton)
-        mainLayout.addWidget(self.statusFailingButton)
-        mainLayout.addWidget(self.statusUnknownButton)
+        mainLayout.addWidget(self.fakeStatusGroupBox)
         self.setLayout(mainLayout)
 
-    def createWidgets(self):
+    def createFakeStatusGroup(self):
 
+        self.fakeStatusGroupBox = QtGui.QGroupBox("Fake status")
         self.statusOkButton= QtGui.QPushButton("Ok")
         self.statusOkButton.clicked.connect(self.onStatusOkButtonClicked)
         self.statusFailingButton= QtGui.QPushButton("Failing")
         self.statusFailingButton.clicked.connect(self.onStatusFailingButtonClicked)
         self.statusUnknownButton= QtGui.QPushButton("Unknown")
         self.statusUnknownButton.clicked.connect(self.onStatusUnknownButtonClicked)
+
+        layout = QtGui.QVBoxLayout()
+        layout.addWidget(self.statusOkButton)
+        layout.addWidget(self.statusFailingButton)
+        layout.addWidget(self.statusUnknownButton)
+        self.fakeStatusGroupBox.setLayout(layout)
 
     def onStatusOkButtonClicked(self):
         self.fakeStatusReader._status = JobStatus.OK
