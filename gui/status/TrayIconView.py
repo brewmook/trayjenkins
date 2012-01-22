@@ -4,13 +4,16 @@ from trayjenkins.status.interfaces import IView
 
 class TrayIconView(IView):
 
-    def __init__(self, parentWidget, delayInSecons):
+    def __init__(self, parentWidget, delayInSecons, menu):
         """
         @type parentWidget: QtGui.QWidget
+        @type delayInSecons: int
+        @type menu: QtGui.QMenu
         """
         self._delayInSeconds= delayInSecons
 
         self._trayIcon= QtGui.QSystemTrayIcon(parentWidget)
+        self._trayIcon.setContextMenu(menu)
 
         self._icons= {JobStatus.FAILING: QtGui.QIcon('images/status/failing.png'),
                       JobStatus.OK:      QtGui.QIcon('images/status/ok.png'),

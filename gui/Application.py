@@ -4,6 +4,7 @@ from gui.status.FakeStatus import FakeStatusReader, FakeStatusGroup
 from gui.status.StatusUpdateThread import StatusUpdateThread
 from gui.status.TrayIconView import TrayIconView
 from trayjenkins.status.Model import Model as StatusModel
+from trayjenkins.status.Presenter import Presenter as StatusPresenter
 
 class MainWindow(QtGui.QDialog):
 
@@ -29,9 +30,14 @@ class MainWindow(QtGui.QDialog):
         self.statusReaderView = FakeStatusGroup(self.statusReader)
 
     def createTrayIcon(self):
-        from trayjenkins.status.Presenter import Presenter
+
+        self.quitAction = QtGui.QAction("&Quit", self, triggered=QtGui.qApp.quit)
+
+        self.trayMenu = QtGui.QMenu(self)
+        self.trayMenu.addAction(self.quitAction)
+
         self.statusModel = StatusModel(self.statusReader)
-        self.statusPresenter= Presenter(self.statusModel, TrayIconView(self, 5))
+        self.statusPresenter = StatusPresenter(self.statusModel, TrayIconView(self, 5, self.trayMenu))
 
 
 class Application(QtGui.QDialog):
