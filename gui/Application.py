@@ -11,7 +11,7 @@ class FakeStatusReader(trayjenkins.status.interfaces.IStatusReader):
 
         self._status= JobStatus.UNKNOWN
 
-    def status(self, jenkins):
+    def status(self):
 
         return self._status
 
@@ -72,7 +72,7 @@ class MainWindow(QtGui.QDialog):
     def createTrayIcon(self):
         from trayjenkins.status.Presenter import Presenter
         self.fakeStatusReader = FakeStatusReader()
-        self.statusModel = StatusModel(None, self.fakeStatusReader)
+        self.statusModel = StatusModel(self.fakeStatusReader)
         self.statusPresenter= Presenter(self.statusModel, TrayIconView(self, 5))
 
 

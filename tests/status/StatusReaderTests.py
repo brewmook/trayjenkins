@@ -1,6 +1,5 @@
 import mox
 from unittest import TestCase
-import trayjenkins
 from trayjenkins.status.StatusReader import StatusReader
 from pyjenkins.interfaces import IJenkins
 from pyjenkins.Job import Job, JobStatus
@@ -17,8 +16,8 @@ class StatusReaderTests(TestCase):
                                       Job('terry', JobStatus.OK)])
         mocks.ReplayAll()
 
-        reader = StatusReader()
-        result = reader.status(jenkins)
+        reader = StatusReader(jenkins)
+        result = reader.status()
 
         self.assertEqual(JobStatus.FAILING, result)
 
@@ -31,8 +30,8 @@ class StatusReaderTests(TestCase):
                                       Job('terry', JobStatus.OK)])
         mocks.ReplayAll()
 
-        reader = StatusReader()
-        result = reader.status(jenkins)
+        reader = StatusReader(jenkins)
+        result = reader.status()
 
         self.assertEqual(JobStatus.OK, result)
 
@@ -44,7 +43,7 @@ class StatusReaderTests(TestCase):
         jenkins.listJobs().AndReturn(None)
         mocks.ReplayAll()
 
-        reader = StatusReader()
-        result = reader.status(jenkins)
+        reader = StatusReader(jenkins)
+        result = reader.status()
 
         self.assertEqual(JobStatus.UNKNOWN, result)

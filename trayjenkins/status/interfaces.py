@@ -20,7 +20,8 @@ class IView(object):
 
 class IStatusReader(object):
 
-    def status(self, jenkins):
+    def status(self):
         """
-        @type jenkins: pyjenkins.interfaces.IJenkins
+        @return String from pyjenkins.Job.JobStatus
+        @rtype: str
         """
