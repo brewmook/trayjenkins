@@ -1,24 +1,9 @@
 import sys
-from PySide import QtGui, QtCore
+from PySide import QtGui
 from gui.status.FakeStatus import FakeStatusReader, FakeStatusGroup
+from gui.status.StatusUpdateThread import StatusUpdateThread
 from gui.status.TrayIconView import TrayIconView
 from trayjenkins.status.Model import Model as StatusModel
-
-class StatusUpdateThread(QtCore.QThread):
-
-    def __init__(self, statusModel, *args, **kwargs):
-        """
-        @type statusModel: trayjenkins.status.interfaces.IModel
-        """
-        QtCore.QThread.__init__(self, *args, **kwargs)
-        self.statusModel = statusModel
-
-    def run(self):
-
-        while True:
-            self.sleep(5)
-            self.statusModel.updateStatus()
-
 
 class MainWindow(QtGui.QDialog):
 
