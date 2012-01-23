@@ -28,8 +28,7 @@ On Linux, Mac etc, use `trayjenkins.sh`.
 Licence
 -------
 
-So far, public domain, use at your own risk. A more appropriate
-licence will be chosen soon.
+MIT Licence, see LICENCE.txt.
 
 Developer setup
 ---------------
