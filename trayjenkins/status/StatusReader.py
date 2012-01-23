@@ -1,5 +1,5 @@
 from trayjenkins.status.interfaces import IStatusReader
-from pyjenkins.Job import JobStatus
+from pyjenkins.job import JobStatus
 
 class StatusReader(IStatusReader):
 

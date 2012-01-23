@@ -3,7 +3,7 @@ from unittest import TestCase
 from trayjenkins.status.Model import Model
 from trayjenkins.status.interfaces import IStatusReader
 from pyjenkins.interfaces import IJenkins, IEvent
-from pyjenkins.Job import JobStatus
+from pyjenkins.job import JobStatus
 
 class ModelTests(TestCase):
 

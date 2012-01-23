@@ -1,6 +1,6 @@
 from trayjenkins.status.interfaces import IModel
-from pyjenkins.Job import JobStatus
-from pyjenkins.Event import Event
+from pyjenkins.job import JobStatus
+from pyjenkins.event import Event
 
 class Model(IModel):
 

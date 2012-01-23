@@ -22,6 +22,6 @@ class IStatusReader(object):
 
     def status(self):
         """
-        @return String from pyjenkins.Job.JobStatus
+        @return String from pyjenkins.job.JobStatus
         @rtype: str
         """

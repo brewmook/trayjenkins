@@ -1,5 +1,5 @@
 from PySide import QtGui
-from pyjenkins.Job import JobStatus
+from pyjenkins.job import JobStatus
 from trayjenkins.status.interfaces import IStatusReader
 
 class FakeStatusReader(IStatusReader):

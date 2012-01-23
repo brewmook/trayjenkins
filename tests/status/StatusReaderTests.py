@@ -2,7 +2,7 @@ import mox
 from unittest import TestCase
 from trayjenkins.status.StatusReader import StatusReader
 from pyjenkins.interfaces import IJenkins
-from pyjenkins.Job import Job, JobStatus
+from pyjenkins.job import Job, JobStatus
 
 class StatusReaderTests(TestCase):
 
