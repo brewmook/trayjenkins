@@ -1,7 +1,7 @@
 import mox
 from unittest import TestCase
 from pyjenkins.event import Event
-from trayjenkins.status.Presenter import Presenter
+from trayjenkins.status.presenter import Presenter
 from trayjenkins.status.interfaces import IView, IModel
 
 class PresenterTests(TestCase):

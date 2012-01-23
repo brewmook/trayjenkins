@@ -3,8 +3,8 @@ from PySide import QtGui
 from gui.status.FakeStatus import FakeStatusReader, FakeStatusGroup
 from gui.status.StatusUpdateThread import StatusUpdateThread
 from gui.status.TrayIconView import TrayIconView
-from trayjenkins.status.Model import Model as StatusModel
-from trayjenkins.status.Presenter import Presenter as StatusPresenter
+from trayjenkins.status.model import Model as StatusModel
+from trayjenkins.status.presenter import Presenter as StatusPresenter
 
 class MainWindow(QtGui.QDialog):
 

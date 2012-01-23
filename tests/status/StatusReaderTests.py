@@ -1,6 +1,6 @@
 import mox
 from unittest import TestCase
-from trayjenkins.status.StatusReader import StatusReader
+from trayjenkins.status.statusreader import StatusReader
 from pyjenkins.interfaces import IJenkins
 from pyjenkins.job import Job, JobStatus
 
