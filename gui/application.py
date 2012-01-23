@@ -1,8 +1,8 @@
 import sys
 from PySide import QtGui
-from gui.status.FakeStatus import FakeStatusReader, FakeStatusGroup
-from gui.status.StatusUpdateThread import StatusUpdateThread
-from gui.status.TrayIconView import TrayIconView
+from gui.status.fake import FakeStatusReader, FakeStatusGroup
+from gui.status.thread import StatusUpdateThread
+from gui.status.view import TrayIconView
 from trayjenkins.status.model import Model as StatusModel
 from trayjenkins.status.presenter import Presenter as StatusPresenter
 

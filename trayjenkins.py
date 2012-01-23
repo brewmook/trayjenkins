@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 import sys
-from gui.Application import Application
+from gui.application import Application
 
 app= Application()
 
