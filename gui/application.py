@@ -15,6 +15,7 @@ class MainWindow(QtGui.QDialog):
     def __init__(self):
         super(MainWindow, self).__init__()
 
+        self.createActions()
         self.createJobsMVP()
         self.createTrayIcon()
 
@@ -31,16 +32,23 @@ class MainWindow(QtGui.QDialog):
         self.jobsView = JobsListView()
         self.jobsPresenter = JobsPresenter(self.jobsModel, self.jobsView)
 
-    def createTrayIcon(self):
+    def createActions(self):
 
         self.quitAction = QtGui.QAction("&Quit", self, triggered=QtGui.qApp.quit)
+        self.showControlsAction = QtGui.QAction("&Show controls", self, triggered=self.showNormal)
+
+    def createTrayIcon(self):
 
         self.trayMenu = QtGui.QMenu(self)
+        self.trayMenu.addAction(self.showControlsAction)
         self.trayMenu.addAction(self.quitAction)
 
         self.statusModel = StatusModel(self.jobsModel, StatusReader())
         self.statusPresenter = StatusPresenter(self.statusModel, TrayIconView(self, self.trayMenu))
 
+    def closeEvent(self, event):
+        self.hide()
+        event.ignore()
 
 class Application(QtGui.QDialog):
 
@@ -51,7 +59,6 @@ class Application(QtGui.QDialog):
     def run(self):
 
         window = MainWindow()
-        window.show()
 
         return self.application.exec_()
 
