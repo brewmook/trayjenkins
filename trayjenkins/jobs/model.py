@@ -2,7 +2,7 @@ from pyjenkins.backend.http import Http
 from pyjenkins.event import Event
 from pyjenkins.jenkins import Jenkins, JenkinsFactory
 from pyjenkins.server import Server
-from trayjenkins.server.interfaces import IModel
+from trayjenkins.jobs.interfaces import IModel
 
 class Model(IModel):
 

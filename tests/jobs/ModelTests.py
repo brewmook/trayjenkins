@@ -5,7 +5,7 @@ from pyjenkins.job import Job, JobStatus
 from pyjenkins.event import Event
 from pyjenkins.server import Server
 
-from trayjenkins.server.model import Model
+from trayjenkins.jobs.model import Model
 
 class ModelTests(TestCase):
 

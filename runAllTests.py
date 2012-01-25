@@ -6,7 +6,7 @@ import os
 
 sys.path.append('submodules/pyjenkins')
 
-from tests.server.ModelTests import ModelTests as ServerModelTests
+from tests.jobs.ModelTests import ModelTests as JobsModelTests
 
 from tests.status.ModelTests import ModelTests as StatusModelTests
 from tests.status.PresenterTests import PresenterTests
