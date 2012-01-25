@@ -13,7 +13,7 @@ class MainWindow(QtGui.QDialog):
     def __init__(self):
         super(MainWindow, self).__init__()
 
-        self.jobsModel = JobsModel(Server('http://kaluga:8080/', 'pyjenkins', 'afa21f90c68b79f58ff7ed4014ae9f9a'))
+        self.jobsModel = JobsModel(Server('http://ci.jenkins-ci.org/', '', ''))
 
         self.createTrayIcon()
 
