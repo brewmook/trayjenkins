@@ -1,33 +1,24 @@
 import sys
 from PySide import QtGui
-from gui.status.fake import FakeStatusReader, FakeStatusGroup
-from gui.status.thread import StatusUpdateThread
 from gui.status.view import TrayIconView
+from gui.thread.jobsupdate import JobsUpdateThread
+from trayjenkins.jobs.model import Model as JobsModel
 from trayjenkins.status.model import Model as StatusModel
+from trayjenkins.status.statusreader import StatusReader
 from trayjenkins.status.presenter import Presenter as StatusPresenter
+from pyjenkins.server import Server
 
 class MainWindow(QtGui.QDialog):
 
     def __init__(self):
         super(MainWindow, self).__init__()
 
-        self.createStatusReader()
+        self.jobsModel = JobsModel(Server('http://kaluga:8080/', 'pyjenkins', 'afa21f90c68b79f58ff7ed4014ae9f9a'))
+
         self.createTrayIcon()
-        self.layoutWidgets()
 
-        self.statusThread = StatusUpdateThread(self.statusModel)
-        self.statusThread.start()
-
-    def layoutWidgets(self):
-
-        mainLayout = QtGui.QVBoxLayout()
-        mainLayout.addWidget(self.statusReaderView)
-        self.setLayout(mainLayout)
-
-    def createStatusReader(self):
-
-        self.statusReader = FakeStatusReader()
-        self.statusReaderView = FakeStatusGroup(self.statusReader)
+        self.jobsUpdateThread = JobsUpdateThread(self.jobsModel)
+        self.jobsUpdateThread.start()
 
     def createTrayIcon(self):
 
@@ -36,7 +27,7 @@ class MainWindow(QtGui.QDialog):
         self.trayMenu = QtGui.QMenu(self)
         self.trayMenu.addAction(self.quitAction)
 
-        self.statusModel = StatusModel(self.statusReader)
+        self.statusModel = StatusModel(self.jobsModel, StatusReader())
         self.statusPresenter = StatusPresenter(self.statusModel, TrayIconView(self, 5, self.trayMenu))
 
 
@@ -49,7 +40,6 @@ class Application(QtGui.QDialog):
     def run(self):
 
         window = MainWindow()
-        window.show()
 
         return self.application.exec_()
 

@@ -1,10 +1,5 @@
 class IModel(object):
 
-    def updateStatus(self):
-        """
-        @rtype: None
-        """
-
     def statusChangedEvent(self):
         """
         Event arguments: status:str
@@ -20,8 +15,9 @@ class IView(object):
 
 class IStatusReader(object):
 
-    def status(self):
+    def status(self, jobs):
         """
+        @type jobs: [pyjenkins.job.Job]
         @return String from pyjenkins.job.JobStatus
         @rtype: str
         """

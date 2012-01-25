@@ -3,16 +3,13 @@ from pyjenkins.job import JobStatus
 
 class StatusReader(IStatusReader):
 
-    def __init__(self, jenkins):
+    def status(self, jobs):
         """
-        @type jenkins: pyjenkins.interfaces.IJenkins
+        @type jobs: [pyjenkins.job.Job]
+        @return String from pyjenkins.job.JobStatus
+        @rtype: str
         """
-        self._jenkins = jenkins
-
-    def status(self):
-
         result= JobStatus.OK
-        jobs= self._jenkins.listJobs()
 
         if jobs is None:
             result= JobStatus.UNKNOWN
