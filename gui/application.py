@@ -39,7 +39,7 @@ class MainWindow(QtGui.QDialog):
         self.trayMenu.addAction(self.quitAction)
 
         self.statusModel = StatusModel(self.jobsModel, StatusReader())
-        self.statusPresenter = StatusPresenter(self.statusModel, TrayIconView(self, 5, self.trayMenu))
+        self.statusPresenter = StatusPresenter(self.statusModel, TrayIconView(self, self.trayMenu))
 
 
 class Application(QtGui.QDialog):

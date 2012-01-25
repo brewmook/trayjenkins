@@ -4,14 +4,11 @@ from trayjenkins.status.interfaces import IView
 
 class TrayIconView(IView):
 
-    def __init__(self, parentWidget, delayInSecons, menu):
+    def __init__(self, parentWidget, menu):
         """
         @type parentWidget: QtGui.QWidget
-        @type delayInSecons: int
         @type menu: QtGui.QMenu
         """
-        self._delayInSeconds= delayInSecons
-
         self._trayIcon= QtGui.QSystemTrayIcon(parentWidget)
         self._trayIcon.setContextMenu(menu)
 
@@ -31,5 +28,4 @@ class TrayIconView(IView):
         self._trayIcon.setToolTip(status.capitalize())
         self._trayIcon.showMessage(unicode("Jenkins status change"),
                                    unicode("Status: %s" % status.capitalize()),
-                                   QtGui.QSystemTrayIcon.Information,# icon,
-                                   self._delayInSeconds * 1000)
+                                   QtGui.QSystemTrayIcon.Information)
