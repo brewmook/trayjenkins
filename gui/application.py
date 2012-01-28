@@ -1,4 +1,5 @@
 import sys
+from optparse import OptionParser
 from PySide import QtGui
 from gui.jobs.view import JobsListView
 from gui.jobs.fake import FakeJobsModel
@@ -13,11 +14,11 @@ from pyjenkins.server import Server
 
 class MainWindow(QtGui.QDialog):
 
-    def __init__(self):
+    def __init__(self, jenkinsHost):
         super(MainWindow, self).__init__()
 
         self.createActions()
-        self.createJobsMVP()
+        self.createJobsMVP(jenkinsHost)
         self.createTrayIcon()
 
         mainLayout = QtGui.QVBoxLayout()
@@ -27,10 +28,13 @@ class MainWindow(QtGui.QDialog):
         self.jobsUpdateThread = JobsUpdateThread(self.jobsModel, 5)
         self.jobsUpdateThread.start()
 
-    def createJobsMVP(self):
+    def createJobsMVP(self, jenkinsHost):
 
-        #self.jobsModel = JobsModel(Server('http://ci.jenkins-ci.org/', '', ''))
-        self.jobsModel = FakeJobsModel()
+        if jenkinsHost == 'FAKE':
+            self.jobsModel = FakeJobsModel()
+        else:
+            self.jobsModel = JobsModel(Server(jenkinsHost, '', ''))
+
         self.jobsView = JobsListView()
         self.jobsPresenter = JobsPresenter(self.jobsModel, self.jobsView)
 
@@ -60,7 +64,21 @@ class Application(QtGui.QDialog):
 
     def run(self):
 
-        window = MainWindow()
+        jenkinsHost = self.parseOptions()
+
+        window = MainWindow(jenkinsHost)
 
         return self.application.exec_()
 
+    def parseOptions(self):
+
+        parser = OptionParser(usage='usage: %prog [options] host')
+        (options, args) = parser.parse_args()
+
+        if len(args) is 1:
+            jenkinsHost = args[0]
+        else:
+            parser.print_help()
+            sys.exit(1)
+
+        return jenkinsHost

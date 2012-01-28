@@ -2,4 +2,4 @@
 setlocal
 set PYTHONPATH=%cd%/submodules/pyjenkins;%PYTHONPATH%
 echo %PYTHONPATH%
-python trayjenkins.py
+python trayjenkins.py %*

@@ -18,7 +18,7 @@ class FakeJobsModel(IModel):
         """
         @rtype: None
         """
-        print jobs
+        jobs = self.jobsRota[self.nextJobs]
         if self.jobs != jobs:
             self.jobs = jobs
             self._jobsUpdatedEvent.fire(jobs)
