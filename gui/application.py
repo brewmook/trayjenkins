@@ -1,6 +1,7 @@
 import sys
 from PySide import QtGui
 from gui.jobs.view import JobsListView
+from gui.jobs.fake import FakeJobsModel
 from gui.status.view import TrayIconView
 from gui.thread.jobsupdate import JobsUpdateThread
 from trayjenkins.jobs.model import Model as JobsModel
@@ -23,12 +24,13 @@ class MainWindow(QtGui.QDialog):
         mainLayout.addWidget(self.jobsView)
         self.setLayout(mainLayout)
 
-        self.jobsUpdateThread = JobsUpdateThread(self.jobsModel)
+        self.jobsUpdateThread = JobsUpdateThread(self.jobsModel, 5)
         self.jobsUpdateThread.start()
 
     def createJobsMVP(self):
 
-        self.jobsModel = JobsModel(Server('http://ci.jenkins-ci.org/', '', ''))
+        #self.jobsModel = JobsModel(Server('http://ci.jenkins-ci.org/', '', ''))
+        self.jobsModel = FakeJobsModel()
         self.jobsView = JobsListView()
         self.jobsPresenter = JobsPresenter(self.jobsModel, self.jobsView)
 
