@@ -8,9 +8,9 @@ class JobsListView(QtGui.QGroupBox, IView):
         QtGui.QGroupBox.__init__(self, "Jobs")
 
         self._jobs = QtGui.QListWidget()
-        self._icons = {JobStatus.FAILING: QtGui.QIcon('images/status/failing.png'),
-                       JobStatus.OK:      QtGui.QIcon('images/status/ok.png'),
-                       JobStatus.UNKNOWN: QtGui.QIcon('images/status/unknown.png')}
+        self._icons = {JobStatus.FAILING: QtGui.QIcon('media/status/failing.png'),
+                       JobStatus.OK:      QtGui.QIcon('media/status/ok.png'),
+                       JobStatus.UNKNOWN: QtGui.QIcon('media/status/unknown.png')}
 
         layout = QtGui.QVBoxLayout()
         layout.addWidget(self._jobs)

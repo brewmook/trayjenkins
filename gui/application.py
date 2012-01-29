@@ -3,7 +3,7 @@ from optparse import OptionParser
 from PySide import QtGui
 from gui.jobs.view import JobsListView
 from gui.jobs.fake import FakeJobsModel
-from gui.status.view import TrayIconView
+from gui.status.view import TrayIconView, SoundView, MultiView
 from gui.thread.jobsupdate import JobsUpdateThread
 from trayjenkins.jobs.model import Model as JobsModel
 from trayjenkins.jobs.presenter import Presenter as JobsPresenter
@@ -49,8 +49,10 @@ class MainWindow(QtGui.QDialog):
         self.trayMenu.addAction(self.showControlsAction)
         self.trayMenu.addAction(self.quitAction)
 
+        view = MultiView([TrayIconView(self, self.trayMenu),
+                          SoundView(self)])
         self.statusModel = StatusModel(self.jobsModel, StatusReader())
-        self.statusPresenter = StatusPresenter(self.statusModel, TrayIconView(self, self.trayMenu))
+        self.statusPresenter = StatusPresenter(self.statusModel, view)
 
     def closeEvent(self, event):
         self.hide()
@@ -61,6 +63,7 @@ class Application(QtGui.QDialog):
     def __init__(self):
 
         self.application= QtGui.QApplication(sys.argv)
+        self.application.setApplicationName('Trayjenkins')
 
     def run(self):
 
