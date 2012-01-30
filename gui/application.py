@@ -4,7 +4,7 @@ from PySide import QtGui
 from gui.jobs.view import JobsListView
 from gui.jobs.fake import FakeJobsModel
 from gui.status.view import TrayIconView, SoundView, MultiView
-from gui.thread.jobsupdate import JobsUpdateThread
+from gui.timer.jobsupdate import JobsUpdateTimer
 from trayjenkins.jobs.model import Model as JobsModel
 from trayjenkins.jobs.presenter import Presenter as JobsPresenter
 from trayjenkins.status.model import Model as StatusModel
@@ -25,8 +25,7 @@ class MainWindow(QtGui.QDialog):
         mainLayout.addWidget(self.jobsView)
         self.setLayout(mainLayout)
 
-        self.jobsUpdateThread = JobsUpdateThread(self.jobsModel, 5)
-        self.jobsUpdateThread.start()
+        self.jobsUpdateTimer = JobsUpdateTimer(self.jobsModel, 5, self)
 
     def createJobsMVP(self, jenkinsHost):
 
