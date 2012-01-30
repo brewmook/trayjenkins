@@ -1,8 +1,8 @@
 from pyjenkins.backend.http import Http
-from pyjenkins.event import Event
 from pyjenkins.jenkins import Jenkins, JenkinsFactory
 from pyjenkins.server import Server
 from trayjenkins.jobs.interfaces import IModel
+from trayjenkins.event import Event
 
 class Model(IModel):
 
@@ -12,7 +12,7 @@ class Model(IModel):
         """
         @type server: pyjenkins.server.Server
         @type jenkinsFactory: pyjenkins.interfaces.IJenkinsFactory
-        @type event: pyjenkins.interfaces.IEvent
+        @type event: trayjenkins.event.IEvent
         """
         self._jenkins = jenkinsFactory.create(server)
         self._jobsUpdatedEvent = event
@@ -30,6 +30,6 @@ class Model(IModel):
     def jobsUpdatedEvent(self):
         """
         Listeners receive Event.fire([pyjenkins.job.Job])
-        @rtype: pyjenkins.interfaces.IEvent
+        @rtype: trayjenkins.event.IEvent
         """
         return self._jobsUpdatedEvent

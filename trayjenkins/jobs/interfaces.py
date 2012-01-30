@@ -8,7 +8,7 @@ class IModel(object):
     def jobsUpdatedEvent(self):
         """
         Listeners receive Event.fire([pyjenkins.job.Job])
-        @rtype: pyjenkins.interfaces.IEvent
+        @rtype: trayjenkins.event.IEvent
         """
 
 class IView(object):

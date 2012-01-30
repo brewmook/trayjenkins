@@ -1,6 +1,6 @@
 import mox
 from unittest import TestCase
-from pyjenkins.event import Event
+from trayjenkins.event import Event
 from trayjenkins.jobs.presenter import Presenter
 from trayjenkins.jobs.interfaces import IView, IModel
 

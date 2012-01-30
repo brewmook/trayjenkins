@@ -1,6 +1,6 @@
 from trayjenkins.status.interfaces import IModel
+from trayjenkins.event import Event
 from pyjenkins.job import JobStatus
-from pyjenkins.event import Event
 
 class Model(IModel):
 
@@ -25,6 +25,6 @@ class Model(IModel):
     def statusChangedEvent(self):
         """
         Event arguments: status:str
-        @rtype: pyjenkins.interfaces.IEvent
+        @rtype: trayjenkins.event.IEvent
         """
         return self._statusChangedEvent

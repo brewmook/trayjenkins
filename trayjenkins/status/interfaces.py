@@ -3,7 +3,7 @@ class IModel(object):
     def statusChangedEvent(self):
         """
         Event arguments: status:str
-        @rtype: pyjenkins.interfaces.IEvent
+        @rtype: trayjenkins.event.IEvent
         """
 
 class IView(object):

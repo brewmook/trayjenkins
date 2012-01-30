@@ -1,10 +1,10 @@
 import mox
 from unittest import TestCase
-from pyjenkins.interfaces import IEvent, IJenkins, IJenkinsFactory
+from pyjenkins.interfaces import IJenkins, IJenkinsFactory
 from pyjenkins.job import Job, JobStatus
-from pyjenkins.event import Event
 from pyjenkins.server import Server
 
+from trayjenkins.event import Event, IEvent
 from trayjenkins.jobs.model import Model
 
 class ModelTests(TestCase):

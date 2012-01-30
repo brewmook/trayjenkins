@@ -6,6 +6,8 @@ import os
 
 sys.path.append('submodules/pyjenkins')
 
+from tests.EventTests import EventTests
+
 from tests.jobs.ModelTests import ModelTests as JobsModelTests
 from tests.jobs.PresenterTests import PresenterTests as JobsPresenterTests
 

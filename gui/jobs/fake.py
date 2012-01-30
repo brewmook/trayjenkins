@@ -1,5 +1,5 @@
+from trayjenkins.event import Event
 from trayjenkins.jobs.interfaces import IModel
-from pyjenkins.event import Event
 from pyjenkins.job import Job, JobStatus
 
 class FakeJobsModel(IModel):
@@ -30,6 +30,6 @@ class FakeJobsModel(IModel):
     def jobsUpdatedEvent(self):
         """
         Listeners receive Event.fire([pyjenkins.job.Job])
-        @rtype: pyjenkins.interfaces.IEvent
+        @rtype: trayjenkins.event.IEvent
         """
         return self._jobsUpdatedEvent
