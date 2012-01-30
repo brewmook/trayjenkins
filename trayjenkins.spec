@@ -1,7 +1,7 @@
 # -*- mode: python -*-
 a = Analysis(['trayjenkins.py'],
              pathex=['submodules/pyjenkins'],
-             hiddenimports=['encodings', 'PyQt4.phonon'],
+             hiddenimports=['encodings'],
              hookspath=None)
 pyz = PYZ(a.pure)
 exe = EXE(pyz,
