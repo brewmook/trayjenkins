@@ -1,5 +1,12 @@
 *.pyc
 *~
 
+/dist
+/build
+/*.log
+/warn*.txt
+
 /.idea
+/.project
+/.pydevproject
 /*.komodoproject
