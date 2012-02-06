@@ -4,7 +4,7 @@ from optparse import OptionParser
 from PySide import QtGui
 from gui.jobs import JobsListView
 from gui.fake import FakeJobsModel
-from gui.status.view import TrayIconView, SoundView, MultiView
+from gui.status import TrayIconView, SoundView, MultiView
 from gui.timer.jobsupdate import JobsUpdateTimer
 from gui.media import MediaFiles
 from trayjenkins.jobs.model import Model as JobsModel
