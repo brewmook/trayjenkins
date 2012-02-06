@@ -4,13 +4,18 @@ from pyjenkins.job import JobStatus
 
 class JobsListView(QtGui.QGroupBox, IView):
 
-    def __init__(self):
+    def __init__(self, mediaFiles):
+        """
+        @type mediaFiles: gui.media.MediaFiles
+        """
         QtGui.QGroupBox.__init__(self, "Jobs")
 
         self._jobs = QtGui.QListWidget()
-        self._icons = {JobStatus.FAILING: QtGui.QIcon('media/status/failing.png'),
-                       JobStatus.OK:      QtGui.QIcon('media/status/ok.png'),
-                       JobStatus.UNKNOWN: QtGui.QIcon('media/status/unknown.png')}
+        self._icons = {
+            JobStatus.FAILING: QtGui.QIcon(mediaFiles.failingImagePath()),
+            JobStatus.OK:      QtGui.QIcon(mediaFiles.okImagePath()),
+            JobStatus.UNKNOWN: QtGui.QIcon(mediaFiles.unknownImagePath()),
+            }
 
         layout = QtGui.QVBoxLayout()
         layout.addWidget(self._jobs)

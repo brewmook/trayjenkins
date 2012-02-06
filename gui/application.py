@@ -20,7 +20,7 @@ class MainWindow(QtGui.QDialog):
         super(MainWindow, self).__init__()
 
         self.createActions()
-        self.createJobsMVP(jenkinsHost)
+        self.createJobsMVP(jenkinsHost, mediaFiles)
         self.createTrayIcon(mediaFiles)
 
         mainLayout = QtGui.QVBoxLayout()
@@ -29,14 +29,14 @@ class MainWindow(QtGui.QDialog):
 
         self.jobsUpdateTimer = JobsUpdateTimer(self.jobsModel, 5, self)
 
-    def createJobsMVP(self, jenkinsHost):
+    def createJobsMVP(self, jenkinsHost, mediaFiles):
 
         if jenkinsHost == 'FAKE':
             self.jobsModel = FakeJobsModel()
         else:
             self.jobsModel = JobsModel(Server(jenkinsHost, '', ''))
 
-        self.jobsView = JobsListView()
+        self.jobsView = JobsListView(mediaFiles)
         self.jobsPresenter = JobsPresenter(self.jobsModel, self.jobsView)
 
     def createActions(self):
