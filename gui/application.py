@@ -2,8 +2,8 @@ import os
 import sys
 from optparse import OptionParser
 from PySide import QtGui
-from gui.jobs.view import JobsListView
-from gui.jobs.fake import FakeJobsModel
+from gui.jobs import JobsListView
+from gui.fake import FakeJobsModel
 from gui.status.view import TrayIconView, SoundView, MultiView
 from gui.timer.jobsupdate import JobsUpdateTimer
 from gui.media import MediaFiles
