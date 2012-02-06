@@ -2,11 +2,10 @@ import os
 import sys
 from optparse import OptionParser
 from PySide import QtGui
-from gui.jobs import JobsListView
 from gui.fake import FakeJobsModel
-from gui.status import TrayIconView, SoundView, MultiView
-from gui.timer.jobsupdate import JobsUpdateTimer
+from gui.jobs import JobsListView, JobsUpdateTimer
 from gui.media import MediaFiles
+from gui.status import TrayIconView, SoundView, MultiView
 from trayjenkins.jobs.model import Model as JobsModel
 from trayjenkins.jobs.presenter import Presenter as JobsPresenter
 from trayjenkins.status.model import Model as StatusModel
