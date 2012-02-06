@@ -13,6 +13,7 @@ from trayjenkins.status.model import Model as StatusModel
 from trayjenkins.status.statusreader import StatusReader
 from trayjenkins.status.presenter import Presenter as StatusPresenter
 from pyjenkins.server import Server
+from trayjenkins import __version__
 
 class MainWindow(QtGui.QDialog):
 
@@ -28,6 +29,9 @@ class MainWindow(QtGui.QDialog):
         self.setLayout(mainLayout)
 
         self.jobsUpdateTimer = JobsUpdateTimer(self.jobsModel, 5, self)
+
+        self.setWindowTitle("TrayJenkins (%s)" % __version__)
+        self.resize(640, 480)
 
     def createJobsMVP(self, jenkinsHost, mediaFiles):
 
