@@ -1,31 +1,24 @@
-import os
 from PySide import QtGui
 from PySide.phonon import Phonon
 from pyjenkins.job import JobStatus
 from trayjenkins.status.interfaces import IView
 
-class ResourceLocator(object):
-
-    def __init__(self, executablePath):
-        self._executablePath = executablePath
-
-    def locate(self, resource):
-        return os.path.join(self._executablePath, resource)
-
 class TrayIconView(IView):
 
-    def __init__(self, parentWidget, menu, executablePath):
+    def __init__(self, parentWidget, menu, mediaFiles):
         """
         @type parentWidget: QtGui.QWidget
         @type menu: QtGui.QMenu
+        @type mediaFiles: gui.media.MediaFiles
         """
         self._trayIcon= QtGui.QSystemTrayIcon(parentWidget)
         self._trayIcon.setContextMenu(menu)
-        resources = ResourceLocator(executablePath)
 
-        self._icons= {JobStatus.FAILING: QtGui.QIcon(resources.locate('media/status/failing.png')),
-                      JobStatus.OK:      QtGui.QIcon(resources.locate('media/status/ok.png')),
-                      JobStatus.UNKNOWN: QtGui.QIcon(resources.locate('media/status/unknown.png'))}
+        self._icons = {
+            JobStatus.FAILING: QtGui.QIcon(mediaFiles.failingImagePath()),
+            JobStatus.OK:      QtGui.QIcon(mediaFiles.okImagePath()),
+            JobStatus.UNKNOWN: QtGui.QIcon(mediaFiles.unknownImagePath()),
+            }
 
         self.setStatus(JobStatus.UNKNOWN)
 
@@ -45,15 +38,19 @@ class TrayIconView(IView):
 
 class SoundView(IView):
 
-    def __init__(self, parent, executablePath):
-
-        resources = ResourceLocator(executablePath)
+    def __init__(self, parent, mediaFiles):
+        """
+        @type parent: QtGui.QWidget
+        @type mediaFiles: gui.media.MediaFiles
+        """
         self.mediaObject = Phonon.MediaObject(parent)
         self.audioOutput = Phonon.AudioOutput(Phonon.NotificationCategory, parent)
         Phonon.createPath(self.mediaObject, self.audioOutput)
 
-        self._sounds = {JobStatus.FAILING: Phonon.MediaSource(resources.locate('media/status/failing.wav')),
-                        JobStatus.OK:      Phonon.MediaSource(resources.locate('media/status/ok.wav'))}
+        self._sounds = {
+            JobStatus.FAILING: Phonon.MediaSource(mediaFiles.failingSoundPath()),
+            JobStatus.OK:      Phonon.MediaSource(mediaFiles.okSoundPath()),
+            }
 
     def setStatus(self, status):
         """

@@ -6,6 +6,7 @@ from gui.jobs.view import JobsListView
 from gui.jobs.fake import FakeJobsModel
 from gui.status.view import TrayIconView, SoundView, MultiView
 from gui.timer.jobsupdate import JobsUpdateTimer
+from gui.media import MediaFiles
 from trayjenkins.jobs.model import Model as JobsModel
 from trayjenkins.jobs.presenter import Presenter as JobsPresenter
 from trayjenkins.status.model import Model as StatusModel
@@ -15,12 +16,12 @@ from pyjenkins.server import Server
 
 class MainWindow(QtGui.QDialog):
 
-    def __init__(self, jenkinsHost, executablePath):
+    def __init__(self, jenkinsHost, mediaFiles):
         super(MainWindow, self).__init__()
 
         self.createActions()
         self.createJobsMVP(jenkinsHost)
-        self.createTrayIcon(executablePath)
+        self.createTrayIcon(mediaFiles)
 
         mainLayout = QtGui.QVBoxLayout()
         mainLayout.addWidget(self.jobsView)
@@ -43,14 +44,14 @@ class MainWindow(QtGui.QDialog):
         self.quitAction = QtGui.QAction("&Quit", self, triggered=QtGui.qApp.quit)
         self.showControlsAction = QtGui.QAction("&Show controls", self, triggered=self.showNormal)
 
-    def createTrayIcon(self, executablePath):
+    def createTrayIcon(self, mediaFiles):
 
         self.trayMenu = QtGui.QMenu(self)
         self.trayMenu.addAction(self.showControlsAction)
         self.trayMenu.addAction(self.quitAction)
 
-        view = MultiView([TrayIconView(self, self.trayMenu, executablePath),
-                          SoundView(self, executablePath)])
+        view = MultiView([TrayIconView(self, self.trayMenu, mediaFiles),
+                          SoundView(self, mediaFiles)])
         self.statusModel = StatusModel(self.jobsModel, StatusReader())
         self.statusPresenter = StatusPresenter(self.statusModel, view)
 
@@ -68,9 +69,9 @@ class Application(QtGui.QDialog):
     def run(self):
 
         jenkinsHost = self.parseOptions()
-        path = self.executablePath()
+        mediaFiles = MediaFiles(self.executablePath())
 
-        window = MainWindow(jenkinsHost, path)
+        window = MainWindow(jenkinsHost, mediaFiles)
 
         return self.application.exec_()
 
