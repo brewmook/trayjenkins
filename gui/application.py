@@ -1,3 +1,4 @@
+import os
 import sys
 from optparse import OptionParser
 from PySide import QtGui
@@ -14,12 +15,12 @@ from pyjenkins.server import Server
 
 class MainWindow(QtGui.QDialog):
 
-    def __init__(self, jenkinsHost):
+    def __init__(self, jenkinsHost, executablePath):
         super(MainWindow, self).__init__()
 
         self.createActions()
         self.createJobsMVP(jenkinsHost)
-        self.createTrayIcon()
+        self.createTrayIcon(executablePath)
 
         mainLayout = QtGui.QVBoxLayout()
         mainLayout.addWidget(self.jobsView)
@@ -42,14 +43,14 @@ class MainWindow(QtGui.QDialog):
         self.quitAction = QtGui.QAction("&Quit", self, triggered=QtGui.qApp.quit)
         self.showControlsAction = QtGui.QAction("&Show controls", self, triggered=self.showNormal)
 
-    def createTrayIcon(self):
+    def createTrayIcon(self, executablePath):
 
         self.trayMenu = QtGui.QMenu(self)
         self.trayMenu.addAction(self.showControlsAction)
         self.trayMenu.addAction(self.quitAction)
 
-        view = MultiView([TrayIconView(self, self.trayMenu),
-                          SoundView(self)])
+        view = MultiView([TrayIconView(self, self.trayMenu, executablePath),
+                          SoundView(self, executablePath)])
         self.statusModel = StatusModel(self.jobsModel, StatusReader())
         self.statusPresenter = StatusPresenter(self.statusModel, view)
 
@@ -67,8 +68,9 @@ class Application(QtGui.QDialog):
     def run(self):
 
         jenkinsHost = self.parseOptions()
+        path = self.executablePath()
 
-        window = MainWindow(jenkinsHost)
+        window = MainWindow(jenkinsHost, path)
 
         return self.application.exec_()
 
@@ -84,3 +86,14 @@ class Application(QtGui.QDialog):
             sys.exit(1)
 
         return jenkinsHost
+
+    def executablePath(self):
+
+        path = ''
+        try:
+            path = sys._MEIPASS
+        except AttributeError:
+            path = os.path.abspath(".")
+            
+        return path
+
