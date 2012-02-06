@@ -1,5 +1,5 @@
 from PySide import QtCore, QtGui
-from trayjenkins.jobs.interfaces import IView
+from trayjenkins.jobs import IView
 from pyjenkins.job import JobStatus
 
 class JobsListView(QtGui.QGroupBox, IView):
@@ -34,7 +34,7 @@ class JobsUpdateTimer(QtCore.QObject):
 
     def __init__(self, jobsModel, seconds, parent=None):
         """
-        @type jobsModel: trayjenkins.jobs.interfaces.IModel
+        @type jobsModel: trayjenkins.jobs.IModel
         @type seconds: int
         @type parent: PySide.QtCore.QObject
         """

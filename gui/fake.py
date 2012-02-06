@@ -1,5 +1,5 @@
 from trayjenkins.event import Event
-from trayjenkins.jobs.interfaces import IModel
+from trayjenkins.jobs import IModel
 from pyjenkins.job import Job, JobStatus
 
 class FakeJobsModel(IModel):

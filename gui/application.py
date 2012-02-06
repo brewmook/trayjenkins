@@ -6,8 +6,7 @@ from gui.fake import FakeJobsModel
 from gui.jobs import JobsListView, JobsUpdateTimer
 from gui.media import MediaFiles
 from gui.status import TrayIconView, SoundView, MultiView
-from trayjenkins.jobs.model import Model as JobsModel
-from trayjenkins.jobs.presenter import Presenter as JobsPresenter
+from trayjenkins.jobs import Model as JobsModel, Presenter as JobsPresenter
 from trayjenkins.status.model import Model as StatusModel
 from trayjenkins.status.statusreader import StatusReader
 from trayjenkins.status.presenter import Presenter as StatusPresenter

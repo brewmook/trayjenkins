@@ -6,7 +6,7 @@ class Model(IModel):
 
     def __init__(self, jobsModel, statusReader):
         """
-        @type statusReader: trayjenkins.jobs.interfaces.IModel
+        @type statusReader: trayjenkins.jobs.IModel
         @type statusReader: trayjenkins.status.interfaces.IStatusReader
         """
         self._statusReader = statusReader
