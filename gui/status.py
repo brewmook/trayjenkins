@@ -1,7 +1,7 @@
 from PySide import QtGui
 from PySide.phonon import Phonon
 from pyjenkins.job import JobStatus
-from trayjenkins.status.interfaces import IView
+from trayjenkins.status import IView
 
 class TrayIconView(IView):
 
@@ -68,7 +68,7 @@ class MultiView(IView):
 
     def __init__(self, views=[]):
         """
-        @type views: [trayjenkins.status.interfaces.IView]
+        @type views: [trayjenkins.status.IView]
         """
         self._views = views
 

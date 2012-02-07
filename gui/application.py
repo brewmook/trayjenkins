@@ -7,9 +7,7 @@ from gui.jobs import JobsListView, JobsUpdateTimer
 from gui.media import MediaFiles
 from gui.status import TrayIconView, SoundView, MultiView
 from trayjenkins.jobs import Model as JobsModel, Presenter as JobsPresenter
-from trayjenkins.status.model import Model as StatusModel
-from trayjenkins.status.statusreader import StatusReader
-from trayjenkins.status.presenter import Presenter as StatusPresenter
+from trayjenkins.status import Model as StatusModel, StatusReader, Presenter as StatusPresenter
 from pyjenkins.server import Server
 from trayjenkins import __version__
 

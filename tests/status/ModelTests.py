@@ -2,8 +2,7 @@ import mox
 from unittest import TestCase
 from trayjenkins.event import Event, IEvent
 from trayjenkins.jobs import IModel as JobsModel
-from trayjenkins.status.model import Model
-from trayjenkins.status.interfaces import IStatusReader
+from trayjenkins.status import IStatusReader, Model
 from pyjenkins.interfaces import IJenkins
 from pyjenkins.job import Job, JobStatus
 

@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from trayjenkins.status.statusreader import StatusReader
+from trayjenkins.status import StatusReader
 from trayjenkins.jobs import IModel
 from pyjenkins.job import Job, JobStatus
 
