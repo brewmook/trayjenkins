@@ -5,9 +5,31 @@ from pyjenkins.job import Job, JobStatus
 from pyjenkins.server import Server
 
 from trayjenkins.event import Event, IEvent
-from trayjenkins.jobs import Model
+from trayjenkins.jobs import Presenter, IView, IModel, Model
 
-class ModelTests(TestCase):
+class JobsPresenterTests(TestCase):
+
+    def test_Constructor_ModelFiresJobsUpdatedEvent_ViewSetJobsCalled(self):
+
+        mocks= mox.Mox()
+
+        jobs = 'list of jobs'
+        model= mocks.CreateMock(IModel)
+        view= mocks.CreateMock(IView)
+        event= Event()
+
+        model.jobsUpdatedEvent().AndReturn(event)
+        view.setJobs(jobs)
+
+        mocks.ReplayAll()
+
+        presenter= Presenter(model, view)
+        event.fire(jobs)
+
+        mox.Verify(view)
+
+
+class JobsModelTests(TestCase):
 
     def test_updateJobs_FirstCall_FireJobsUpdatedEventWithRetrievedJobs(self):
 
