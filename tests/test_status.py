@@ -1,12 +1,33 @@
 import mox
 from unittest import TestCase
+
 from trayjenkins.event import Event, IEvent
 from trayjenkins.jobs import IModel as JobsModel
-from trayjenkins.status import IStatusReader, Model
+from trayjenkins.status import IStatusReader, IView, IModel, Presenter, Model, StatusReader
 from pyjenkins.interfaces import IJenkins
 from pyjenkins.job import Job, JobStatus
 
-class ModelTests(TestCase):
+class StatusPresenterTests(TestCase):
+
+    def test_Constructor_ModelFiresStatusChangedEvent_ViewSetStatusCalled(self):
+
+        mocks= mox.Mox()
+
+        model= mocks.CreateMock(IModel)
+        view= mocks.CreateMock(IView)
+        event= Event()
+
+        model.statusChangedEvent().AndReturn(event)
+        view.setStatus('some status string')
+
+        mocks.ReplayAll()
+
+        presenter= Presenter(model, view)
+        event.fire('some status string')
+
+        mox.Verify(view)
+
+class StatusModelTests(TestCase):
 
     def setUp(self):
 
@@ -105,3 +126,33 @@ class ModelTests(TestCase):
         self.jobsEvent.fire(self.jobs)
     
         mox.Verify(self.statusEvent)
+
+class StatusReaderTests(TestCase):
+
+    def test_status_OneFailingJob_ReturnFailing(self):
+
+        jobs = [Job('eric', JobStatus.UNKNOWN),
+                Job('john', JobStatus.FAILING),
+                Job('terry', JobStatus.OK)]
+
+        reader = StatusReader()
+        result = reader.status(jobs)
+
+        self.assertEqual(JobStatus.FAILING, result)
+
+    def test_status_NoFailingJobs_ReturnOk(self):
+
+        jobs = [Job('eric', JobStatus.UNKNOWN),
+                Job('terry', JobStatus.OK)]
+
+        reader = StatusReader()
+        result = reader.status(jobs)
+
+        self.assertEqual(JobStatus.OK, result)
+
+    def test_status_JobsListIsNone_ReturnUnknown(self):
+
+        reader = StatusReader()
+        result = reader.status(None)
+
+        self.assertEqual(JobStatus.UNKNOWN, result)
