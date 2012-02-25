@@ -1,7 +1,7 @@
 import os
 import sys
 from optparse import OptionParser
-from PySide import QtGui
+from PySide import QtCore, QtGui
 
 import gui.fake
 import gui.jobs
@@ -37,8 +37,10 @@ class MainWindow(QtGui.QDialog):
 
         if jenkinsHost == 'FAKE':
             self.jobsModel = gui.fake.JobsModel()
+            self.homeUrl = QtCore.QUrl('https://github.com/coolhandmook/trayjenkins')
         else:
             self.jobsModel = JobsModel(Server(jenkinsHost, '', ''))
+            self.homeUrl = QtCore.QUrl(jenkinsHost)
 
         self.jobsView = gui.jobs.ListView(mediaFiles)
         self.jobsPresenter = JobsPresenter(self.jobsModel, self.jobsView)
@@ -56,6 +58,7 @@ class MainWindow(QtGui.QDialog):
 
         self.trayIcon = QtGui.QSystemTrayIcon(self)
         self.trayIcon.setContextMenu(self.trayMenu)
+        self.trayIcon.messageClicked.connect(self.onTrayIconMessageClicked)
 
         view = gui.status.MultiView([gui.status.TrayIconView(self.trayIcon, mediaFiles),
                                      gui.status.SoundView(self, mediaFiles)])
@@ -65,6 +68,9 @@ class MainWindow(QtGui.QDialog):
     def closeEvent(self, event):
         self.hide()
         event.ignore()
+
+    def onTrayIconMessageClicked(self):
+        QtGui.QDesktopServices.openUrl(self.homeUrl)
 
 class Application(QtGui.QDialog):
 
