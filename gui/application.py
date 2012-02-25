@@ -37,10 +37,10 @@ class MainWindow(QtGui.QDialog):
 
         if jenkinsHost == 'FAKE':
             self.jobsModel = gui.fake.JobsModel()
-            self.homeUrl = QtCore.QUrl('https://github.com/coolhandmook/trayjenkins')
+            self.jenkinsUrl = QtCore.QUrl('https://github.com/coolhandmook/trayjenkins')
         else:
             self.jobsModel = JobsModel(Server(jenkinsHost, '', ''))
-            self.homeUrl = QtCore.QUrl(jenkinsHost)
+            self.jenkinsUrl = QtCore.QUrl(jenkinsHost)
 
         self.jobsView = gui.jobs.ListView(mediaFiles)
         self.jobsPresenter = JobsPresenter(self.jobsModel, self.jobsView)
@@ -48,17 +48,19 @@ class MainWindow(QtGui.QDialog):
     def createActions(self):
 
         self.quitAction = QtGui.QAction("&Quit", self, triggered=QtGui.qApp.quit)
-        self.showControlsAction = QtGui.QAction("&Show controls", self, triggered=self.showNormal)
+        self.showControlsAction = QtGui.QAction("Show &Controls", self, triggered=self.showNormal)
+        self.showJenkinsAction = QtGui.QAction("Show &Jenkins", self, triggered=self.openJenkinsUrl)
 
     def createTrayIcon(self, mediaFiles):
 
         self.trayMenu = QtGui.QMenu(self)
         self.trayMenu.addAction(self.showControlsAction)
+        self.trayMenu.addAction(self.showJenkinsAction)
         self.trayMenu.addAction(self.quitAction)
 
         self.trayIcon = QtGui.QSystemTrayIcon(self)
         self.trayIcon.setContextMenu(self.trayMenu)
-        self.trayIcon.messageClicked.connect(self.onTrayIconMessageClicked)
+        self.trayIcon.messageClicked.connect(self.openJenkinsUrl)
         self.trayIcon.activated.connect(self.onTrayIconActivated)
 
         view = gui.status.MultiView([gui.status.TrayIconView(self.trayIcon, mediaFiles),
@@ -70,8 +72,8 @@ class MainWindow(QtGui.QDialog):
         self.hide()
         event.ignore()
 
-    def onTrayIconMessageClicked(self):
-        QtGui.QDesktopServices.openUrl(self.homeUrl)
+    def openJenkinsUrl(self):
+        QtGui.QDesktopServices.openUrl(self.jenkinsUrl)
 
     def onTrayIconActivated(self, reason):
         if reason in (QtGui.QSystemTrayIcon.Trigger, QtGui.QSystemTrayIcon.DoubleClick):
