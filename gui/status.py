@@ -5,14 +5,12 @@ from trayjenkins.status import IView
 
 class TrayIconView(IView):
 
-    def __init__(self, parentWidget, menu, mediaFiles):
+    def __init__(self, trayIcon, mediaFiles):
         """
-        @type parentWidget: QtGui.QWidget
-        @type menu: QtGui.QMenu
+        @type trayIcon: QtGui.QSystemTrayIcon
         @type mediaFiles: gui.media.MediaFiles
         """
-        self._trayIcon= QtGui.QSystemTrayIcon(parentWidget)
-        self._trayIcon.setContextMenu(menu)
+        self._trayIcon= trayIcon
 
         self._icons = {
             JobStatus.FAILING: QtGui.QIcon(mediaFiles.failingImagePath()),

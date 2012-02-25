@@ -50,7 +50,10 @@ class MainWindow(QtGui.QDialog):
         self.trayMenu.addAction(self.showControlsAction)
         self.trayMenu.addAction(self.quitAction)
 
-        view = MultiView([TrayIconView(self, self.trayMenu, mediaFiles),
+        self.trayIcon = QtGui.QSystemTrayIcon(self)
+        self.trayIcon.setContextMenu(self.trayMenu)
+
+        view = MultiView([TrayIconView(self.trayIcon, mediaFiles),
                           SoundView(self, mediaFiles)])
         self.statusModel = StatusModel(self.jobsModel, StatusReader())
         self.statusPresenter = StatusPresenter(self.statusModel, view)
