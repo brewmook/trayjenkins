@@ -45,8 +45,7 @@ class StatusModelTests(TestCase):
         self.statusEvent.fire(JobStatus.FAILING)
         self.mocks.ReplayAll()
 
-        model= Model(self.jobsModel, self.statusReader)
-        model._statusChangedEvent = self.statusEvent
+        model= Model(self.jobsModel, self.statusReader, self.statusEvent)
 
         self.jobsEvent.fire(self.jobs)
 
@@ -58,8 +57,7 @@ class StatusModelTests(TestCase):
         self.statusEvent.fire(JobStatus.OK)
         self.mocks.ReplayAll()
     
-        model= Model(self.jobsModel, self.statusReader)
-        model._statusChangedEvent = self.statusEvent
+        model= Model(self.jobsModel, self.statusReader, self.statusEvent)
     
         self.jobsEvent.fire(self.jobs)
     
@@ -70,9 +68,7 @@ class StatusModelTests(TestCase):
         self.statusReader.status(self.jobs).AndReturn(JobStatus.UNKNOWN)
         self.mocks.ReplayAll()
     
-        model= Model(self.jobsModel, self.statusReader)
-        # inject fake event
-        model._statusChangedEvent = self.statusEvent
+        model= Model(self.jobsModel, self.statusReader, self.statusEvent)
     
         self.jobsEvent.fire(self.jobs)
     
@@ -85,9 +81,7 @@ class StatusModelTests(TestCase):
         self.statusEvent.fire(JobStatus.FAILING)
         self.mocks.ReplayAll()
     
-        model= Model(self.jobsModel, self.statusReader)
-        # inject fake event
-        model._statusChangedEvent = self.statusEvent
+        model= Model(self.jobsModel, self.statusReader, self.statusEvent)
     
         self.jobsEvent.fire(self.jobs)
         self.jobsEvent.fire(self.jobs)
@@ -101,9 +95,7 @@ class StatusModelTests(TestCase):
         self.statusEvent.fire(JobStatus.OK)
         self.mocks.ReplayAll()
     
-        model= Model(self.jobsModel, self.statusReader)
-        # inject fake event
-        model._statusChangedEvent = self.statusEvent
+        model= Model(self.jobsModel, self.statusReader, self.statusEvent)
     
         self.jobsEvent.fire(self.jobs)
         self.jobsEvent.fire(self.jobs)
@@ -118,9 +110,7 @@ class StatusModelTests(TestCase):
         self.statusEvent.fire(JobStatus.OK)
         self.mocks.ReplayAll()
     
-        model= Model(self.jobsModel, self.statusReader)
-        # inject fake event
-        model._statusChangedEvent = self.statusEvent
+        model= Model(self.jobsModel, self.statusReader, self.statusEvent)
     
         self.jobsEvent.fire(self.jobs)
         self.jobsEvent.fire(self.jobs)

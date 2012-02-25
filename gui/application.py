@@ -9,7 +9,7 @@ import gui.media
 import gui.status
 
 from trayjenkins.jobs import Model as JobsModel, Presenter as JobsPresenter
-from trayjenkins.status import Model as StatusModel, StatusReader, Presenter as StatusPresenter
+from trayjenkins.status import Model as StatusModel, Presenter as StatusPresenter
 from pyjenkins.server import Server
 from trayjenkins import __version__
 
@@ -59,7 +59,7 @@ class MainWindow(QtGui.QDialog):
 
         view = gui.status.MultiView([gui.status.TrayIconView(self.trayIcon, mediaFiles),
                                      gui.status.SoundView(self, mediaFiles)])
-        self.statusModel = StatusModel(self.jobsModel, StatusReader())
+        self.statusModel = StatusModel(self.jobsModel)
         self.statusPresenter = StatusPresenter(self.statusModel, view)
 
     def closeEvent(self, event):
