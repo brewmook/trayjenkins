@@ -28,7 +28,7 @@ class TrayIconView(IView):
         self._trayIcon.setToolTip(status.capitalize())
         
         self._trayIcon.showMessage(unicode("Jenkins status change"),
-                                   unicode("Status: %s" % status.capitalize()),
+                                   unicode(message),
                                    QtGui.QSystemTrayIcon.Information)
 
 

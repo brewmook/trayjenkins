@@ -50,7 +50,7 @@ class Presenter(object):
 
         self._view.setStatus(status, message)
 
-class DummyMessageComposer(IMessageComposer):
+class DefaultMessageComposer(IMessageComposer):
 
     def message(self, jobs):
         """
@@ -58,7 +58,18 @@ class DummyMessageComposer(IMessageComposer):
         @return Brief message describing the job statuses.
         @rtype: str
         """
-        return None
+        result = ''
+        if jobs is not None:
+            if len(jobs) == 0:
+                result = 'No jobs'
+            else:
+                failing = [job.name for job in jobs if job.status == JobStatus.FAILING]
+                if failing:
+                    result = 'FAILING:\n' + '\n'.join(failing)
+                else:
+                    result = 'All active jobs pass'
+
+        return result
 
 class StatusReader(IStatusReader):
 
@@ -83,7 +94,7 @@ class StatusReader(IStatusReader):
 class Model(IModel):
 
     def __init__(self, jobsModel,
-                 messageComposer=DummyMessageComposer(),
+                 messageComposer=DefaultMessageComposer(),
                  statusReader=StatusReader(),
                  statusChangedEvent=Event()):
         """

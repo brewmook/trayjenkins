@@ -3,7 +3,7 @@ from unittest import TestCase
 
 from trayjenkins.event import Event, IEvent
 from trayjenkins.jobs import IModel as JobsModel
-from trayjenkins.status import IMessageComposer, IStatusReader, IView, IModel, Presenter, Model, StatusReader
+from trayjenkins.status import IMessageComposer, IStatusReader, IView, IModel, Presenter, Model, StatusReader, DefaultMessageComposer
 from pyjenkins.interfaces import IJenkins
 from pyjenkins.job import Job, JobStatus
 
@@ -145,3 +145,52 @@ class StatusReaderTests(TestCase):
         result = reader.status(None)
 
         self.assertEqual(JobStatus.UNKNOWN, result)
+
+
+class DefaultMessageComposerTests(TestCase):
+
+    def test_message_EmptyJobs_ReturnCorrectMessage(self):
+
+        jobs = []
+
+        composer = DefaultMessageComposer()
+        result = composer.message(jobs)
+
+        self.assertEqual('No jobs', result)
+
+    def test_message_AllJobsOk_ReturnCorrectMessage(self):
+
+        jobs = [Job('eric', JobStatus.OK),
+                Job('terry', JobStatus.OK)]
+
+        composer = DefaultMessageComposer()
+        result = composer.message(jobs)
+
+        self.assertEqual('All active jobs pass', result)
+
+    def test_message_OneFailingJob_ReturnCorrectMessage(self):
+
+        jobs = [Job('eric', JobStatus.OK),
+                Job('terry', JobStatus.FAILING)]
+
+        composer = DefaultMessageComposer()
+        result = composer.message(jobs)
+
+        self.assertEqual('FAILING:\nterry', result)
+
+    def test_message_TwoFailingJobs_ReturnCorrectMessage(self):
+
+        jobs = [Job('eric', JobStatus.FAILING),
+                Job('terry', JobStatus.FAILING)]
+
+        composer = DefaultMessageComposer()
+        result = composer.message(jobs)
+
+        self.assertEqual('FAILING:\neric\nterry', result)
+
+    def test_message_JobsListIsNone_ReturnUnknown(self):
+
+        composer = DefaultMessageComposer()
+        result = composer.message(None)
+
+        self.assertEqual('', result)
