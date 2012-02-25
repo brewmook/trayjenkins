@@ -20,8 +20,6 @@ class TrayIconView(IView):
 
         self.setStatus(JobStatus.UNKNOWN)
 
-        self._trayIcon.show()
-
     def setStatus(self, status):
         """
         @type status: str

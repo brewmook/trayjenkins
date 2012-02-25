@@ -22,6 +22,8 @@ class MainWindow(QtGui.QDialog):
         self.createJobsMVP(jenkinsHost, mediaFiles)
         self.createTrayIcon(mediaFiles)
 
+        self.trayIcon.show()
+
         mainLayout = QtGui.QVBoxLayout()
         mainLayout.addWidget(self.jobsView)
         self.setLayout(mainLayout)
