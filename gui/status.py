@@ -18,9 +18,9 @@ class TrayIconView(IView):
             JobStatus.UNKNOWN: QtGui.QIcon(mediaFiles.unknownImagePath()),
             }
 
-        self.setStatus(JobStatus.UNKNOWN)
+        self.setStatus(JobStatus.UNKNOWN, None)
 
-    def setStatus(self, status):
+    def setStatus(self, status, message):
         """
         @type status: str
         """
@@ -48,7 +48,7 @@ class SoundView(IView):
             JobStatus.OK:      Phonon.MediaSource(mediaFiles.okSoundPath()),
             }
 
-    def setStatus(self, status):
+    def setStatus(self, status, message):
         """
         @type status: str
         """
@@ -68,9 +68,9 @@ class MultiView(IView):
         """
         self._views = views
 
-    def setStatus(self, status):
+    def setStatus(self, status, message):
         """
         @type status: str
         """
         for view in self._views:
-            view.setStatus(status)
+            view.setStatus(status, message)

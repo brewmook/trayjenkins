@@ -5,15 +5,16 @@ class IModel(object):
 
     def statusChangedEvent(self):
         """
-        Event arguments: status:str
+        Event arguments: (status:str, message:str)
         @rtype: trayjenkins.event.IEvent
         """
 
 class IView(object):
 
-    def setStatus(self, status):
+    def setStatus(self, status, message):
         """
         @type status: str
+        @type message: str
         """
 
 class IStatusReader(object):
@@ -22,6 +23,15 @@ class IStatusReader(object):
         """
         @type jobs: [pyjenkins.job.Job]
         @return String from pyjenkins.job.JobStatus
+        @rtype: str
+        """
+
+class IMessageComposer(object):
+
+    def message(self, jobs):
+        """
+        @type jobs: [pyjenkins.job.Job]
+        @return Brief message describing the job statuses.
         @rtype: str
         """
 
@@ -36,9 +46,19 @@ class Presenter(object):
         self._view= view
         model.statusChangedEvent().register(self.onModelStatusChanged)
 
-    def onModelStatusChanged(self, status):
+    def onModelStatusChanged(self, status, message):
 
-        self._view.setStatus(status)
+        self._view.setStatus(status, message)
+
+class DummyMessageComposer(IMessageComposer):
+
+    def message(self, jobs):
+        """
+        @type jobs: [pyjenkins.job.Job]
+        @return Brief message describing the job statuses.
+        @rtype: str
+        """
+        return None
 
 class StatusReader(IStatusReader):
 
@@ -63,24 +83,29 @@ class StatusReader(IStatusReader):
 class Model(IModel):
 
     def __init__(self, jobsModel,
+                 messageComposer=DummyMessageComposer(),
                  statusReader=StatusReader(),
                  statusChangedEvent=Event()):
         """
         @type statusReader: trayjenkins.jobs.IModel
         @type statusReader: trayjenkins.status.IStatusReader
         """
+        self._messageComposer = messageComposer
         self._statusReader = statusReader
         self._statusChangedEvent = statusChangedEvent
-        self._status = JobStatus.UNKNOWN
+        self._lastStatus = JobStatus.UNKNOWN
+        self._lastMessage = None
         
         jobsModel.jobsUpdatedEvent().register(self.onJobsUpdated)
 
     def onJobsUpdated(self, jobs):
 
-        newStatus = self._statusReader.status(jobs)
-        if newStatus is not self._status:
-            self._statusChangedEvent.fire(newStatus)
-            self._status = newStatus
+        status = self._statusReader.status(jobs)
+        message = self._messageComposer.message(jobs)
+        if self._lastStatus != status or self._lastMessage != message:
+            self._statusChangedEvent.fire(status, message)
+        self._lastStatus = status
+        self._lastMessage = message
 
     def statusChangedEvent(self):
         """

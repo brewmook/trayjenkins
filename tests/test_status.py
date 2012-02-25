@@ -3,7 +3,7 @@ from unittest import TestCase
 
 from trayjenkins.event import Event, IEvent
 from trayjenkins.jobs import IModel as JobsModel
-from trayjenkins.status import IStatusReader, IView, IModel, Presenter, Model, StatusReader
+from trayjenkins.status import IMessageComposer, IStatusReader, IView, IModel, Presenter, Model, StatusReader
 from pyjenkins.interfaces import IJenkins
 from pyjenkins.job import Job, JobStatus
 
@@ -18,12 +18,12 @@ class StatusPresenterTests(TestCase):
         event= Event()
 
         model.statusChangedEvent().AndReturn(event)
-        view.setStatus('some status string')
+        view.setStatus('some status string', 'status message')
 
         mocks.ReplayAll()
 
         presenter= Presenter(model, view)
-        event.fire('some status string')
+        event.fire('some status string', 'status message')
 
         mox.Verify(view)
 
@@ -32,6 +32,7 @@ class StatusModelTests(TestCase):
     def setUp(self):
 
         self.mocks = mox.Mox()
+        self.messageComposer = self.mocks.CreateMock(IMessageComposer)
         self.statusReader = self.mocks.CreateMock(IStatusReader)
         self.statusEvent = self.mocks.CreateMock(IEvent)
         self.jobsModel = self.mocks.CreateMock(JobsModel)
@@ -39,83 +40,81 @@ class StatusModelTests(TestCase):
         self.jobsModel.jobsUpdatedEvent().AndReturn(self.jobsEvent)
         self.jobs = [Job('who', 'cares?')]
 
-    def test_updateStatus_JobsModelFiresFirstJobsUpdatedEventAndNewStatusIsFailing_StatusChangedEventFired(self):
+    def test_updateStatus_JobsModelFiresFirstUpdateEventStatusUnknownAndMessageNone_StatusChangedEventNotFired(self):
 
-        self.statusReader.status(self.jobs).AndReturn(JobStatus.FAILING)
-        self.statusEvent.fire(JobStatus.FAILING)
-        self.mocks.ReplayAll()
-
-        model= Model(self.jobsModel, self.statusReader, self.statusEvent)
-
-        self.jobsEvent.fire(self.jobs)
-
-        mox.Verify(self.statusEvent)
-
-    def test_updateStatus_JobsModelFiresFirstJobsUpdatedEventAndNewStatusIsOk_StatusChangedEventFired(self):
-    
-        self.statusReader.status(self.jobs).AndReturn(JobStatus.OK)
-        self.statusEvent.fire(JobStatus.OK)
-        self.mocks.ReplayAll()
-    
-        model= Model(self.jobsModel, self.statusReader, self.statusEvent)
-    
-        self.jobsEvent.fire(self.jobs)
-    
-        mox.Verify(self.statusEvent)
-    
-    def test_updateStatus_JobsModelFiresFirstJobsUpdatedEventAndNewStatusIsUnknown_StatusChangedEventNotFired(self):
-    
+        self.messageComposer.message(self.jobs).AndReturn(None)
         self.statusReader.status(self.jobs).AndReturn(JobStatus.UNKNOWN)
         self.mocks.ReplayAll()
-    
-        model= Model(self.jobsModel, self.statusReader, self.statusEvent)
-    
+
+        model= Model(self.jobsModel, self.messageComposer, self.statusReader, self.statusEvent)
+
         self.jobsEvent.fire(self.jobs)
-    
+
         mox.Verify(self.statusEvent)
-    
-    def test_updateStatus_JobsModelFiresTwoJobsUpdatedEventsBothWithStatusOfFailing_StatusChangedEventFiredOnceWithFailing(self):
-    
+
+    def test_updateStatus_JobsModelFiresFirstUpdateEvent_StatusChangedEventFired(self):
+
+        self.messageComposer.message(self.jobs).AndReturn('message')
+        self.statusReader.status(self.jobs).AndReturn(JobStatus.FAILING)
+        self.statusEvent.fire(JobStatus.FAILING, 'message')
+        self.mocks.ReplayAll()
+
+        model= Model(self.jobsModel, self.messageComposer, self.statusReader, self.statusEvent)
+
+        self.jobsEvent.fire(self.jobs)
+
+        mox.Verify(self.statusEvent)
+
+    def test_updateStatus_TwoJobsModelUpdatesWithSameStatusAndMessage_StatusChangedEventFiredOnce(self):
+
+        self.messageComposer.message(self.jobs).AndReturn('message')
+        self.messageComposer.message(self.jobs).AndReturn('message')
         self.statusReader.status(self.jobs).AndReturn(JobStatus.FAILING)
         self.statusReader.status(self.jobs).AndReturn(JobStatus.FAILING)
-        self.statusEvent.fire(JobStatus.FAILING)
+        self.statusEvent.fire(JobStatus.FAILING, 'message')
         self.mocks.ReplayAll()
-    
-        model= Model(self.jobsModel, self.statusReader, self.statusEvent)
-    
+
+        model= Model(self.jobsModel, self.messageComposer, self.statusReader, self.statusEvent)
+
         self.jobsEvent.fire(self.jobs)
         self.jobsEvent.fire(self.jobs)
-    
+
         mox.Verify(self.statusEvent)
-    
-    def test_updateStatus_JobsModelFiresTwoJobsUpdatedEventsBothWithStatusOfOk_StatusChangedEventFiredOnceWithOk(self):
-    
-        self.statusReader.status(self.jobs).AndReturn(JobStatus.OK)
-        self.statusReader.status(self.jobs).AndReturn(JobStatus.OK)
-        self.statusEvent.fire(JobStatus.OK)
-        self.mocks.ReplayAll()
-    
-        model= Model(self.jobsModel, self.statusReader, self.statusEvent)
-    
-        self.jobsEvent.fire(self.jobs)
-        self.jobsEvent.fire(self.jobs)
-    
-        mox.Verify(self.statusEvent)
-    
-    def test_updateStatus_JobsModelFiresTwoJobsUpdatedEventsWithStatusOfFailingThenOk_StatusChangedEventFiredOnceWithFailingOnceWithOk(self):
-    
+
+    def test_updateStatus_TwoJobsModelUpdatesWithDifferentStatus_StatusChangedEventFiredTwice(self):
+
+        self.messageComposer.message(self.jobs).AndReturn('message')
+        self.messageComposer.message(self.jobs).AndReturn('message')
         self.statusReader.status(self.jobs).AndReturn(JobStatus.FAILING)
         self.statusReader.status(self.jobs).AndReturn(JobStatus.OK)
-        self.statusEvent.fire(JobStatus.FAILING)
-        self.statusEvent.fire(JobStatus.OK)
+        self.statusEvent.fire(JobStatus.FAILING, 'message')
+        self.statusEvent.fire(JobStatus.OK, 'message')
         self.mocks.ReplayAll()
-    
-        model= Model(self.jobsModel, self.statusReader, self.statusEvent)
-    
+
+        model= Model(self.jobsModel, self.messageComposer, self.statusReader, self.statusEvent)
+
         self.jobsEvent.fire(self.jobs)
         self.jobsEvent.fire(self.jobs)
-    
+
         mox.Verify(self.statusEvent)
+
+    def test_updateStatus_TwoJobsModelUpdatesWithDifferentMessage_StatusChangedEventFiredTwice(self):
+
+        self.messageComposer.message(self.jobs).AndReturn('message one')
+        self.messageComposer.message(self.jobs).AndReturn('message two')
+        self.statusReader.status(self.jobs).AndReturn(JobStatus.FAILING)
+        self.statusReader.status(self.jobs).AndReturn(JobStatus.FAILING)
+        self.statusEvent.fire(JobStatus.FAILING, 'message one')
+        self.statusEvent.fire(JobStatus.FAILING, 'message two')
+        self.mocks.ReplayAll()
+
+        model= Model(self.jobsModel, self.messageComposer, self.statusReader, self.statusEvent)
+
+        self.jobsEvent.fire(self.jobs)
+        self.jobsEvent.fire(self.jobs)
+
+        mox.Verify(self.statusEvent)
+
 
 class StatusReaderTests(TestCase):
 
