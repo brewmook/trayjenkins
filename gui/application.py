@@ -28,7 +28,7 @@ class MainWindow(QtGui.QDialog):
         mainLayout.addWidget(self.jobsView)
         self.setLayout(mainLayout)
 
-        self.jobsUpdateTimer = gui.jobs.UpdateTimer(self.jobsModel, 5, self)
+        self.jobsUpdateTimer = gui.jobs.UpdateTimer(self.jobsModel, 15, self)
 
         self.setWindowTitle("TrayJenkins (%s)" % __version__)
         self.resize(640, 480)
@@ -59,6 +59,7 @@ class MainWindow(QtGui.QDialog):
         self.trayIcon = QtGui.QSystemTrayIcon(self)
         self.trayIcon.setContextMenu(self.trayMenu)
         self.trayIcon.messageClicked.connect(self.onTrayIconMessageClicked)
+        self.trayIcon.activated.connect(self.onTrayIconActivated)
 
         view = gui.status.MultiView([gui.status.TrayIconView(self.trayIcon, mediaFiles),
                                      gui.status.SoundView(self, mediaFiles)])
@@ -71,6 +72,11 @@ class MainWindow(QtGui.QDialog):
 
     def onTrayIconMessageClicked(self):
         QtGui.QDesktopServices.openUrl(self.homeUrl)
+
+    def onTrayIconActivated(self, reason):
+        if reason in (QtGui.QSystemTrayIcon.Trigger, QtGui.QSystemTrayIcon.DoubleClick):
+            self.showControlsAction.trigger()
+
 
 class Application(QtGui.QDialog):
 
