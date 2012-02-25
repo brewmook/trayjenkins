@@ -2,7 +2,7 @@ from PySide import QtCore, QtGui
 from trayjenkins.jobs import IView
 from pyjenkins.job import JobStatus
 
-class JobsListView(QtGui.QGroupBox, IView):
+class ListView(QtGui.QGroupBox, IView):
 
     def __init__(self, mediaFiles):
         """
@@ -30,7 +30,7 @@ class JobsListView(QtGui.QGroupBox, IView):
             self._jobs.addItem(QtGui.QListWidgetItem(self._icons[job.status],
                                                      job.name))
 
-class JobsUpdateTimer(QtCore.QObject):
+class UpdateTimer(QtCore.QObject):
 
     def __init__(self, jobsModel, seconds, parent=None):
         """

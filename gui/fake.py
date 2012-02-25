@@ -2,7 +2,7 @@ from trayjenkins.event import Event
 from trayjenkins.jobs import IModel
 from pyjenkins.job import Job, JobStatus
 
-class FakeJobsModel(IModel):
+class JobsModel(IModel):
 
     def __init__(self):
         self._jobsUpdatedEvent = Event()

@@ -2,10 +2,12 @@ import os
 import sys
 from optparse import OptionParser
 from PySide import QtGui
-from gui.fake import FakeJobsModel
-from gui.jobs import JobsListView, JobsUpdateTimer
-from gui.media import MediaFiles
-from gui.status import TrayIconView, SoundView, MultiView
+
+import gui.fake
+import gui.jobs
+import gui.media
+import gui.status
+
 from trayjenkins.jobs import Model as JobsModel, Presenter as JobsPresenter
 from trayjenkins.status import Model as StatusModel, StatusReader, Presenter as StatusPresenter
 from pyjenkins.server import Server
@@ -24,7 +26,7 @@ class MainWindow(QtGui.QDialog):
         mainLayout.addWidget(self.jobsView)
         self.setLayout(mainLayout)
 
-        self.jobsUpdateTimer = JobsUpdateTimer(self.jobsModel, 5, self)
+        self.jobsUpdateTimer = gui.jobs.UpdateTimer(self.jobsModel, 5, self)
 
         self.setWindowTitle("TrayJenkins (%s)" % __version__)
         self.resize(640, 480)
@@ -32,11 +34,11 @@ class MainWindow(QtGui.QDialog):
     def createJobsMVP(self, jenkinsHost, mediaFiles):
 
         if jenkinsHost == 'FAKE':
-            self.jobsModel = FakeJobsModel()
+            self.jobsModel = gui.fake.JobsModel()
         else:
             self.jobsModel = JobsModel(Server(jenkinsHost, '', ''))
 
-        self.jobsView = JobsListView(mediaFiles)
+        self.jobsView = gui.jobs.ListView(mediaFiles)
         self.jobsPresenter = JobsPresenter(self.jobsModel, self.jobsView)
 
     def createActions(self):
@@ -53,8 +55,8 @@ class MainWindow(QtGui.QDialog):
         self.trayIcon = QtGui.QSystemTrayIcon(self)
         self.trayIcon.setContextMenu(self.trayMenu)
 
-        view = MultiView([TrayIconView(self.trayIcon, mediaFiles),
-                          SoundView(self, mediaFiles)])
+        view = gui.status.MultiView([gui.status.TrayIconView(self.trayIcon, mediaFiles),
+                                     gui.status.SoundView(self, mediaFiles)])
         self.statusModel = StatusModel(self.jobsModel, StatusReader())
         self.statusPresenter = StatusPresenter(self.statusModel, view)
 
@@ -72,7 +74,7 @@ class Application(QtGui.QDialog):
     def run(self):
 
         jenkinsHost = self.parseOptions()
-        mediaFiles = MediaFiles(self.executablePath())
+        mediaFiles = gui.media.MediaFiles(self.executablePath())
 
         window = MainWindow(jenkinsHost, mediaFiles)
 
@@ -100,4 +102,3 @@ class Application(QtGui.QDialog):
             path = os.path.abspath(".")
             
         return path
-
