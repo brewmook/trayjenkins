@@ -2,15 +2,43 @@ from PySide import QtCore, QtGui
 from trayjenkins.jobs import IView
 from pyjenkins.job import JobStatus
 
+class ListWithContextMenu(QtGui.QListWidget):
+
+    def __init__(self, actions, parent=0):
+        """
+        @type actions: {str => PySide.QtGui.QAction}
+        """
+        super(ListWithContextMenu, self).__init__(parent)
+        self._actions = actions
+
+    def contextMenuEvent(self, event):
+        """
+        @type event: PySide.QtGui.QContextMenuEvent
+        """
+        if self.itemAt(event.pos()) is not None:
+            menu = self._buildContextMenu()
+            menu.popup(self.mapToGlobal(event.pos()))
+
+    def _buildContextMenu(self):
+
+        menu = QtGui.QMenu(self)
+        for action in self._actions:
+            menu.addAction(self._actions[action])
+        return menu
+
+
 class ListView(QtGui.QGroupBox, IView):
 
-    def __init__(self, mediaFiles):
+    def __init__(self, mediaFiles, ignoreJobsFilter):
         """
         @type mediaFiles: gui.media.MediaFiles
         """
         QtGui.QGroupBox.__init__(self, "Jobs")
 
-        self._jobs = QtGui.QListWidget()
+        self._actions = { 'Ignore': QtGui.QAction('Ignore', self, triggered=self.ignoreJob) }
+
+        self._jobs = ListWithContextMenu(self._actions, self)
+        self._ignoreJobsFilter = ignoreJobsFilter
         self._icons = {
             JobStatus.DISABLED: mediaFiles.disabledIcon(),
             JobStatus.FAILING:  mediaFiles.failingIcon(),
@@ -22,6 +50,12 @@ class ListView(QtGui.QGroupBox, IView):
         layout.addWidget(self._jobs)
         self.setLayout(layout)
 
+    def ignoreJob(self):
+
+        item = self._jobs.currentItem()
+        if item is not None:
+            self._ignoreJobsFilter.ignore(item.text())
+        
     def setJobs(self, jobs):
         """
         @type jobs: [pyjenkins.job.Job]

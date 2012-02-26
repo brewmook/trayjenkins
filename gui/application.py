@@ -57,7 +57,7 @@ class MainWindow(QtGui.QDialog):
         self.ignoreJobsFilter = IgnoreJobsFilter()
 
         self.createActions()
-        self.createJobsMVP(jenkinsHost, mediaFiles)
+        self.createJobsMVP(jenkinsHost, mediaFiles, self.ignoreJobsFilter)
 
         self.trayIcon = TrayIcon(self,
                                  mediaFiles,
@@ -76,7 +76,7 @@ class MainWindow(QtGui.QDialog):
         self.setWindowTitle("TrayJenkins (%s)" % __version__)
         self.resize(640, 480)
 
-    def createJobsMVP(self, jenkinsHost, mediaFiles):
+    def createJobsMVP(self, jenkinsHost, mediaFiles, ignoreJobsFilter):
 
         if jenkinsHost == 'FAKE':
             self.jobsModel = gui.fake.JobsModel()
@@ -85,7 +85,7 @@ class MainWindow(QtGui.QDialog):
             self.jobsModel = JobsModel(Server(jenkinsHost, '', ''))
             self.jenkinsUrl = QtCore.QUrl(jenkinsHost)
 
-        self.jobsView = gui.jobs.ListView(mediaFiles)
+        self.jobsView = gui.jobs.ListView(mediaFiles, ignoreJobsFilter)
         self.jobsPresenter = JobsPresenter(self.jobsModel, self.jobsView)
 
     def createActions(self):
