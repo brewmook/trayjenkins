@@ -122,7 +122,8 @@ class StatusReaderTests(TestCase):
 
         jobs = [Job('eric', JobStatus.UNKNOWN),
                 Job('john', JobStatus.FAILING),
-                Job('terry', JobStatus.OK)]
+                Job('terry', JobStatus.OK),
+                Job('graham', JobStatus.DISABLED)]
 
         reader = StatusReader()
         result = reader.status(jobs)
@@ -132,7 +133,8 @@ class StatusReaderTests(TestCase):
     def test_status_NoFailingJobs_ReturnOk(self):
 
         jobs = [Job('eric', JobStatus.UNKNOWN),
-                Job('terry', JobStatus.OK)]
+                Job('terry', JobStatus.OK),
+                Job('graham', JobStatus.DISABLED)]
 
         reader = StatusReader()
         result = reader.status(jobs)

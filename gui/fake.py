@@ -10,7 +10,7 @@ class JobsModel(IModel):
         self.jobsRota = [[Job('spam', JobStatus.OK),
                           Job('eggs', JobStatus.OK)],
                          [Job('spam', JobStatus.FAILING),
-                          Job('eggs', JobStatus.OK)],
+                          Job('eggs', JobStatus.DISABLED)],
                         ]
         self.nextJobs = 0
 
