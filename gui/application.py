@@ -8,7 +8,7 @@ import gui.jobs
 import gui.media
 import gui.status
 
-from trayjenkins.jobs import Model as JobsModel, Presenter as JobsPresenter
+from trayjenkins.jobs import Model as JobsModel, Presenter as JobsPresenter, IgnoreJobsFilter
 from trayjenkins.status import Model as StatusModel, Presenter as StatusPresenter
 from pyjenkins.job import JobStatus
 from pyjenkins.server import Server
@@ -16,7 +16,7 @@ from trayjenkins import __version__
 
 class TrayIcon(object):
 
-    def __init__(self, parent, mediaFiles, showControlsAction, showJenkinsAction, quitAction, jobsModel):
+    def __init__(self, parent, mediaFiles, showControlsAction, showJenkinsAction, quitAction, jobsModel, ignoreJobsFilter):
 
         self.showControlsAction = showControlsAction
         self.showJenkinsAction = showJenkinsAction
@@ -35,7 +35,7 @@ class TrayIcon(object):
         trayIconViewAdapter = gui.status.TrayIconViewAdapter(trayIconView, mediaFiles)
         statusView = gui.status.MultiView([trayIconViewAdapter,
                                            gui.status.SoundView(parent, mediaFiles)])
-        self.statusModel = StatusModel(jobsModel)
+        self.statusModel = StatusModel(jobsModel, jobsFilter=ignoreJobsFilter)
         self.statusPresenter = StatusPresenter(self.statusModel, statusView)
         statusView.setStatus(JobStatus.UNKNOWN, None)
 
@@ -54,6 +54,8 @@ class MainWindow(QtGui.QDialog):
     def __init__(self, jenkinsHost, mediaFiles):
         super(MainWindow, self).__init__()
 
+        self.ignoreJobsFilter = IgnoreJobsFilter()
+
         self.createActions()
         self.createJobsMVP(jenkinsHost, mediaFiles)
 
@@ -62,7 +64,8 @@ class MainWindow(QtGui.QDialog):
                                  self.showControlsAction,
                                  self.showJenkinsAction,
                                  self.quitAction,
-                                 self.jobsModel)
+                                 self.jobsModel,
+                                 self.ignoreJobsFilter)
 
         mainLayout = QtGui.QVBoxLayout()
         mainLayout.addWidget(self.jobsView)
