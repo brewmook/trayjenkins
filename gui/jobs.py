@@ -57,12 +57,14 @@ class ListView(QtGui.QGroupBox, IView):
         item = self._jobs.currentItem()
         if item is not None:
             self._ignoreJobsFilter.ignore(item.text())
+            item.setIcon(self._ignoredIcon)
         
     def unignoreJob(self):
 
         item = self._jobs.currentItem()
         if item is not None:
             self._ignoreJobsFilter.unignore(item.text())
+            item.setIcon(self._icons[JobStatus.UNKNOWN])
         
     def setJobs(self, jobs):
         """
