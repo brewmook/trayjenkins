@@ -13,10 +13,10 @@ class TrayIconView(IView):
         self._trayIcon= trayIcon
 
         self._icons = {
-            JobStatus.FAILING:  QtGui.QIcon(mediaFiles.failingImagePath()),
-            JobStatus.OK:       QtGui.QIcon(mediaFiles.okImagePath()),
+            JobStatus.FAILING:  mediaFiles.failingIcon(),
+            JobStatus.OK:       mediaFiles.okIcon(),
             }
-        self._defaultIcon = QtGui.QIcon(mediaFiles.unknownImagePath())
+        self._defaultIcon = mediaFiles.unknownIcon()
 
         self.setStatus(JobStatus.UNKNOWN, None)
 

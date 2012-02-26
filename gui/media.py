@@ -1,21 +1,22 @@
 import os
+from PySide import QtGui
 
 class MediaFiles(object):
 
     def __init__(self, executablePath):
         self._executablePath = executablePath
 
-    def disabledImagePath(self):
-        return self._locate('media/status/disabled.png')
+    def disabledIcon(self):
+        return QtGui.QIcon(self._locate('media/status/disabled.png'))
 
-    def okImagePath(self):
-        return self._locate('media/status/ok.png')
+    def okIcon(self):
+        return QtGui.QIcon(self._locate('media/status/ok.png'))
 
-    def failingImagePath(self):
-        return self._locate('media/status/failing.png')
+    def failingIcon(self):
+        return QtGui.QIcon(self._locate('media/status/failing.png'))
 
-    def unknownImagePath(self):
-        return self._locate('media/status/unknown.png')
+    def unknownIcon(self):
+        return QtGui.QIcon(self._locate('media/status/unknown.png'))
 
     def okSoundPath(self):
         return self._locate('media/status/ok.wav')

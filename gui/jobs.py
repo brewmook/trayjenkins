@@ -12,10 +12,10 @@ class ListView(QtGui.QGroupBox, IView):
 
         self._jobs = QtGui.QListWidget()
         self._icons = {
-            JobStatus.DISABLED: QtGui.QIcon(mediaFiles.disabledImagePath()),
-            JobStatus.FAILING:  QtGui.QIcon(mediaFiles.failingImagePath()),
-            JobStatus.OK:       QtGui.QIcon(mediaFiles.okImagePath()),
-            JobStatus.UNKNOWN:  QtGui.QIcon(mediaFiles.unknownImagePath()),
+            JobStatus.DISABLED: mediaFiles.disabledIcon(),
+            JobStatus.FAILING:  mediaFiles.failingIcon(),
+            JobStatus.OK:       mediaFiles.okIcon(),
+            JobStatus.UNKNOWN:  mediaFiles.unknownIcon(),
             }
 
         layout = QtGui.QVBoxLayout()
