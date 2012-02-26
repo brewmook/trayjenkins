@@ -107,6 +107,25 @@ class NoFilter(IJobsFilter):
         return jobs
 
 
+class IgnoreJobsFilter(IJobsFilter):
+
+    def __init__(self):
+
+        self._ignores = set()
+
+    def filter(self, jobs):
+
+        return [job for job in jobs if job.name not in self._ignores]
+
+    def ignore(self, jobName):
+
+        self._ignores.add(jobName)
+
+    def unignore(self, jobName):
+
+        self._ignores.discard(jobName)
+
+
 class Model(IModel):
 
     def __init__(self,
