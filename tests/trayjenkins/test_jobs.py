@@ -5,7 +5,7 @@ from pyjenkins.job import Job, JobStatus
 from pyjenkins.server import Server
 
 from trayjenkins.event import Event, IEvent
-from trayjenkins.jobs import Presenter, IView, IModel, Model
+from trayjenkins.jobs import *
 
 class JobsPresenterTests(TestCase):
 
@@ -111,3 +111,67 @@ class JobsModelTests(TestCase):
         model = Model(server, factory, event)
 
         self.assertTrue(event is model.jobsUpdatedEvent())
+
+
+class NoFilterTests(TestCase):
+
+    def test_filter_ReturnUnmodifiedList(self):
+
+        jobs = ['list', 'of', 'jobs']
+        filter = NoFilter()
+        result = filter.filter(jobs)
+
+        self.assertTrue(jobs is result)
+
+
+class IgnoreJobsFilterTests(TestCase):
+
+    def test_filter_NothingIgnored_ReturnUnmodifiedList(self):
+
+        jobs = [Job('eric', JobStatus.FAILING),
+                Job('terry', JobStatus.FAILING)]
+
+        filter = IgnoreJobsFilter()
+        result = filter.filter(jobs)
+
+        self.assertEqual(jobs, result)
+
+    def test_filter_EricIgnored_ReturnFilteredList(self):
+
+        jobs = [Job('eric', JobStatus.FAILING),
+                Job('terry', JobStatus.FAILING)]
+
+        filter = IgnoreJobsFilter()
+        filter.ignore('terry')
+
+        expected = [Job('eric', JobStatus.FAILING)]
+        result = filter.filter(jobs)
+
+        self.assertEqual(expected, result)
+
+    def test_filter_EricAndTerryIgnored_ReturnEmptyList(self):
+
+        jobs = [Job('eric', JobStatus.FAILING),
+                Job('terry', JobStatus.FAILING)]
+
+        filter = IgnoreJobsFilter()
+        filter.ignore('eric')
+        filter.ignore('terry')
+
+        expected = []
+        result = filter.filter(jobs)
+
+        self.assertEqual(expected, result)
+
+    def test_filter_EricIgnoredThenUnignored_ReturnFilteredList(self):
+
+        jobs = [Job('eric', JobStatus.FAILING),
+                Job('terry', JobStatus.FAILING)]
+
+        filter = IgnoreJobsFilter()
+        filter.ignore('terry')
+        filter.unignore('terry')
+
+        result = filter.filter(jobs)
+
+        self.assertEqual(jobs, result)

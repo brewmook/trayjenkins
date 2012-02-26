@@ -2,7 +2,7 @@ import mox
 from unittest import TestCase
 
 from trayjenkins.event import Event, IEvent
-from trayjenkins.jobs import IModel as JobsModel
+from trayjenkins.jobs import IModel as JobsModel, IFilter
 from trayjenkins.status import *
 from pyjenkins.interfaces import IJenkins
 from pyjenkins.job import Job, JobStatus
@@ -32,7 +32,7 @@ class StatusModelTests(TestCase):
     def setUp(self):
 
         self.mocks = mox.Mox()
-        self.filter = self.mocks.CreateMock(IJobsFilter)
+        self.filter = self.mocks.CreateMock(IFilter)
         self.messageComposer = self.mocks.CreateMock(IMessageComposer)
         self.statusReader = self.mocks.CreateMock(IStatusReader)
         self.statusEvent = self.mocks.CreateMock(IEvent)
@@ -220,67 +220,3 @@ class DefaultMessageComposerTests(TestCase):
         result = composer.message(None)
 
         self.assertEqual('', result)
-
-
-class NoFilterTests(TestCase):
-
-    def test_filter_ReturnUnmodifiedList(self):
-
-        jobs = ['list', 'of', 'jobs']
-        filter = NoFilter()
-        result = filter.filter(jobs)
-
-        self.assertTrue(jobs is result)
-
-
-class IgnoreJobsFilterTests(TestCase):
-
-    def test_filter_NothingIgnored_ReturnUnmodifiedList(self):
-
-        jobs = [Job('eric', JobStatus.FAILING),
-                Job('terry', JobStatus.FAILING)]
-
-        filter = IgnoreJobsFilter()
-        result = filter.filter(jobs)
-
-        self.assertEqual(jobs, result)
-
-    def test_filter_EricIgnored_ReturnFilteredList(self):
-
-        jobs = [Job('eric', JobStatus.FAILING),
-                Job('terry', JobStatus.FAILING)]
-
-        filter = IgnoreJobsFilter()
-        filter.ignore('terry')
-
-        expected = [Job('eric', JobStatus.FAILING)]
-        result = filter.filter(jobs)
-
-        self.assertEqual(expected, result)
-
-    def test_filter_EricAndTerryIgnored_ReturnEmptyList(self):
-
-        jobs = [Job('eric', JobStatus.FAILING),
-                Job('terry', JobStatus.FAILING)]
-
-        filter = IgnoreJobsFilter()
-        filter.ignore('eric')
-        filter.ignore('terry')
-
-        expected = []
-        result = filter.filter(jobs)
-
-        self.assertEqual(expected, result)
-
-    def test_filter_EricIgnoredThenUnignored_ReturnFilteredList(self):
-
-        jobs = [Job('eric', JobStatus.FAILING),
-                Job('terry', JobStatus.FAILING)]
-
-        filter = IgnoreJobsFilter()
-        filter.ignore('terry')
-        filter.unignore('terry')
-
-        result = filter.filter(jobs)
-
-        self.assertEqual(jobs, result)

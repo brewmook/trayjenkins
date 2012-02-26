@@ -23,6 +23,14 @@ class IView(object):
         @type jobs: [pyjenkins.job.Job]
         """
 
+class IFilter(object):
+
+    def filter(self, jobs):
+        """
+        @type jobs: [pyjenkins.job.Job]
+        @rtype: [pyjenkins.job.Job]
+        """
+
 class Presenter(object):
 
     def __init__(self, model, view):
@@ -68,3 +76,27 @@ class Model(IModel):
         @rtype: trayjenkins.event.IEvent
         """
         return self._jobsUpdatedEvent
+
+class NoFilter(IFilter):
+
+    def filter(self, jobs):
+
+        return jobs
+
+class IgnoreJobsFilter(IFilter):
+
+    def __init__(self):
+
+        self._ignores = set()
+
+    def filter(self, jobs):
+
+        return [job for job in jobs if job.name not in self._ignores]
+
+    def ignore(self, jobName):
+
+        self._ignores.add(jobName)
+
+    def unignore(self, jobName):
+
+        self._ignores.discard(jobName)

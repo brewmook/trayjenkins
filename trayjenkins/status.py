@@ -1,4 +1,5 @@
 from trayjenkins.event import Event
+from trayjenkins.jobs import NoFilter
 from pyjenkins.job import JobStatus
 
 class IModel(object):
@@ -33,14 +34,6 @@ class IMessageComposer(object):
         @type jobs: [pyjenkins.job.Job]
         @return Brief message describing the job statuses.
         @rtype: str
-        """
-
-class IJobsFilter(object):
-
-    def filter(self, jobs):
-        """
-        @type jobs: [pyjenkins.job.Job]
-        @rtype: [pyjenkins.job.Job]
         """
 
 class Presenter(object):
@@ -100,32 +93,6 @@ class StatusReader(IStatusReader):
         return result
 
 
-class NoFilter(IJobsFilter):
-
-    def filter(self, jobs):
-
-        return jobs
-
-
-class IgnoreJobsFilter(IJobsFilter):
-
-    def __init__(self):
-
-        self._ignores = set()
-
-    def filter(self, jobs):
-
-        return [job for job in jobs if job.name not in self._ignores]
-
-    def ignore(self, jobName):
-
-        self._ignores.add(jobName)
-
-    def unignore(self, jobName):
-
-        self._ignores.discard(jobName)
-
-
 class Model(IModel):
 
     def __init__(self,
@@ -136,6 +103,7 @@ class Model(IModel):
                  statusChangedEvent=Event()):
         """
         @type jobsModel: trayjenkins.jobs.IModel
+        @type jobsFilter: trayjenkins.jobs.IFilter
         @type messageComposer: trayjenkins.status.IMessageComposer
         @type statusReader: trayjenkins.status.IStatusReader
         @type statusChangedEvent: trayjenkins.event.Event
