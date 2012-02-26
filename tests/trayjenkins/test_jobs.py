@@ -175,3 +175,20 @@ class IgnoreJobsFilterTests(TestCase):
         result = filter.filter(jobs)
 
         self.assertEqual(jobs, result)
+
+    def test_ignoring_JobNotIgnored_ReturnFalse(self):
+
+        filter = IgnoreJobsFilter()
+
+        result = filter.ignoring('norwegian blue')
+
+        self.assertEqual(False, result)
+
+    def test_ignoring_JobIsIgnored_ReturnTrue(self):
+
+        filter = IgnoreJobsFilter()
+        filter.ignore('norwegian blue')
+
+        result = filter.ignoring('norwegian blue')
+
+        self.assertEqual(True, result)

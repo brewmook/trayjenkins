@@ -100,3 +100,7 @@ class IgnoreJobsFilter(IFilter):
     def unignore(self, jobName):
 
         self._ignores.discard(jobName)
+
+    def ignoring(self, jobName):
+
+        return jobName in self._ignores

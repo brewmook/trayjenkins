@@ -9,11 +9,14 @@ class MediaFiles(object):
     def disabledIcon(self):
         return QtGui.QIcon(self._locate('media/status/disabled.png'))
 
-    def okIcon(self):
-        return QtGui.QIcon(self._locate('media/status/ok.png'))
-
     def failingIcon(self):
         return QtGui.QIcon(self._locate('media/status/failing.png'))
+
+    def ignoredIcon(self):
+        return QtGui.QIcon(self._locate('media/status/ignored.png'))
+
+    def okIcon(self):
+        return QtGui.QIcon(self._locate('media/status/ok.png'))
 
     def unknownIcon(self):
         return QtGui.QIcon(self._locate('media/status/unknown.png'))

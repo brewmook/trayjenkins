@@ -46,6 +46,7 @@ class ListView(QtGui.QGroupBox, IView):
             JobStatus.OK:       mediaFiles.okIcon(),
             JobStatus.UNKNOWN:  mediaFiles.unknownIcon(),
             }
+        self._ignoredIcon = mediaFiles.ignoredIcon()
 
         layout = QtGui.QVBoxLayout()
         layout.addWidget(self._jobs)
@@ -69,8 +70,11 @@ class ListView(QtGui.QGroupBox, IView):
         """
         self._jobs.clear()
         for job in jobs:
-            self._jobs.addItem(QtGui.QListWidgetItem(self._icons[job.status],
-                                                     job.name))
+            if self._ignoreJobsFilter.ignoring(job.name):
+                icon = self._ignoredIcon
+            else:
+                icon = self._icons[job.status]
+            self._jobs.addItem(QtGui.QListWidgetItem(icon, job.name))
 
 class UpdateTimer(QtCore.QObject):
 
