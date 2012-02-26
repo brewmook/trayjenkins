@@ -2,21 +2,35 @@ from PySide import QtCore, QtGui
 from trayjenkins.jobs import IView
 from pyjenkins.job import JobStatus
 
-class MenuFactory(object):
-
-    def __init__(self, actions):
-        """
-        @type actions: {str => PySide.QtGui.QAction}
-        """
-        self._actions = actions
+class _QMenuFactory(object):
 
     def create(self, parentWidget):
         """
         @type parentWidget: PySide.QtGui.Widget
         """
-        menu = QtGui.QMenu(parentWidget)
-        for action in self._actions:
-            menu.addAction(self._actions[action])
+        return QtGui.QMenu(parentWidget)
+
+class ContextSensitiveMenuFactory(object):
+
+    def __init__(self, actions, ignoreJobsFilter, menuFactory=_QMenuFactory()):
+        """
+        @type actions: {str => PySide.QtGui.QAction}
+        @type ignoreJobsFilter: trayjenkins.jobs.IgnoreJobsFilter
+        @type menuFactory: _QMenuFactory
+        """
+        self._actions = actions
+        self._ignoreJobsFilter = ignoreJobsFilter
+        self._menuFactory = menuFactory
+
+    def create(self, parentWidget, itemText):
+        """
+        @type parentWidget: PySide.QtGui.Widget
+        """
+        menu = self._menuFactory.create(parentWidget)
+        if self._ignoreJobsFilter.ignoring(itemText):
+            menu.addAction(self._actions['Cancel ignore'])
+        else:
+            menu.addAction(self._actions['Ignore'])
         return menu
 
 
@@ -33,8 +47,9 @@ class ListWithContextMenu(QtGui.QListWidget):
         """
         @type event: PySide.QtGui.QContextMenuEvent
         """
-        if self.itemAt(event.pos()) is not None:
-            menu = self._menuFactory.create(self)
+        item = self.itemAt(event.pos())
+        if item is not None:
+            menu = self._menuFactory.create(self, item.text())
             menu.popup(self.mapToGlobal(event.pos()))
 
 
@@ -43,13 +58,14 @@ class ListView(QtGui.QGroupBox, IView):
     def __init__(self, mediaFiles, ignoreJobsFilter):
         """
         @type mediaFiles: gui.media.MediaFiles
+        @type ignoreJobsFilter: trayjenkins.jobs.IgnoreJobsFilter
         """
         QtGui.QGroupBox.__init__(self, "Jobs")
 
-        self._actions = { 'Ignore': QtGui.QAction('Ignore', self, triggered=self.ignoreJob),
-                          'Cancel ignore': QtGui.QAction('Cancel ignore', self, triggered=self.unignoreJob) }
+        actions = { 'Ignore': QtGui.QAction('Ignore', self, triggered=self.ignoreJob),
+                    'Cancel ignore': QtGui.QAction('Cancel ignore', self, triggered=self.unignoreJob) }
 
-        menuFactory = MenuFactory(self._actions)
+        menuFactory = ContextSensitiveMenuFactory(actions, ignoreJobsFilter)
         self._jobs = ListWithContextMenu(menuFactory, self)
         self._ignoreJobsFilter = ignoreJobsFilter
         self._icons = {
