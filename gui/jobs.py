@@ -2,29 +2,40 @@ from PySide import QtCore, QtGui
 from trayjenkins.jobs import IView
 from pyjenkins.job import JobStatus
 
-class ListWithContextMenu(QtGui.QListWidget):
+class MenuFactory(object):
 
-    def __init__(self, actions, parent=0):
+    def __init__(self, actions):
         """
         @type actions: {str => PySide.QtGui.QAction}
         """
-        super(ListWithContextMenu, self).__init__(parent)
         self._actions = actions
+
+    def create(self, parentWidget):
+        """
+        @type parentWidget: PySide.QtGui.Widget
+        """
+        menu = QtGui.QMenu(parentWidget)
+        for action in self._actions:
+            menu.addAction(self._actions[action])
+        return menu
+
+
+class ListWithContextMenu(QtGui.QListWidget):
+
+    def __init__(self, menuFactory, parent=0):
+        """
+        @type menuFactory: MenuFactory
+        """
+        super(ListWithContextMenu, self).__init__(parent)
+        self._menuFactory = menuFactory
 
     def contextMenuEvent(self, event):
         """
         @type event: PySide.QtGui.QContextMenuEvent
         """
         if self.itemAt(event.pos()) is not None:
-            menu = self._buildContextMenu()
+            menu = self._menuFactory.create(self)
             menu.popup(self.mapToGlobal(event.pos()))
-
-    def _buildContextMenu(self):
-
-        menu = QtGui.QMenu(self)
-        for action in self._actions:
-            menu.addAction(self._actions[action])
-        return menu
 
 
 class ListView(QtGui.QGroupBox, IView):
@@ -38,7 +49,8 @@ class ListView(QtGui.QGroupBox, IView):
         self._actions = { 'Ignore': QtGui.QAction('Ignore', self, triggered=self.ignoreJob),
                           'Cancel ignore': QtGui.QAction('Cancel ignore', self, triggered=self.unignoreJob) }
 
-        self._jobs = ListWithContextMenu(self._actions, self)
+        menuFactory = MenuFactory(self._actions)
+        self._jobs = ListWithContextMenu(menuFactory, self)
         self._ignoreJobsFilter = ignoreJobsFilter
         self._icons = {
             JobStatus.DISABLED: mediaFiles.disabledIcon(),
