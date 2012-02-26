@@ -14,6 +14,41 @@ from pyjenkins.job import JobStatus
 from pyjenkins.server import Server
 from trayjenkins import __version__
 
+class TrayIcon(object):
+
+    def __init__(self, parent, mediaFiles, showControlsAction, showJenkinsAction, quitAction, jobsModel):
+
+        self.showControlsAction = showControlsAction
+        self.showJenkinsAction = showJenkinsAction
+
+        self.trayMenu = QtGui.QMenu(parent)
+        self.trayMenu.addAction(showControlsAction)
+        self.trayMenu.addAction(showJenkinsAction)
+        self.trayMenu.addAction(quitAction)
+
+        self.trayIcon = QtGui.QSystemTrayIcon(parent)
+        self.trayIcon.setContextMenu(self.trayMenu)
+        self.trayIcon.messageClicked.connect(self.onMessageClicked)
+        self.trayIcon.activated.connect(self.onActivated)
+
+        trayIconView = gui.status.TrayIconView(self.trayIcon)
+        trayIconViewAdapter = gui.status.TrayIconViewAdapter(trayIconView, mediaFiles)
+        statusView = gui.status.MultiView([trayIconViewAdapter,
+                                           gui.status.SoundView(parent, mediaFiles)])
+        self.statusModel = StatusModel(jobsModel)
+        self.statusPresenter = StatusPresenter(self.statusModel, statusView)
+        statusView.setStatus(JobStatus.UNKNOWN, None)
+
+        self.trayIcon.show()
+
+    def onActivated(self, reason):
+        if reason in (QtGui.QSystemTrayIcon.Trigger, QtGui.QSystemTrayIcon.DoubleClick):
+            self.showControlsAction.trigger()
+
+    def onMessageClicked(self):
+        self.showJenkinsAction.trigger()
+
+
 class MainWindow(QtGui.QDialog):
 
     def __init__(self, jenkinsHost, mediaFiles):
@@ -21,9 +56,13 @@ class MainWindow(QtGui.QDialog):
 
         self.createActions()
         self.createJobsMVP(jenkinsHost, mediaFiles)
-        self.createTrayIcon(mediaFiles)
 
-        self.trayIcon.show()
+        self.trayIcon = TrayIcon(self,
+                                 mediaFiles,
+                                 self.showControlsAction,
+                                 self.showJenkinsAction,
+                                 self.quitAction,
+                                 self.jobsModel)
 
         mainLayout = QtGui.QVBoxLayout()
         mainLayout.addWidget(self.jobsView)
@@ -52,36 +91,12 @@ class MainWindow(QtGui.QDialog):
         self.showControlsAction = QtGui.QAction("Show &Controls", self, triggered=self.showNormal)
         self.showJenkinsAction = QtGui.QAction("Show &Jenkins", self, triggered=self.openJenkinsUrl)
 
-    def createTrayIcon(self, mediaFiles):
-
-        self.trayMenu = QtGui.QMenu(self)
-        self.trayMenu.addAction(self.showControlsAction)
-        self.trayMenu.addAction(self.showJenkinsAction)
-        self.trayMenu.addAction(self.quitAction)
-
-        self.trayIcon = QtGui.QSystemTrayIcon(self)
-        self.trayIcon.setContextMenu(self.trayMenu)
-        self.trayIcon.messageClicked.connect(self.openJenkinsUrl)
-        self.trayIcon.activated.connect(self.onTrayIconActivated)
-
-        trayIconView = gui.status.TrayIconView(self.trayIcon)
-        trayIconViewAdapter = gui.status.TrayIconViewAdapter(trayIconView, mediaFiles)
-        statusView = gui.status.MultiView([trayIconViewAdapter,
-                                           gui.status.SoundView(self, mediaFiles)])
-        self.statusModel = StatusModel(self.jobsModel)
-        self.statusPresenter = StatusPresenter(self.statusModel, statusView)
-        statusView.setStatus(JobStatus.UNKNOWN, None)
-
     def closeEvent(self, event):
         self.hide()
         event.ignore()
 
     def openJenkinsUrl(self):
         QtGui.QDesktopServices.openUrl(self.jenkinsUrl)
-
-    def onTrayIconActivated(self, reason):
-        if reason in (QtGui.QSystemTrayIcon.Trigger, QtGui.QSystemTrayIcon.DoubleClick):
-            self.showControlsAction.trigger()
 
 
 class Application(QtGui.QDialog):
