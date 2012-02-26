@@ -5,6 +5,9 @@ class MediaFiles(object):
     def __init__(self, executablePath):
         self._executablePath = executablePath
 
+    def disabledImagePath(self):
+        return self._locate('media/status/disabled.png')
+
     def okImagePath(self):
         return self._locate('media/status/ok.png')
 

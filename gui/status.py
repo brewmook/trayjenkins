@@ -13,11 +13,10 @@ class TrayIconView(IView):
         self._trayIcon= trayIcon
 
         self._icons = {
-            JobStatus.DISABLED: QtGui.QIcon(mediaFiles.unknownImagePath()),
             JobStatus.FAILING:  QtGui.QIcon(mediaFiles.failingImagePath()),
             JobStatus.OK:       QtGui.QIcon(mediaFiles.okImagePath()),
-            JobStatus.UNKNOWN:  QtGui.QIcon(mediaFiles.unknownImagePath()),
             }
+        self._defaultIcon = QtGui.QIcon(mediaFiles.unknownImagePath())
 
         self.setStatus(JobStatus.UNKNOWN, None)
 
@@ -25,7 +24,7 @@ class TrayIconView(IView):
         """
         @type status: str
         """
-        self._trayIcon.setIcon(self._icons[status])
+        self._trayIcon.setIcon(self._icons.get(status, self._defaultIcon))
         self._trayIcon.setToolTip(status.capitalize())
         
         self._trayIcon.showMessage(unicode("Jenkins status change"),
