@@ -35,7 +35,8 @@ class ListView(QtGui.QGroupBox, IView):
         """
         QtGui.QGroupBox.__init__(self, "Jobs")
 
-        self._actions = { 'Ignore': QtGui.QAction('Ignore', self, triggered=self.ignoreJob) }
+        self._actions = { 'Ignore': QtGui.QAction('Ignore', self, triggered=self.ignoreJob),
+                          'Cancel ignore': QtGui.QAction('Cancel ignore', self, triggered=self.unignoreJob) }
 
         self._jobs = ListWithContextMenu(self._actions, self)
         self._ignoreJobsFilter = ignoreJobsFilter
@@ -55,6 +56,12 @@ class ListView(QtGui.QGroupBox, IView):
         item = self._jobs.currentItem()
         if item is not None:
             self._ignoreJobsFilter.ignore(item.text())
+        
+    def unignoreJob(self):
+
+        item = self._jobs.currentItem()
+        if item is not None:
+            self._ignoreJobsFilter.unignore(item.text())
         
     def setJobs(self, jobs):
         """
