@@ -4,7 +4,6 @@ from unittest import TestCase
 from trayjenkins.event import Event, IEvent
 from trayjenkins.jobs import IModel as JobsModel, IFilter
 from trayjenkins.status import *
-from pyjenkins.interfaces import IJenkins
 from pyjenkins.job import Job, JobStatus
 
 class StatusPresenterTests(TestCase):

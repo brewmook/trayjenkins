@@ -1,6 +1,7 @@
 import mox
 from unittest import TestCase
-from pyjenkins.interfaces import IJenkins, IJenkinsFactory
+from pyjenkins.interfaces import IJenkinsFactory
+from pyjenkins.jenkins import Jenkins
 from pyjenkins.job import Job, JobStatus
 from pyjenkins.server import Server
 
@@ -34,7 +35,7 @@ class JobsModelTests(TestCase):
     def test_updateJobs_FirstCall_FireJobsUpdatedEventWithRetrievedJobs(self):
 
         mocks = mox.Mox()
-        jenkins = mocks.CreateMock(IJenkins)
+        jenkins = mocks.CreateMock(Jenkins)
         factory = mocks.CreateMock(IJenkinsFactory)
         event = mocks.CreateMock(IEvent)
 
@@ -54,7 +55,7 @@ class JobsModelTests(TestCase):
     def test_updateJobs_SecondCallReturnsSameJobs_JobsUpdatedEventNotFiredOnceOnly(self):
 
         mocks = mox.Mox()
-        jenkins = mocks.CreateMock(IJenkins)
+        jenkins = mocks.CreateMock(Jenkins)
         factory = mocks.CreateMock(IJenkinsFactory)
         event = mocks.CreateMock(IEvent)
 
@@ -76,7 +77,7 @@ class JobsModelTests(TestCase):
     def test_updateJobs_SecondCallReturnsDifferentJobs_JobsUpdatedEventFiredForEachResult(self):
 
         mocks = mox.Mox()
-        jenkins = mocks.CreateMock(IJenkins)
+        jenkins = mocks.CreateMock(Jenkins)
         factory = mocks.CreateMock(IJenkinsFactory)
         event = mocks.CreateMock(IEvent)
 
