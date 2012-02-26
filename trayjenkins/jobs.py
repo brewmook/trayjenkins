@@ -65,7 +65,7 @@ class Model(IModel):
         """
         @rtype: None
         """
-        jobs = self._jenkins.listJobs()
+        jobs = self._jenkins.list_jobs()
         if self.jobs != jobs:
             self.jobs = jobs
             self._jobsUpdatedEvent.fire(jobs)

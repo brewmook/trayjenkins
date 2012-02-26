@@ -41,7 +41,7 @@ class JobsModelTests(TestCase):
         server = Server('host', 'uname', 'pw')
         jobs = [Job('job1', JobStatus.OK), Job('job2', JobStatus.FAILING)]
         factory.create(server).AndReturn(jenkins)
-        jenkins.listJobs().AndReturn(jobs)
+        jenkins.list_jobs().AndReturn(jobs)
         event.fire(jobs)
 
         mocks.ReplayAll()
@@ -61,8 +61,8 @@ class JobsModelTests(TestCase):
         server = Server('host', 'uname', 'pw')
         jobs = [Job('job1', JobStatus.OK), Job('job2', JobStatus.FAILING)]
         factory.create(server).AndReturn(jenkins)
-        jenkins.listJobs().AndReturn(jobs)
-        jenkins.listJobs().AndReturn(jobs)
+        jenkins.list_jobs().AndReturn(jobs)
+        jenkins.list_jobs().AndReturn(jobs)
         event.fire(jobs)
 
         mocks.ReplayAll()
@@ -84,8 +84,8 @@ class JobsModelTests(TestCase):
         jobsOne = [Job('job1', JobStatus.OK), Job('job2', JobStatus.FAILING)]
         jobsTwo = [Job('job1', JobStatus.OK), Job('job2', JobStatus.OK)]
         factory.create(server).AndReturn(jenkins)
-        jenkins.listJobs().AndReturn(jobsOne)
-        jenkins.listJobs().AndReturn(jobsTwo)
+        jenkins.list_jobs().AndReturn(jobsOne)
+        jenkins.list_jobs().AndReturn(jobsTwo)
         event.fire(jobsOne)
         event.fire(jobsTwo)
 
