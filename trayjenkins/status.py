@@ -35,6 +35,14 @@ class IMessageComposer(object):
         @rtype: str
         """
 
+class IJobsFilter(object):
+
+    def filter(self, jobs):
+        """
+        @type jobs: [pyjenkins.job.Job]
+        @rtype: [pyjenkins.job.Job]
+        """
+
 class Presenter(object):
 
     def __init__(self, model, view):
@@ -91,16 +99,29 @@ class StatusReader(IStatusReader):
 
         return result
 
+
+class NoFilter(IJobsFilter):
+
+    def filter(self, jobs):
+
+        return jobs
+
+
 class Model(IModel):
 
-    def __init__(self, jobsModel,
+    def __init__(self,
+                 jobsModel,
+                 jobsFilter=NoFilter(),
                  messageComposer=DefaultMessageComposer(),
                  statusReader=StatusReader(),
                  statusChangedEvent=Event()):
         """
-        @type statusReader: trayjenkins.jobs.IModel
+        @type jobsModel: trayjenkins.jobs.IModel
+        @type messageComposer: trayjenkins.status.IMessageComposer
         @type statusReader: trayjenkins.status.IStatusReader
+        @type statusChangedEvent: trayjenkins.event.Event
         """
+        self._jobsFilter = jobsFilter
         self._messageComposer = messageComposer
         self._statusReader = statusReader
         self._statusChangedEvent = statusChangedEvent
@@ -111,6 +132,7 @@ class Model(IModel):
 
     def onJobsUpdated(self, jobs):
 
+        jobs = self._jobsFilter.filter(jobs)
         status = self._statusReader.status(jobs)
         message = self._messageComposer.message(jobs)
         if self._lastStatus != status or self._lastMessage != message:
