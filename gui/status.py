@@ -3,33 +3,65 @@ from PySide.phonon import Phonon
 from pyjenkins.job import JobStatus
 from trayjenkins.status import IView
 
-class TrayIconView(IView):
+class TrayIconView(object):
 
-    def __init__(self, trayIcon, mediaFiles):
+    def __init__(self, trayIcon):
         """
         @type trayIcon: QtGui.QSystemTrayIcon
         @type mediaFiles: gui.media.MediaFiles
         """
         self._trayIcon= trayIcon
 
-        self._icons = {
-            JobStatus.FAILING:  mediaFiles.failingIcon(),
-            JobStatus.OK:       mediaFiles.okIcon(),
-            }
-        self._defaultIcon = mediaFiles.unknownIcon()
+    def setIcon(self, trayIcon, tooltip, messageTitle, messageText, messageIcon):
+        """
+        @type trayIcon: QtGui.QIcon
+        @type tooltip: str
+        @type messageTitle: unicode
+        @type messageText: unicode
+        @type messageIcon: QtGui.QSystemTrayIcon.MessageIcon
+        """
+        self._trayIcon.setIcon(trayIcon)
+        self._trayIcon.setToolTip(tooltip)
+        self._trayIcon.showMessage(messageTitle, messageText, messageIcon)
 
-        self.setStatus(JobStatus.UNKNOWN, None)
+
+class TrayIconViewAdapter(IView):
+
+    def __init__(self, view, mediaFiles):
+        """
+        @type view: gui.status.TrayIconView
+        @type mediaFiles: gui.media.MediaFiles
+        """
+        self._view = view
+        self._media = mediaFiles
 
     def setStatus(self, status, message):
         """
         @type status: str
+        @type message: str
         """
-        self._trayIcon.setIcon(self._icons.get(status, self._defaultIcon))
-        self._trayIcon.setToolTip(status.capitalize())
-        
-        self._trayIcon.showMessage(unicode("Jenkins status change"),
-                                   unicode(message),
-                                   QtGui.QSystemTrayIcon.Information)
+        messageIcon = QtGui.QSystemTrayIcon.Information
+        if status is JobStatus.FAILING:
+            trayIcon = self._media.failingIcon()
+            messageIcon = QtGui.QSystemTrayIcon.Warning
+        elif status is JobStatus.OK:
+            trayIcon = self._media.okIcon()
+        else:
+            trayIcon = self._media.unknownIcon()
+
+        if status is None:
+            tooltip = 'None'
+        else:
+            tooltip = status.capitalize()
+
+        if message is None:
+            message = ''
+
+        self._view.setIcon(trayIcon,
+                           tooltip,
+                           unicode('Jenkins status change'),
+                           unicode(message),
+                           messageIcon)
 
 
 class SoundView(IView):

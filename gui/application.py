@@ -10,6 +10,7 @@ import gui.status
 
 from trayjenkins.jobs import Model as JobsModel, Presenter as JobsPresenter
 from trayjenkins.status import Model as StatusModel, Presenter as StatusPresenter
+from pyjenkins.job import JobStatus
 from pyjenkins.server import Server
 from trayjenkins import __version__
 
@@ -63,10 +64,13 @@ class MainWindow(QtGui.QDialog):
         self.trayIcon.messageClicked.connect(self.openJenkinsUrl)
         self.trayIcon.activated.connect(self.onTrayIconActivated)
 
-        view = gui.status.MultiView([gui.status.TrayIconView(self.trayIcon, mediaFiles),
-                                     gui.status.SoundView(self, mediaFiles)])
+        trayIconView = gui.status.TrayIconView(self.trayIcon)
+        trayIconViewAdapter = gui.status.TrayIconViewAdapter(trayIconView, mediaFiles)
+        statusView = gui.status.MultiView([trayIconViewAdapter,
+                                           gui.status.SoundView(self, mediaFiles)])
         self.statusModel = StatusModel(self.jobsModel)
-        self.statusPresenter = StatusPresenter(self.statusModel, view)
+        self.statusPresenter = StatusPresenter(self.statusModel, statusView)
+        statusView.setStatus(JobStatus.UNKNOWN, None)
 
     def closeEvent(self, event):
         self.hide()
