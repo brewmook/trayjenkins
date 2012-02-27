@@ -3,6 +3,7 @@ from unittest import TestCase
 from PySide import QtGui
 
 import gui.jobs
+import gui.qmock
 import trayjenkins.jobs
 
 class MockQMenu(object):
@@ -21,10 +22,10 @@ class ContextSensitiveMenuFactoryTests(TestCase):
 
         self.mocks = mox.Mox()
         self.menu = self.mocks.CreateMock(MockQMenu)
-        self.menuFactory = self.mocks.CreateMock(gui.jobs._QMenuFactory)
+        self.qtgui = self.mocks.CreateMock(gui.qmock.QtGuiFactory)
         self.ignoreJobsFilter = self.mocks.CreateMock(trayjenkins.jobs.IgnoreJobsFilter)
 
-        self.menuFactory.create(self.parent).AndReturn(self.menu)
+        self.qtgui.QMenu(self.parent).AndReturn(self.menu)
 
     def test_create_AnyJob_ReturnMenu(self):
 
@@ -34,7 +35,7 @@ class ContextSensitiveMenuFactoryTests(TestCase):
 
         factory = gui.jobs.ContextSensitiveMenuFactory(self.actions,
                                                        self.ignoreJobsFilter,
-                                                       self.menuFactory)
+                                                       self.qtgui)
 
         result = factory.create(self.parent, 'job')
 
@@ -48,7 +49,7 @@ class ContextSensitiveMenuFactoryTests(TestCase):
 
         factory = gui.jobs.ContextSensitiveMenuFactory(self.actions,
                                                        self.ignoreJobsFilter,
-                                                       self.menuFactory)
+                                                       self.qtgui)
 
         result = factory.create(self.parent, 'job')
 
@@ -62,7 +63,7 @@ class ContextSensitiveMenuFactoryTests(TestCase):
 
         factory = gui.jobs.ContextSensitiveMenuFactory(self.actions,
                                                        self.ignoreJobsFilter,
-                                                       self.menuFactory)
+                                                       self.qtgui)
 
         result = factory.create(self.parent, 'job')
 

@@ -1,32 +1,25 @@
 from PySide import QtCore, QtGui
 from trayjenkins.jobs import IView
 from pyjenkins.job import JobStatus
-
-class _QMenuFactory(object):
-
-    def create(self, parentWidget):
-        """
-        @type parentWidget: PySide.QtGui.Widget
-        """
-        return QtGui.QMenu(parentWidget)
+from gui.qmock import QtGuiFactory
 
 class ContextSensitiveMenuFactory(object):
 
-    def __init__(self, actions, ignoreJobsFilter, menuFactory=_QMenuFactory()):
+    def __init__(self, actions, ignoreJobsFilter, qtgui=QtGuiFactory()):
         """
         @type actions: {str => PySide.QtGui.QAction}
         @type ignoreJobsFilter: trayjenkins.jobs.IgnoreJobsFilter
-        @type menuFactory: _QMenuFactory
+        @type qtgui: QtGuiFactory
         """
         self._actions = actions
         self._ignoreJobsFilter = ignoreJobsFilter
-        self._menuFactory = menuFactory
+        self._qtgui = qtgui
 
     def create(self, parentWidget, itemText):
         """
         @type parentWidget: PySide.QtGui.Widget
         """
-        menu = self._menuFactory.create(parentWidget)
+        menu = self._qtgui.QMenu(parentWidget)
         if self._ignoreJobsFilter.ignoring(itemText):
             menu.addAction(self._actions['Cancel ignore'])
         else:
@@ -38,7 +31,8 @@ class ListWithContextMenu(QtGui.QListWidget):
 
     def __init__(self, menuFactory, parent=0):
         """
-        @type menuFactory: MenuFactory
+        @type menuFactory: ContextSensitiveMenuFactory
+        @type parent: PySide.QtGui.QWidget
         """
         super(ListWithContextMenu, self).__init__(parent)
         self._menuFactory = menuFactory
