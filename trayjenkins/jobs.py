@@ -70,7 +70,7 @@ class Model(IModel):
         self._jobsFilter = jobsFilter
         self._jenkins = jenkinsFactory.create(server)
         self._jobsUpdatedEvent = event
-        self.jobs = None
+        self._jobs = None
 
     def updateJobs(self):
         """
@@ -78,8 +78,8 @@ class Model(IModel):
         """
         jobs = self._jenkins.list_jobs()
         filtered = self._jobsFilter.filter(jobs)
-        if self.jobs != filtered:
-            self.jobs = filtered
+        if self._jobs != filtered:
+            self._jobs = filtered
             self._jobsUpdatedEvent.fire(jobs)
 
     def jobsUpdatedEvent(self):
