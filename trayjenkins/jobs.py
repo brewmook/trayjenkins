@@ -47,16 +47,27 @@ class Presenter(object):
         self._view.setJobs(jobs)
 
 
+class NoFilter(IFilter):
+
+    def filter(self, jobs):
+
+        return jobs
+
+
 class Model(IModel):
 
-    def __init__(self, server,
+    def __init__(self,
+                 server,
+                 jobsFilter=NoFilter(),
                  jenkinsFactory=JenkinsFactory(),
                  event=Event()):
         """
         @type server: pyjenkins.server.Server
+        @type jobsFilter: trayjenkins.jobs.IFilter
         @type jenkinsFactory: pyjenkins.interfaces.IJenkinsFactory
         @type event: trayjenkins.event.IEvent
         """
+        self._jobsFilter = jobsFilter
         self._jenkins = jenkinsFactory.create(server)
         self._jobsUpdatedEvent = event
         self.jobs = None
@@ -66,8 +77,9 @@ class Model(IModel):
         @rtype: None
         """
         jobs = self._jenkins.list_jobs()
-        if self.jobs != jobs:
-            self.jobs = jobs
+        filtered = self._jobsFilter.filter(jobs)
+        if self.jobs != filtered:
+            self.jobs = filtered
             self._jobsUpdatedEvent.fire(jobs)
 
     def jobsUpdatedEvent(self):
@@ -77,11 +89,6 @@ class Model(IModel):
         """
         return self._jobsUpdatedEvent
 
-class NoFilter(IFilter):
-
-    def filter(self, jobs):
-
-        return jobs
 
 class IgnoreJobsFilter(IFilter):
 

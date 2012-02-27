@@ -35,6 +35,7 @@ class JobsModelTests(TestCase):
     def setUp(self):
         
         self.mocks = mox.Mox()
+        self.filter = self.mocks.CreateMock(IFilter)
         self.jenkins = self.mocks.CreateMock(Jenkins)
         self.factory = self.mocks.CreateMock(IJenkinsFactory)
         self.event = self.mocks.CreateMock(IEvent)
@@ -43,12 +44,13 @@ class JobsModelTests(TestCase):
     def test_updateJobs_FirstCall_FireJobsUpdatedEventWithRetrievedJobs(self):
 
         jobs = [Job('job1', JobStatus.OK), Job('job2', JobStatus.FAILING)]
+        self.filter.filter(mox.IgnoreArg()).AndReturn(jobs)
         self.factory.create(self.server).AndReturn(self.jenkins)
         self.jenkins.list_jobs().AndReturn(jobs)
         self.event.fire(jobs)
         self.mocks.ReplayAll()
 
-        model = Model(self.server, self.factory, self.event)
+        model = Model(self.server, self.filter, self.factory, self.event)
         model.updateJobs()
 
         mox.Verify(self.event)
@@ -56,13 +58,15 @@ class JobsModelTests(TestCase):
     def test_updateJobs_SecondCallReturnsSameJobs_JobsUpdatedEventNotFiredOnceOnly(self):
 
         jobs = [Job('job1', JobStatus.OK), Job('job2', JobStatus.FAILING)]
+        self.filter.filter(mox.IgnoreArg()).AndReturn(jobs)
+        self.filter.filter(mox.IgnoreArg()).AndReturn(jobs)
         self.factory.create(self.server).AndReturn(self.jenkins)
         self.jenkins.list_jobs().AndReturn(jobs)
         self.jenkins.list_jobs().AndReturn(jobs)
         self.event.fire(jobs)
         self.mocks.ReplayAll()
 
-        model = Model(self.server, self.factory, self.event)
+        model = Model(self.server, self.filter, self.factory, self.event)
         model.updateJobs()
         model.updateJobs()
 
@@ -72,6 +76,8 @@ class JobsModelTests(TestCase):
 
         jobsOne = [Job('job1', JobStatus.OK), Job('job2', JobStatus.FAILING)]
         jobsTwo = [Job('job1', JobStatus.OK), Job('job2', JobStatus.OK)]
+        self.filter.filter(jobsOne).AndReturn(jobsOne)
+        self.filter.filter(jobsTwo).AndReturn(jobsTwo)
         self.factory.create(self.server).AndReturn(self.jenkins)
         self.jenkins.list_jobs().AndReturn(jobsOne)
         self.jenkins.list_jobs().AndReturn(jobsTwo)
@@ -79,7 +85,26 @@ class JobsModelTests(TestCase):
         self.event.fire(jobsTwo)
         self.mocks.ReplayAll()
 
-        model = Model(self.server, self.factory, self.event)
+        model = Model(self.server, self.filter, self.factory, self.event)
+        model.updateJobs()
+        model.updateJobs()
+
+        mox.Verify(self.event)
+
+    def test_updateJobs_SameJobsButFilterAltersList_JobsUpdatedEventFiredForEachUpdate(self):
+
+        real_jobs = [Job('job1', JobStatus.OK), Job('job2', JobStatus.FAILING)]
+        filtered_jobs = [Job('job1', JobStatus.OK)]
+        self.filter.filter(real_jobs).AndReturn(real_jobs)
+        self.filter.filter(real_jobs).AndReturn(filtered_jobs)
+        self.factory.create(self.server).AndReturn(self.jenkins)
+        self.jenkins.list_jobs().AndReturn(real_jobs)
+        self.jenkins.list_jobs().AndReturn(real_jobs)
+        self.event.fire(real_jobs)
+        self.event.fire(real_jobs)
+        self.mocks.ReplayAll()
+
+        model = Model(self.server, self.filter, self.factory, self.event)
         model.updateJobs()
         model.updateJobs()
 
@@ -90,7 +115,7 @@ class JobsModelTests(TestCase):
         self.factory.create(mox.IgnoreArg()).AndReturn(None)
         self.mocks.ReplayAll()
 
-        model = Model(self.server, self.factory, self.event)
+        model = Model(self.server, self.filter, self.factory, self.event)
 
         self.assertTrue(self.event is model.jobsUpdatedEvent())
 

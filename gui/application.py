@@ -82,7 +82,7 @@ class MainWindow(QtGui.QDialog):
             self.jobsModel = gui.fake.JobsModel()
             self.jenkinsUrl = QtCore.QUrl('https://github.com/coolhandmook/trayjenkins')
         else:
-            self.jobsModel = JobsModel(Server(jenkinsHost, '', ''))
+            self.jobsModel = JobsModel(Server(jenkinsHost, '', ''), ignoreJobsFilter)
             self.jenkinsUrl = QtCore.QUrl(jenkinsHost)
 
         self.jobsView = gui.jobs.ListView(mediaFiles, ignoreJobsFilter)
