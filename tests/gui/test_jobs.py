@@ -15,16 +15,14 @@ class ContextSensitiveMenuFactoryTests(TestCase):
     def setUp(self):
 
         self.parent = 'fake parent'
-        self.actions = {
-            'Ignore':'ignore action',
-            'Cancel ignore':'cancel ignore action',
-            }
-
         self.mocks = mox.Mox()
+        self.actions = self.mocks.CreateMock(gui.jobs.ContextMenuActions)
         self.menu = self.mocks.CreateMock(MockQMenu)
         self.qtgui = self.mocks.CreateMock(gui.qmock.QtGuiFactory)
         self.ignoreJobsFilter = self.mocks.CreateMock(trayjenkins.jobs.IgnoreJobsFilter)
 
+        self.actions.ignore().InAnyOrder().AndReturn('ignore action')
+        self.actions.cancel_ignore().InAnyOrder().AndReturn('cancel ignore action')
         self.qtgui.QMenu(self.parent).AndReturn(self.menu)
 
     def test_create_AnyJob_ReturnMenu(self):
@@ -68,3 +66,4 @@ class ContextSensitiveMenuFactoryTests(TestCase):
         result = factory.create(self.parent, 'job')
 
         mox.Verify(self.menu)
+

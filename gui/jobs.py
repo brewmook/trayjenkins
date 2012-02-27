@@ -3,11 +3,25 @@ from trayjenkins.jobs import IView
 from pyjenkins.job import JobStatus
 from gui.qmock import QtGuiFactory
 
+class ContextMenuActions(object):
+
+    def __init__(self, parent, ignore_trigger, cancel_ignore_trigger):
+
+        self._ignore = QtGui.QAction('Ignore', parent, triggered=ignore_trigger)
+        self._cancel_ignore = QtGui.QAction('Cancel ignore', parent, triggered=cancel_ignore_trigger)
+
+    def ignore(self):
+        return self._ignore
+
+    def cancel_ignore(self):
+        return self._cancel_ignore
+
+
 class ContextSensitiveMenuFactory(object):
 
     def __init__(self, actions, ignoreJobsFilter, qtgui=QtGuiFactory()):
         """
-        @type actions: {str => PySide.QtGui.QAction}
+        @type actions: ContextMenuActions
         @type ignoreJobsFilter: trayjenkins.jobs.IgnoreJobsFilter
         @type qtgui: QtGuiFactory
         """
@@ -21,9 +35,9 @@ class ContextSensitiveMenuFactory(object):
         """
         menu = self._qtgui.QMenu(parentWidget)
         if self._ignoreJobsFilter.ignoring(itemText):
-            menu.addAction(self._actions['Cancel ignore'])
+            menu.addAction(self._actions.cancel_ignore())
         else:
-            menu.addAction(self._actions['Ignore'])
+            menu.addAction(self._actions.ignore())
         return menu
 
 
@@ -56,9 +70,9 @@ class ListView(QtGui.QGroupBox, IView):
         """
         QtGui.QGroupBox.__init__(self, "Jobs")
 
-        actions = { 'Ignore': QtGui.QAction('Ignore', self, triggered=self.ignoreJob),
-                    'Cancel ignore': QtGui.QAction('Cancel ignore', self, triggered=self.unignoreJob) }
-
+        actions = ContextMenuActions(self,
+                                     ignore_trigger=self.ignoreJob,
+                                     cancel_ignore_trigger=self.unignoreJob)
         menuFactory = ContextSensitiveMenuFactory(actions, ignoreJobsFilter)
         self._jobs = ListWithContextMenu(menuFactory, self)
         self._ignoreJobsFilter = ignoreJobsFilter
