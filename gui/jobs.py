@@ -19,22 +19,23 @@ class ContextMenuActions(object):
 
 class ContextMenuFactory(object):
 
-    def __init__(self, actions, ignoreJobsFilter, qtgui=QtGuiFactory()):
+    def __init__(self, actions, ignore_jobs_filter, qtgui=QtGuiFactory()):
         """
         @type actions: ContextMenuActions
-        @type ignoreJobsFilter: trayjenkins.jobs.IgnoreJobsFilter
+        @type ignore_jobs_filter: trayjenkins.jobs.IgnoreJobsFilter
         @type qtgui: QtGuiFactory
         """
         self._actions = actions
-        self._ignoreJobsFilter = ignoreJobsFilter
+        self._ignore_jobs_filter = ignore_jobs_filter
         self._qtgui = qtgui
 
-    def create(self, parentWidget, itemText):
+    def create(self, parent, job_name):
         """
-        @type parentWidget: PySide.QtGui.Widget
+        @type parent: PySide.QtGui.Widget
+        @type job_name: str
         """
-        menu = self._qtgui.QMenu(parentWidget)
-        if self._ignoreJobsFilter.ignoring(itemText):
+        menu = self._qtgui.QMenu(parent)
+        if self._ignore_jobs_filter.ignoring(job_name):
             menu.addAction(self._actions.cancel_ignore())
         else:
             menu.addAction(self._actions.ignore())
