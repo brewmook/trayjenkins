@@ -37,7 +37,7 @@ class StatusModelTests(TestCase):
         self.statusEvent = self.mocks.CreateMock(IEvent)
         self.jobsModel = self.mocks.CreateMock(JobsModel)
         self.jobsEvent = Event()
-        self.jobsModel.jobsUpdatedEvent().AndReturn(self.jobsEvent)
+        self.jobsModel.jobs_updated_event().AndReturn(self.jobsEvent)
         self.jobs = [Job('who', 'cares?')]
 
     def test_updateStatus_JobsModelFiresFirstUpdateEventStatusUnknownAndMessageNone_StatusChangedEventNotFired(self):

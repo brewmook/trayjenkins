@@ -119,9 +119,9 @@ class UpdateTimer(QtCore.QObject):
 
         self._jobs_timer_id = self.startTimer(seconds * 1000)
         self._jobs_model = jobs_model
-        self._jobs_model.updateJobs()
+        self._jobs_model.update_jobs()
 
     def timerEvent(self, event):
 
         if event.timerId() == self._jobs_timer_id:
-            self._jobs_model.updateJobs()
+            self._jobs_model.update_jobs()

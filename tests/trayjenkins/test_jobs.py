@@ -19,7 +19,7 @@ class JobsPresenterTests(TestCase):
         view= mocks.CreateMock(IView)
         event= Event()
 
-        model.jobsUpdatedEvent().AndReturn(event)
+        model.jobs_updated_event().AndReturn(event)
         view.setJobs(jobs)
 
         mocks.ReplayAll()
@@ -41,7 +41,7 @@ class JobsModelTests(TestCase):
         self.event = self.mocks.CreateMock(IEvent)
         self.server = Server('host', 'uname', 'pw')
 
-    def test_updateJobs_FirstCall_FireJobsUpdatedEventWithRetrievedJobs(self):
+    def test__update_jobs__FirstCall_FireJobsUpdatedEventWithRetrievedJobs(self):
 
         jobs = [Job('job1', JobStatus.OK), Job('job2', JobStatus.FAILING)]
         self.filter.filter(mox.IgnoreArg()).AndReturn(jobs)
@@ -51,11 +51,11 @@ class JobsModelTests(TestCase):
         self.mocks.ReplayAll()
 
         model = Model(self.server, self.filter, self.factory, self.event)
-        model.updateJobs()
+        model.update_jobs()
 
         mox.Verify(self.event)
 
-    def test_updateJobs_SecondCallReturnsSameJobs_JobsUpdatedEventNotFiredOnceOnly(self):
+    def test__update_jobs__SecondCallReturnsSameJobs_JobsUpdatedEventNotFiredOnceOnly(self):
 
         jobs = [Job('job1', JobStatus.OK), Job('job2', JobStatus.FAILING)]
         self.filter.filter(mox.IgnoreArg()).AndReturn(jobs)
@@ -67,12 +67,12 @@ class JobsModelTests(TestCase):
         self.mocks.ReplayAll()
 
         model = Model(self.server, self.filter, self.factory, self.event)
-        model.updateJobs()
-        model.updateJobs()
+        model.update_jobs()
+        model.update_jobs()
 
         mox.Verify(self.event)
 
-    def test_updateJobs_SecondCallReturnsDifferentJobs_JobsUpdatedEventFiredForEachResult(self):
+    def test__update_jobs__SecondCallReturnsDifferentJobs_JobsUpdatedEventFiredForEachResult(self):
 
         jobsOne = [Job('job1', JobStatus.OK), Job('job2', JobStatus.FAILING)]
         jobsTwo = [Job('job1', JobStatus.OK), Job('job2', JobStatus.OK)]
@@ -86,12 +86,12 @@ class JobsModelTests(TestCase):
         self.mocks.ReplayAll()
 
         model = Model(self.server, self.filter, self.factory, self.event)
-        model.updateJobs()
-        model.updateJobs()
+        model.update_jobs()
+        model.update_jobs()
 
         mox.Verify(self.event)
 
-    def test_updateJobs_SameJobsButFilterAltersList_JobsUpdatedEventFiredForEachUpdate(self):
+    def test__update_jobs__SameJobsButFilterAltersList_JobsUpdatedEventFiredForEachUpdate(self):
 
         real_jobs = [Job('job1', JobStatus.OK), Job('job2', JobStatus.FAILING)]
         filtered_jobs = [Job('job1', JobStatus.OK)]
@@ -105,19 +105,19 @@ class JobsModelTests(TestCase):
         self.mocks.ReplayAll()
 
         model = Model(self.server, self.filter, self.factory, self.event)
-        model.updateJobs()
-        model.updateJobs()
+        model.update_jobs()
+        model.update_jobs()
 
         mox.Verify(self.event)
 
-    def test_jobsUpdatedEvent_ReturnsEventFromConstructor(self):
+    def test__jobs_updated__event_ReturnsEventFromConstructor(self):
 
         self.factory.create(mox.IgnoreArg()).AndReturn(None)
         self.mocks.ReplayAll()
 
         model = Model(self.server, self.filter, self.factory, self.event)
 
-        self.assertTrue(self.event is model.jobsUpdatedEvent())
+        self.assertTrue(self.event is model.jobs_updated_event())
 
 
 class NoFilterTests(TestCase):

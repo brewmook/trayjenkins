@@ -115,7 +115,7 @@ class Model(IModel):
         self._lastStatus = JobStatus.UNKNOWN
         self._lastMessage = None
         
-        jobsModel.jobsUpdatedEvent().register(self.onJobsUpdated)
+        jobsModel.jobs_updated_event().register(self.onJobsUpdated)
 
     def onJobsUpdated(self, jobs):
 

@@ -5,12 +5,12 @@ from trayjenkins.event import Event
 
 class IModel(object):
 
-    def updateJobs(self):
+    def update_jobs(self):
         """
         @rtype: None
         """
 
-    def jobsUpdatedEvent(self):
+    def jobs_updated_event(self):
         """
         Listeners receive Event.fire([pyjenkins.job.Job])
         @rtype: trayjenkins.event.IEvent
@@ -40,7 +40,7 @@ class Presenter(object):
         """
         self._model= model
         self._view= view
-        model.jobsUpdatedEvent().register(self.onModelJobsChanged)
+        model.jobs_updated_event().register(self.onModelJobsChanged)
 
     def onModelJobsChanged(self, jobs):
         
@@ -69,10 +69,10 @@ class Model(IModel):
         """
         self._jobsFilter = jobsFilter
         self._jenkins = jenkinsFactory.create(server)
-        self._jobsUpdatedEvent = event
+        self._jobs_updated_event = event
         self._jobs = None
 
-    def updateJobs(self):
+    def update_jobs(self):
         """
         @rtype: None
         """
@@ -80,14 +80,14 @@ class Model(IModel):
         filtered = self._jobsFilter.filter(jobs)
         if self._jobs != filtered:
             self._jobs = filtered
-            self._jobsUpdatedEvent.fire(jobs)
+            self._jobs_updated_event.fire(jobs)
 
-    def jobsUpdatedEvent(self):
+    def jobs_updated_event(self):
         """
         Listeners receive Event.fire([pyjenkins.job.Job])
         @rtype: trayjenkins.event.IEvent
         """
-        return self._jobsUpdatedEvent
+        return self._jobs_updated_event
 
 
 class IgnoreJobsFilter(IFilter):
