@@ -113,32 +113,32 @@ class Application(QtGui.QDialog):
 
     def __init__(self):
 
-        self.application= QtGui.QApplication(sys.argv)
-        self.application.setApplicationName('Trayjenkins')
+        self._application= QtGui.QApplication(sys.argv)
+        self._application.setApplicationName('Trayjenkins')
 
     def run(self):
 
-        jenkinsHost = self.parseOptions()
-        mediaFiles = gui.media.MediaFiles(self.executablePath())
+        jenkins_host = self._parse_options()
+        media_files = gui.media.MediaFiles(self._executable_path())
 
-        window = MainWindow(jenkinsHost, mediaFiles)
+        window = MainWindow(jenkins_host, media_files)
 
-        return self.application.exec_()
+        return self._application.exec_()
 
-    def parseOptions(self):
+    def _parse_options(self):
 
         parser = OptionParser(usage='usage: %prog [options] host')
         (options, args) = parser.parse_args()
 
         if len(args) is 1:
-            jenkinsHost = args[0]
+            jenkins_host = args[0]
         else:
             parser.print_help()
             sys.exit(1)
 
-        return jenkinsHost
+        return jenkins_host
 
-    def executablePath(self):
+    def _executable_path(self):
 
         path = ''
         try:
