@@ -109,19 +109,19 @@ class ListView(QtGui.QGroupBox, IView):
 
 class UpdateTimer(QtCore.QObject):
 
-    def __init__(self, jobsModel, seconds, parent=None):
+    def __init__(self, jobs_model, seconds, parent=None):
         """
-        @type jobsModel: trayjenkins.jobs.IModel
+        @type jobs_model: trayjenkins.jobs.IModel
         @type seconds: int
         @type parent: PySide.QtCore.QObject
         """
         QtCore.QObject.__init__(self, parent)
 
-        self.jobsTimerId = self.startTimer(seconds * 1000)
-        self.jobsModel = jobsModel
-        self.jobsModel.updateJobs()
+        self._jobs_timer_id = self.startTimer(seconds * 1000)
+        self._jobs_model = jobs_model
+        self._jobs_model.updateJobs()
 
     def timerEvent(self, event):
 
-        if event.timerId() == self.jobsTimerId:
-            self.jobsModel.updateJobs()
+        if event.timerId() == self._jobs_timer_id:
+            self._jobs_model.updateJobs()
