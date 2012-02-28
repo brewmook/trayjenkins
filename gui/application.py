@@ -58,55 +58,55 @@ class TrayIcon(object):
 
 class MainWindow(QtGui.QDialog):
 
-    def __init__(self, jenkinsHost, mediaFiles):
+    def __init__(self, jenkins_host, media_files):
         super(MainWindow, self).__init__()
 
-        self.ignoreJobsFilter = IgnoreJobsFilter()
+        self._ignore_jobs_filter = IgnoreJobsFilter()
 
-        self.createActions()
-        self.createJobsMVP(jenkinsHost, mediaFiles, self.ignoreJobsFilter)
+        self._create_actions()
+        self._create_jobs_mvp(jenkins_host, media_files, self._ignore_jobs_filter)
 
-        self.trayIcon = TrayIcon(self,
-                                 mediaFiles,
-                                 self.showControlsAction,
-                                 self.showJenkinsAction,
-                                 self.quitAction,
-                                 self.jobsModel,
-                                 self.ignoreJobsFilter)
+        self._trayIcon = TrayIcon(self,
+                                  media_files,
+                                  self._show_controls_action,
+                                  self._show_jenkins_action,
+                                  self._quitAction,
+                                  self._jobs_model,
+                                  self._ignore_jobs_filter)
 
-        mainLayout = QtGui.QVBoxLayout()
-        mainLayout.addWidget(self.jobsView)
-        self.setLayout(mainLayout)
+        main_layout = QtGui.QVBoxLayout()
+        main_layout.addWidget(self._jobs_view)
+        self.setLayout(main_layout)
 
-        self.jobsUpdateTimer = gui.jobs.UpdateTimer(self.jobsModel, 15, self)
+        self._jobs_update_timer = gui.jobs.UpdateTimer(self._jobs_model, 15, self)
 
         self.setWindowTitle("TrayJenkins (%s)" % __version__)
         self.resize(640, 480)
 
-    def createJobsMVP(self, jenkinsHost, mediaFiles, ignoreJobsFilter):
+    def _create_jobs_mvp(self, jenkins_host, media_files, ignore_jobs_filter):
 
-        if jenkinsHost == 'FAKE':
-            self.jobsModel = gui.fake.JobsModel()
-            self.jenkinsUrl = QtCore.QUrl('https://github.com/coolhandmook/trayjenkins')
+        if jenkins_host == 'FAKE':
+            self._jobs_model = gui.fake.JobsModel()
+            self._jenkins_url = QtCore.QUrl('https://github.com/coolhandmook/trayjenkins')
         else:
-            self.jobsModel = JobsModel(Server(jenkinsHost, '', ''), ignoreJobsFilter)
-            self.jenkinsUrl = QtCore.QUrl(jenkinsHost)
+            self._jobs_model = JobsModel(Server(jenkins_host, '', ''), ignore_jobs_filter)
+            self._jenkins_url = QtCore.QUrl(jenkins_host)
 
-        self.jobsView = gui.jobs.ListView(mediaFiles, ignoreJobsFilter)
-        self.jobsPresenter = JobsPresenter(self.jobsModel, self.jobsView)
+        self._jobs_view = gui.jobs.ListView(media_files, ignore_jobs_filter)
+        self._jobs_presenter = JobsPresenter(self._jobs_model, self._jobs_view)
 
-    def createActions(self):
+    def _create_actions(self):
 
-        self.quitAction = QtGui.QAction("&Quit", self, triggered=QtGui.qApp.quit)
-        self.showControlsAction = QtGui.QAction("Show &Controls", self, triggered=self.showNormal)
-        self.showJenkinsAction = QtGui.QAction("Show &Jenkins", self, triggered=self.openJenkinsUrl)
+        self._quitAction = QtGui.QAction("&Quit", self, triggered=QtGui.qApp.quit)
+        self._show_controls_action = QtGui.QAction("Show &Controls", self, triggered=self.showNormal)
+        self._show_jenkins_action = QtGui.QAction("Show &Jenkins", self, triggered=self._open_jenkins_url)
 
     def closeEvent(self, event):
         self.hide()
         event.ignore()
 
-    def openJenkinsUrl(self):
-        QtGui.QDesktopServices.openUrl(self.jenkinsUrl)
+    def _open_jenkins_url(self):
+        QtGui.QDesktopServices.openUrl(self._jenkins_url)
 
 
 class Application(QtGui.QDialog):
