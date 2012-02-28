@@ -10,7 +10,7 @@ class MockQMenu(object):
     def addAction(self, parameter):
         pass
 
-class ContextSensitiveMenuFactoryTests(TestCase):
+class ContextMenuFactoryTests(TestCase):
 
     def setUp(self):
 
@@ -31,9 +31,9 @@ class ContextSensitiveMenuFactoryTests(TestCase):
         self.menu.addAction(mox.IgnoreArg())
         self.mocks.ReplayAll()
 
-        factory = gui.jobs.ContextSensitiveMenuFactory(self.actions,
-                                                       self.ignoreJobsFilter,
-                                                       self.qtgui)
+        factory = gui.jobs.ContextMenuFactory(self.actions,
+                                              self.ignoreJobsFilter,
+                                              self.qtgui)
 
         result = factory.create(self.parent, 'job')
 
@@ -45,9 +45,9 @@ class ContextSensitiveMenuFactoryTests(TestCase):
         self.menu.addAction('ignore action')
         self.mocks.ReplayAll()
 
-        factory = gui.jobs.ContextSensitiveMenuFactory(self.actions,
-                                                       self.ignoreJobsFilter,
-                                                       self.qtgui)
+        factory = gui.jobs.ContextMenuFactory(self.actions,
+                                              self.ignoreJobsFilter,
+                                              self.qtgui)
 
         result = factory.create(self.parent, 'job')
 
@@ -59,9 +59,9 @@ class ContextSensitiveMenuFactoryTests(TestCase):
         self.menu.addAction('cancel ignore action')
         self.mocks.ReplayAll()
 
-        factory = gui.jobs.ContextSensitiveMenuFactory(self.actions,
-                                                       self.ignoreJobsFilter,
-                                                       self.qtgui)
+        factory = gui.jobs.ContextMenuFactory(self.actions,
+                                              self.ignoreJobsFilter,
+                                              self.qtgui)
 
         result = factory.create(self.parent, 'job')
 

@@ -17,7 +17,7 @@ class ContextMenuActions(object):
         return self._cancel_ignore
 
 
-class ContextSensitiveMenuFactory(object):
+class ContextMenuFactory(object):
 
     def __init__(self, actions, ignoreJobsFilter, qtgui=QtGuiFactory()):
         """
@@ -76,7 +76,7 @@ class ListView(QtGui.QGroupBox, IView):
         """
         item = self._jobs.itemAt(point)
         if item is not None:
-            factory = ContextSensitiveMenuFactory(self._actions, self._ignoreJobsFilter)
+            factory = ContextMenuFactory(self._actions, self._ignoreJobsFilter)
             menu = factory.create(self._jobs, item.text())
             menu.popup(self._jobs.mapToGlobal(point))
 
