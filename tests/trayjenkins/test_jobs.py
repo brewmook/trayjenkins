@@ -20,7 +20,7 @@ class JobsPresenterTests(TestCase):
         event= Event()
 
         model.jobs_updated_event().AndReturn(event)
-        view.setJobs(jobs)
+        view.set_jobs(jobs)
 
         mocks.ReplayAll()
 

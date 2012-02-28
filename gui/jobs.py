@@ -95,7 +95,7 @@ class ListView(QtGui.QGroupBox, IView):
             self._ignore_jobs_filter.unignore(item.text())
             item.setIcon(self._icons[JobStatus.UNKNOWN])
         
-    def setJobs(self, jobs):
+    def set_jobs(self, jobs):
         """
         @type jobs: [pyjenkins.job.Job]
         """

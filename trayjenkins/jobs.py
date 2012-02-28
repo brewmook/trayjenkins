@@ -18,7 +18,7 @@ class IModel(object):
 
 class IView(object):
     
-    def setJobs(self, jobs):
+    def set_jobs(self, jobs):
         """
         @type jobs: [pyjenkins.job.Job]
         """
@@ -44,7 +44,7 @@ class Presenter(object):
 
     def onModelJobsChanged(self, jobs):
         
-        self._view.setJobs(jobs)
+        self._view.set_jobs(jobs)
 
 
 class NoFilter(IFilter):
