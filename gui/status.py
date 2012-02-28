@@ -8,7 +8,6 @@ class TrayIconView(object):
     def __init__(self, trayIcon):
         """
         @type trayIcon: QtGui.QSystemTrayIcon
-        @type mediaFiles: gui.media.MediaFiles
         """
         self._trayIcon= trayIcon
 
@@ -42,12 +41,12 @@ class TrayIconViewAdapter(IView):
         """
         messageIcon = QtGui.QSystemTrayIcon.Information
         if status is JobStatus.FAILING:
-            trayIcon = self._media.failingIcon()
+            trayIcon = self._media.failing_icon()
             messageIcon = QtGui.QSystemTrayIcon.Warning
         elif status is JobStatus.OK:
-            trayIcon = self._media.okIcon()
+            trayIcon = self._media.ok_icon()
         else:
-            trayIcon = self._media.unknownIcon()
+            trayIcon = self._media.unknown_icon()
 
         if status is None:
             tooltip = 'None'
@@ -76,8 +75,8 @@ class SoundView(IView):
         Phonon.createPath(self.mediaObject, self.audioOutput)
 
         self._sounds = {
-            JobStatus.FAILING: Phonon.MediaSource(mediaFiles.failingSoundPath()),
-            JobStatus.OK:      Phonon.MediaSource(mediaFiles.okSoundPath()),
+            JobStatus.FAILING: Phonon.MediaSource(mediaFiles.failing_sound_path()),
+            JobStatus.OK:      Phonon.MediaSource(mediaFiles.ok_sound_path()),
             }
 
     def setStatus(self, status, message):

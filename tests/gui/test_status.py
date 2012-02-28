@@ -15,9 +15,9 @@ class TrayIconViewAdapterTests(TestCase):
 
         self.view = self.mocks.CreateMock(gui.status.TrayIconView)
         self.media = self.mocks.CreateMock(gui.media.MediaFiles)
-        self.media.failingIcon().InAnyOrder().AndReturn('failing.png')
-        self.media.okIcon().InAnyOrder().AndReturn('ok.png')
-        self.media.unknownIcon().InAnyOrder().AndReturn('unknown.png')
+        self.media.failing_icon().InAnyOrder().AndReturn('failing.png')
+        self.media.ok_icon().InAnyOrder().AndReturn('ok.png')
+        self.media.unknown_icon().InAnyOrder().AndReturn('unknown.png')
 
     def test_setStatus_FailingStatus_PassCorrectArgumentsToView(self):
 

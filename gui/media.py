@@ -3,29 +3,29 @@ from PySide import QtGui
 
 class MediaFiles(object):
 
-    def __init__(self, executablePath):
-        self._executablePath = executablePath
+    def __init__(self, executable_path):
+        self._executable_path = executable_path
 
-    def disabledIcon(self):
+    def disabled_icon(self):
         return QtGui.QIcon(self._locate('media/status/disabled.png'))
 
-    def failingIcon(self):
+    def failing_icon(self):
         return QtGui.QIcon(self._locate('media/status/failing.png'))
 
-    def ignoredIcon(self):
+    def ignored_icon(self):
         return QtGui.QIcon(self._locate('media/status/ignored.png'))
 
-    def okIcon(self):
+    def ok_icon(self):
         return QtGui.QIcon(self._locate('media/status/ok.png'))
 
-    def unknownIcon(self):
+    def unknown_icon(self):
         return QtGui.QIcon(self._locate('media/status/unknown.png'))
 
-    def okSoundPath(self):
+    def ok_sound_path(self):
         return self._locate('media/status/ok.wav')
 
-    def failingSoundPath(self):
+    def failing_sound_path(self):
         return self._locate('media/status/failing.wav')
 
     def _locate(self, resource):
-        return os.path.join(self._executablePath, resource)
+        return os.path.join(self._executable_path, resource)

@@ -60,12 +60,12 @@ class ListView(QtGui.QGroupBox, IView):
         self._jobs.customContextMenuRequested.connect(self._on_custom_context_menu_requested)
         self._ignore_jobs_filter = ignore_jobs_filter
         self._icons = {
-            JobStatus.DISABLED: media_files.disabledIcon(),
-            JobStatus.FAILING:  media_files.failingIcon(),
-            JobStatus.OK:       media_files.okIcon(),
-            JobStatus.UNKNOWN:  media_files.unknownIcon(),
+            JobStatus.DISABLED: media_files.disabled_icon(),
+            JobStatus.FAILING:  media_files.failing_icon(),
+            JobStatus.OK:       media_files.ok_icon(),
+            JobStatus.UNKNOWN:  media_files.unknown_icon(),
             }
-        self._ignored_icon = media_files.ignoredIcon()
+        self._ignored_icon = media_files.ignored_icon()
 
         layout = QtGui.QVBoxLayout()
         layout.addWidget(self._jobs)
