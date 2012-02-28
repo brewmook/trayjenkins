@@ -40,9 +40,9 @@ class Presenter(object):
         """
         self._model= model
         self._view= view
-        model.jobs_updated_event().register(self.onModelJobsChanged)
+        model.jobs_updated_event().register(self._on_model_jobs_changed)
 
-    def onModelJobsChanged(self, jobs):
+    def _on_model_jobs_changed(self, jobs):
         
         self._view.set_jobs(jobs)
 
@@ -58,17 +58,17 @@ class Model(IModel):
 
     def __init__(self,
                  server,
-                 jobsFilter=NoFilter(),
-                 jenkinsFactory=JenkinsFactory(),
+                 jobs_filter=NoFilter(),
+                 jenkins_factory=JenkinsFactory(),
                  event=Event()):
         """
         @type server: pyjenkins.server.Server
-        @type jobsFilter: trayjenkins.jobs.IFilter
-        @type jenkinsFactory: pyjenkins.interfaces.IJenkinsFactory
+        @type jobs_filter: trayjenkins.jobs.IFilter
+        @type jenkins_factory: pyjenkins.interfaces.IJenkinsFactory
         @type event: trayjenkins.event.IEvent
         """
-        self._jobsFilter = jobsFilter
-        self._jenkins = jenkinsFactory.create(server)
+        self._jobs_filter = jobs_filter
+        self._jenkins = jenkins_factory.create(server)
         self._jobs_updated_event = event
         self._jobs = None
 
@@ -77,7 +77,7 @@ class Model(IModel):
         @rtype: None
         """
         jobs = self._jenkins.list_jobs()
-        filtered = self._jobsFilter.filter(jobs)
+        filtered = self._jobs_filter.filter(jobs)
         if self._jobs != filtered:
             self._jobs = filtered
             self._jobs_updated_event.fire(jobs)
