@@ -41,26 +41,6 @@ class ContextSensitiveMenuFactory(object):
         return menu
 
 
-class ListWithContextMenu(QtGui.QListWidget):
-
-    def __init__(self, menuFactory, parent=0):
-        """
-        @type menuFactory: ContextSensitiveMenuFactory
-        @type parent: PySide.QtGui.QWidget
-        """
-        super(ListWithContextMenu, self).__init__(parent)
-        self._menuFactory = menuFactory
-
-    def contextMenuEvent(self, event):
-        """
-        @type event: PySide.QtGui.QContextMenuEvent
-        """
-        item = self.itemAt(event.pos())
-        if item is not None:
-            menu = self._menuFactory.create(self, item.text())
-            menu.popup(self.mapToGlobal(event.pos()))
-
-
 class ListView(QtGui.QGroupBox, IView):
 
     def __init__(self, mediaFiles, ignoreJobsFilter):
@@ -70,11 +50,13 @@ class ListView(QtGui.QGroupBox, IView):
         """
         QtGui.QGroupBox.__init__(self, "Jobs")
 
-        actions = ContextMenuActions(self,
-                                     ignore_trigger=self.ignoreJob,
-                                     cancel_ignore_trigger=self.unignoreJob)
-        menuFactory = ContextSensitiveMenuFactory(actions, ignoreJobsFilter)
-        self._jobs = ListWithContextMenu(menuFactory, self)
+        self._actions = ContextMenuActions(self,
+                                           ignore_trigger=self.ignoreJob,
+                                           cancel_ignore_trigger=self.unignoreJob)
+
+        self._jobs = QtGui.QListWidget(self)
+        self._jobs.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self._jobs.customContextMenuRequested.connect(self.onCustomContextMenuRequested)
         self._ignoreJobsFilter = ignoreJobsFilter
         self._icons = {
             JobStatus.DISABLED: mediaFiles.disabledIcon(),
@@ -87,6 +69,16 @@ class ListView(QtGui.QGroupBox, IView):
         layout = QtGui.QVBoxLayout()
         layout.addWidget(self._jobs)
         self.setLayout(layout)
+
+    def onCustomContextMenuRequested(self, point):
+        """
+        @type point: PySide.QtCore.QPoint
+        """
+        item = self._jobs.itemAt(point)
+        if item is not None:
+            factory = ContextSensitiveMenuFactory(self._actions, self._ignoreJobsFilter)
+            menu = factory.create(self._jobs, item.text())
+            menu.popup(self._jobs.mapToGlobal(point))
 
     def ignoreJob(self):
 
