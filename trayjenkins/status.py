@@ -4,7 +4,7 @@ from pyjenkins.job import JobStatus
 
 class IModel(object):
 
-    def statusChangedEvent(self):
+    def status_changed_event(self):
         """
         Event arguments: (status:str, message:str)
         @rtype: trayjenkins.event.IEvent
@@ -45,7 +45,7 @@ class Presenter(object):
         """
         self._model= model
         self._view= view
-        model.statusChangedEvent().register(self.onModelStatusChanged)
+        model.status_changed_event().register(self.onModelStatusChanged)
 
     def onModelStatusChanged(self, status, message):
 
@@ -100,18 +100,18 @@ class Model(IModel):
                  jobsFilter=NoFilter(),
                  messageComposer=DefaultMessageComposer(),
                  statusReader=StatusReader(),
-                 statusChangedEvent=Event()):
+                 status_changed_event=Event()):
         """
         @type jobsModel: trayjenkins.jobs.IModel
         @type jobsFilter: trayjenkins.jobs.IFilter
         @type messageComposer: trayjenkins.status.IMessageComposer
         @type statusReader: trayjenkins.status.IStatusReader
-        @type statusChangedEvent: trayjenkins.event.Event
+        @type status_changed_event: trayjenkins.event.Event
         """
         self._jobsFilter = jobsFilter
         self._messageComposer = messageComposer
         self._statusReader = statusReader
-        self._statusChangedEvent = statusChangedEvent
+        self._status_changed_event = status_changed_event
         self._lastStatus = JobStatus.UNKNOWN
         self._lastMessage = None
         
@@ -123,13 +123,13 @@ class Model(IModel):
         status = self._statusReader.status(jobs)
         message = self._messageComposer.message(jobs)
         if self._lastStatus != status or self._lastMessage != message:
-            self._statusChangedEvent.fire(status, message)
+            self._status_changed_event.fire(status, message)
         self._lastStatus = status
         self._lastMessage = message
 
-    def statusChangedEvent(self):
+    def status_changed_event(self):
         """
         Event arguments: status:str
         @rtype: trayjenkins.event.IEvent
         """
-        return self._statusChangedEvent
+        return self._status_changed_event
