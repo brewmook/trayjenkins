@@ -6,26 +6,26 @@ class JobsModel(IModel):
 
     def __init__(self):
         self._jobsUpdatedEvent = Event()
-        self.jobs = []
-        self.jobsRota = [[Job('spam', JobStatus.OK),
+        self._jobs = []
+        self._jobs_rota = [[Job('spam', JobStatus.OK),
                           Job('eggs', JobStatus.OK)],
                          [Job('spam', JobStatus.FAILING),
                           Job('eggs', JobStatus.DISABLED)],
                         ]
-        self.nextJobs = 0
+        self._next_jobs = 0
 
     def updateJobs(self):
         """
         @rtype: None
         """
-        jobs = self.jobsRota[self.nextJobs]
-        if self.jobs != jobs:
-            self.jobs = jobs
+        jobs = self._jobs_rota[self._next_jobs]
+        if self._jobs != jobs:
+            self._jobs = jobs
             self._jobsUpdatedEvent.fire(jobs)
 
-        self.nextJobs = self.nextJobs + 1
-        if self.nextJobs is len(self.jobsRota):
-            self.nextJobs = 0
+        self._next_jobs = self._next_jobs + 1
+        if self._next_jobs is len(self._jobs_rota):
+            self._next_jobs = 0
             
     def jobsUpdatedEvent(self):
         """
