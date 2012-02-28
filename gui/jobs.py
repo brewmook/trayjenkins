@@ -44,55 +44,55 @@ class ContextMenuFactory(object):
 
 class ListView(QtGui.QGroupBox, IView):
 
-    def __init__(self, mediaFiles, ignoreJobsFilter):
+    def __init__(self, media_files, ignore_jobs_filter):
         """
-        @type mediaFiles: gui.media.MediaFiles
-        @type ignoreJobsFilter: trayjenkins.jobs.IgnoreJobsFilter
+        @type media_files: gui.media.MediaFiles
+        @type ignore_jobs_filter: trayjenkins.jobs.IgnoreJobsFilter
         """
         QtGui.QGroupBox.__init__(self, "Jobs")
 
         self._actions = ContextMenuActions(self,
-                                           ignore_trigger=self.ignoreJob,
-                                           cancel_ignore_trigger=self.unignoreJob)
+                                           ignore_trigger=self._ignore_job,
+                                           cancel_ignore_trigger=self._unignore_job)
 
         self._jobs = QtGui.QListWidget(self)
         self._jobs.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self._jobs.customContextMenuRequested.connect(self.onCustomContextMenuRequested)
-        self._ignoreJobsFilter = ignoreJobsFilter
+        self._jobs.customContextMenuRequested.connect(self._on_custom_context_menu_requested)
+        self._ignore_jobs_filter = ignore_jobs_filter
         self._icons = {
-            JobStatus.DISABLED: mediaFiles.disabledIcon(),
-            JobStatus.FAILING:  mediaFiles.failingIcon(),
-            JobStatus.OK:       mediaFiles.okIcon(),
-            JobStatus.UNKNOWN:  mediaFiles.unknownIcon(),
+            JobStatus.DISABLED: media_files.disabledIcon(),
+            JobStatus.FAILING:  media_files.failingIcon(),
+            JobStatus.OK:       media_files.okIcon(),
+            JobStatus.UNKNOWN:  media_files.unknownIcon(),
             }
-        self._ignoredIcon = mediaFiles.ignoredIcon()
+        self._ignored_icon = media_files.ignoredIcon()
 
         layout = QtGui.QVBoxLayout()
         layout.addWidget(self._jobs)
         self.setLayout(layout)
 
-    def onCustomContextMenuRequested(self, point):
+    def _on_custom_context_menu_requested(self, point):
         """
         @type point: PySide.QtCore.QPoint
         """
         item = self._jobs.itemAt(point)
         if item is not None:
-            factory = ContextMenuFactory(self._actions, self._ignoreJobsFilter)
+            factory = ContextMenuFactory(self._actions, self._ignore_jobs_filter)
             menu = factory.create(self._jobs, item.text())
             menu.popup(self._jobs.mapToGlobal(point))
 
-    def ignoreJob(self):
+    def _ignore_job(self):
 
         item = self._jobs.currentItem()
         if item is not None:
-            self._ignoreJobsFilter.ignore(item.text())
-            item.setIcon(self._ignoredIcon)
+            self._ignore_jobs_filter.ignore(item.text())
+            item.setIcon(self._ignored_icon)
         
-    def unignoreJob(self):
+    def _unignore_job(self):
 
         item = self._jobs.currentItem()
         if item is not None:
-            self._ignoreJobsFilter.unignore(item.text())
+            self._ignore_jobs_filter.unignore(item.text())
             item.setIcon(self._icons[JobStatus.UNKNOWN])
         
     def setJobs(self, jobs):
@@ -101,8 +101,8 @@ class ListView(QtGui.QGroupBox, IView):
         """
         self._jobs.clear()
         for job in jobs:
-            if self._ignoreJobsFilter.ignoring(job.name):
-                icon = self._ignoredIcon
+            if self._ignore_jobs_filter.ignoring(job.name):
+                icon = self._ignored_icon
             else:
                 icon = self._icons[job.status]
             self._jobs.addItem(QtGui.QListWidgetItem(icon, job.name))
