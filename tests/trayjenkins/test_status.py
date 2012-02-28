@@ -17,7 +17,7 @@ class StatusPresenterTests(TestCase):
         event= Event()
 
         model.status_changed_event().AndReturn(event)
-        view.setStatus('some status string', 'status message')
+        view.set_status('some status string', 'status message')
 
         mocks.ReplayAll()
 

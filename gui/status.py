@@ -34,7 +34,7 @@ class TrayIconViewAdapter(IView):
         self._view = view
         self._media = mediaFiles
 
-    def setStatus(self, status, message):
+    def set_status(self, status, message):
         """
         @type status: str
         @type message: str
@@ -79,7 +79,7 @@ class SoundView(IView):
             JobStatus.OK:      Phonon.MediaSource(mediaFiles.ok_sound_path()),
             }
 
-    def setStatus(self, status, message):
+    def set_status(self, status, message):
         """
         @type status: str
         """
@@ -99,9 +99,9 @@ class MultiView(IView):
         """
         self._views = views
 
-    def setStatus(self, status, message):
+    def set_status(self, status, message):
         """
         @type status: str
         """
         for view in self._views:
-            view.setStatus(status, message)
+            view.set_status(status, message)

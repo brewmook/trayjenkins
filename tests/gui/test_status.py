@@ -19,7 +19,7 @@ class TrayIconViewAdapterTests(TestCase):
         self.media.ok_icon().InAnyOrder().AndReturn('ok.png')
         self.media.unknown_icon().InAnyOrder().AndReturn('unknown.png')
 
-    def test_setStatus_FailingStatus_PassCorrectArgumentsToView(self):
+    def test__set_status__FailingStatus_PassCorrectArgumentsToView(self):
 
         self.view.setIcon('failing.png',
                           'Failing',
@@ -30,11 +30,11 @@ class TrayIconViewAdapterTests(TestCase):
         self.mocks.ReplayAll()
 
         adapter = gui.status.TrayIconViewAdapter(self.view, self.media)
-        adapter.setStatus(JobStatus.FAILING, 'fail message')
+        adapter.set_status(JobStatus.FAILING, 'fail message')
 
         mox.Verify(self.view)
 
-    def test_setStatus_OkStatus_PassCorrectArgumentsToView(self):
+    def test__set_status__OkStatus_PassCorrectArgumentsToView(self):
 
         self.view.setIcon('ok.png',
                           'Ok',
@@ -45,11 +45,11 @@ class TrayIconViewAdapterTests(TestCase):
         self.mocks.ReplayAll()
 
         adapter = gui.status.TrayIconViewAdapter(self.view, self.media)
-        adapter.setStatus(JobStatus.OK, 'pass message')
+        adapter.set_status(JobStatus.OK, 'pass message')
 
         mox.Verify(self.view)
 
-    def test_setStatus_UnknownStatus_PassCorrectArgumentsToView(self):
+    def test__set_status__UnknownStatus_PassCorrectArgumentsToView(self):
 
         self.view.setIcon('unknown.png',
                           'Unknown',
@@ -60,11 +60,11 @@ class TrayIconViewAdapterTests(TestCase):
         self.mocks.ReplayAll()
 
         adapter = gui.status.TrayIconViewAdapter(self.view, self.media)
-        adapter.setStatus(JobStatus.UNKNOWN, 'unknown message')
+        adapter.set_status(JobStatus.UNKNOWN, 'unknown message')
 
         mox.Verify(self.view)
 
-    def test_setStatus_NonsenseStatus_PassCorrectArgumentsToView(self):
+    def test__set_status__NonsenseStatus_PassCorrectArgumentsToView(self):
 
         self.view.setIcon('unknown.png',
                           'Nonsense',
@@ -75,11 +75,11 @@ class TrayIconViewAdapterTests(TestCase):
         self.mocks.ReplayAll()
 
         adapter = gui.status.TrayIconViewAdapter(self.view, self.media)
-        adapter.setStatus('nonsense', 'any message')
+        adapter.set_status('nonsense', 'any message')
 
         mox.Verify(self.view)
 
-    def test_setStatus_StatusIsNone_PassCorrectArgumentsToView(self):
+    def test__set_status__StatusIsNone_PassCorrectArgumentsToView(self):
 
         self.view.setIcon('unknown.png',
                           'None',
@@ -90,11 +90,11 @@ class TrayIconViewAdapterTests(TestCase):
         self.mocks.ReplayAll()
 
         adapter = gui.status.TrayIconViewAdapter(self.view, self.media)
-        adapter.setStatus(None, 'any message')
+        adapter.set_status(None, 'any message')
 
         mox.Verify(self.view)
 
-    def test_setStatus_MessageIsNone_PassCorrectArgumentsToView(self):
+    def test__set_status__MessageIsNone_PassCorrectArgumentsToView(self):
 
         self.view.setIcon(mox.IgnoreArg(),
                           mox.IgnoreArg(),
@@ -105,6 +105,6 @@ class TrayIconViewAdapterTests(TestCase):
         self.mocks.ReplayAll()
 
         adapter = gui.status.TrayIconViewAdapter(self.view, self.media)
-        adapter.setStatus('shrubbery', None)
+        adapter.set_status('shrubbery', None)
 
         mox.Verify(self.view)

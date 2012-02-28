@@ -44,7 +44,7 @@ class TrayIcon(object):
                                             gui.status.SoundView(parent, media_files)])
         self.status_model = StatusModel(jobs_model, jobsFilter=ignore_jobs_filter)
         self.status_presenter = StatusPresenter(self.status_model, status_view)
-        status_view.setStatus(JobStatus.UNKNOWN, None)
+        status_view.set_status(JobStatus.UNKNOWN, None)
 
         self._tray_icon.show()
 

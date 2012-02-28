@@ -12,7 +12,7 @@ class IModel(object):
 
 class IView(object):
 
-    def setStatus(self, status, message):
+    def set_status(self, status, message):
         """
         @type status: str
         @type message: str
@@ -49,7 +49,7 @@ class Presenter(object):
 
     def onModelStatusChanged(self, status, message):
 
-        self._view.setStatus(status, message)
+        self._view.set_status(status, message)
 
 class DefaultMessageComposer(IMessageComposer):
 
