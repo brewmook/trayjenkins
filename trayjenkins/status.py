@@ -45,9 +45,9 @@ class Presenter(object):
         """
         self._model= model
         self._view= view
-        model.status_changed_event().register(self.onModelStatusChanged)
+        model.status_changed_event().register(self._on_model_status_changed)
 
-    def onModelStatusChanged(self, status, message):
+    def _on_model_status_changed(self, status, message):
 
         self._view.set_status(status, message)
 
@@ -96,32 +96,32 @@ class StatusReader(IStatusReader):
 class Model(IModel):
 
     def __init__(self,
-                 jobsModel,
-                 jobsFilter=NoFilter(),
-                 messageComposer=DefaultMessageComposer(),
-                 statusReader=StatusReader(),
+                 jobs_model,
+                 jobs_filter=NoFilter(),
+                 message_composer=DefaultMessageComposer(),
+                 status_reader=StatusReader(),
                  status_changed_event=Event()):
         """
-        @type jobsModel: trayjenkins.jobs.IModel
-        @type jobsFilter: trayjenkins.jobs.IFilter
-        @type messageComposer: trayjenkins.status.IMessageComposer
-        @type statusReader: trayjenkins.status.IStatusReader
+        @type jobs_model: trayjenkins.jobs.IModel
+        @type jobs_filter: trayjenkins.jobs.IFilter
+        @type message_composer: trayjenkins.status.IMessageComposer
+        @type status_reader: trayjenkins.status.IStatusReader
         @type status_changed_event: trayjenkins.event.Event
         """
-        self._jobsFilter = jobsFilter
-        self._messageComposer = messageComposer
-        self._statusReader = statusReader
+        self._jobs_filter = jobs_filter
+        self._message_composer = message_composer
+        self._status_reader = status_reader
         self._status_changed_event = status_changed_event
         self._lastStatus = JobStatus.UNKNOWN
         self._lastMessage = None
         
-        jobsModel.jobs_updated_event().register(self.onJobsUpdated)
+        jobs_model.jobs_updated_event().register(self._on_jobs_updated)
 
-    def onJobsUpdated(self, jobs):
+    def _on_jobs_updated(self, jobs):
 
-        jobs = self._jobsFilter.filter(jobs)
-        status = self._statusReader.status(jobs)
-        message = self._messageComposer.message(jobs)
+        jobs = self._jobs_filter.filter(jobs)
+        status = self._status_reader.status(jobs)
+        message = self._message_composer.message(jobs)
         if self._lastStatus != status or self._lastMessage != message:
             self._status_changed_event.fire(status, message)
         self._lastStatus = status

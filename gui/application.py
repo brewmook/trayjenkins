@@ -42,7 +42,7 @@ class TrayIcon(object):
         tray_icon_view_adapter = gui.status.TrayIconViewAdapter(tray_icon_view, media_files)
         status_view = gui.status.MultiView([tray_icon_view_adapter,
                                             gui.status.SoundView(parent, media_files)])
-        self.status_model = StatusModel(jobs_model, jobsFilter=ignore_jobs_filter)
+        self.status_model = StatusModel(jobs_model, jobs_filter=ignore_jobs_filter)
         self.status_presenter = StatusPresenter(self.status_model, status_view)
         status_view.set_status(JobStatus.UNKNOWN, None)
 
