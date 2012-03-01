@@ -11,22 +11,23 @@ class ContextMenuActions(object):
 
 class ContextMenuFactory(object):
 
-    def __init__(self, actions, ignore_jobs_filter, qtgui=QtGuiFactory()):
+    def __init__(self, parent, actions, ignore_jobs_filter, qtgui=QtGuiFactory()):
         """
+        @type parent: PySide.QtGui.Widget
         @type actions: ContextMenuActions
         @type ignore_jobs_filter: trayjenkins.jobs.IgnoreJobsFilter
         @type qtgui: QtGuiFactory
         """
+        self._parent = parent
         self._actions = actions
         self._ignore_jobs_filter = ignore_jobs_filter
         self._qtgui = qtgui
 
-    def create(self, parent, job_name):
+    def create(self, job_name):
         """
-        @type parent: PySide.QtGui.Widget
         @type job_name: str
         """
-        menu = self._qtgui.QMenu(parent)
+        menu = self._qtgui.QMenu(self._parent)
         if self._ignore_jobs_filter.ignoring(job_name):
             menu.addAction(self._actions.cancel_ignore)
         else:
@@ -43,13 +44,17 @@ class ListView(QtGui.QGroupBox, IView):
         """
         QtGui.QGroupBox.__init__(self, "Jobs")
 
-        self._actions = ContextMenuActions(QtGui.QAction('Ignore', self, triggered=self._ignore_job),
-                                           QtGui.QAction('Cancel ignore', self, triggered=self._unignore_job))
 
         self._jobs = QtGui.QListWidget(self)
         self._jobs.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self._jobs.customContextMenuRequested.connect(self._on_custom_context_menu_requested)
+
         self._ignore_jobs_filter = ignore_jobs_filter
+
+        actions = ContextMenuActions(QtGui.QAction('Ignore', self, triggered=self._ignore_job),
+                                     QtGui.QAction('Cancel ignore', self, triggered=self._unignore_job))
+        self._menu_factory = ContextMenuFactory(self._jobs, actions, ignore_jobs_filter)
+
         self._icons = {
             JobStatus.DISABLED: media_files.disabled_icon(),
             JobStatus.FAILING:  media_files.failing_icon(),
@@ -68,8 +73,7 @@ class ListView(QtGui.QGroupBox, IView):
         """
         item = self._jobs.itemAt(point)
         if item is not None:
-            factory = ContextMenuFactory(self._actions, self._ignore_jobs_filter)
-            menu = factory.create(self._jobs, item.text())
+            menu = self._menu_factory.create(item.text())
             menu.popup(self._jobs.mapToGlobal(point))
 
     def _ignore_job(self):

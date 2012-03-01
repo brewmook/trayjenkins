@@ -29,11 +29,12 @@ class ContextMenuFactoryTests(TestCase):
         self.menu.addAction(mox.IgnoreArg())
         self.mocks.ReplayAll()
 
-        factory = gui.jobs.ContextMenuFactory(self.actions,
+        factory = gui.jobs.ContextMenuFactory(self.parent,
+                                              self.actions,
                                               self.ignoreJobsFilter,
                                               self.qtgui)
 
-        result = factory.create(self.parent, 'job')
+        result = factory.create('job')
 
         self.assertTrue(self.menu is result)
 
@@ -43,11 +44,12 @@ class ContextMenuFactoryTests(TestCase):
         self.menu.addAction('ignore action')
         self.mocks.ReplayAll()
 
-        factory = gui.jobs.ContextMenuFactory(self.actions,
+        factory = gui.jobs.ContextMenuFactory(self.parent,
+                                              self.actions,
                                               self.ignoreJobsFilter,
                                               self.qtgui)
 
-        result = factory.create(self.parent, 'job')
+        result = factory.create('job')
 
         mox.Verify(self.menu)
 
@@ -57,11 +59,12 @@ class ContextMenuFactoryTests(TestCase):
         self.menu.addAction('cancel ignore action')
         self.mocks.ReplayAll()
 
-        factory = gui.jobs.ContextMenuFactory(self.actions,
+        factory = gui.jobs.ContextMenuFactory(self.parent,
+                                              self.actions,
                                               self.ignoreJobsFilter,
                                               self.qtgui)
 
-        result = factory.create(self.parent, 'job')
+        result = factory.create('job')
 
         mox.Verify(self.menu)
 
