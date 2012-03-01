@@ -5,17 +5,9 @@ from gui.qmock import QtGuiFactory
 
 class ContextMenuActions(object):
 
-    def __init__(self, parent, ignore_trigger, cancel_ignore_trigger):
-
-        self._ignore = QtGui.QAction('Ignore', parent, triggered=ignore_trigger)
-        self._cancel_ignore = QtGui.QAction('Cancel ignore', parent, triggered=cancel_ignore_trigger)
-
-    def ignore(self):
-        return self._ignore
-
-    def cancel_ignore(self):
-        return self._cancel_ignore
-
+    def __init__(self, ignore, cancel_ignore):
+        self.ignore = ignore
+        self.cancel_ignore = cancel_ignore
 
 class ContextMenuFactory(object):
 
@@ -36,9 +28,9 @@ class ContextMenuFactory(object):
         """
         menu = self._qtgui.QMenu(parent)
         if self._ignore_jobs_filter.ignoring(job_name):
-            menu.addAction(self._actions.cancel_ignore())
+            menu.addAction(self._actions.cancel_ignore)
         else:
-            menu.addAction(self._actions.ignore())
+            menu.addAction(self._actions.ignore)
         return menu
 
 
@@ -51,9 +43,8 @@ class ListView(QtGui.QGroupBox, IView):
         """
         QtGui.QGroupBox.__init__(self, "Jobs")
 
-        self._actions = ContextMenuActions(self,
-                                           ignore_trigger=self._ignore_job,
-                                           cancel_ignore_trigger=self._unignore_job)
+        self._actions = ContextMenuActions(QtGui.QAction('Ignore', self, triggered=self._ignore_job),
+                                           QtGui.QAction('Cancel ignore', self, triggered=self._unignore_job))
 
         self._jobs = QtGui.QListWidget(self)
         self._jobs.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
