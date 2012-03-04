@@ -28,7 +28,7 @@ class IView(object):
 
 class IFilter(object):
 
-    def filter(self, jobs):
+    def filter_jobs(self, jobs):
         """
         @type jobs: [pyjenkins.job.Job]
         @rtype: [pyjenkins.job.Job]
@@ -53,7 +53,7 @@ class Presenter(object):
 
 class NoFilter(IFilter):
 
-    def filter(self, jobs):
+    def filter_jobs(self, jobs):
 
         return jobs
 
@@ -81,7 +81,7 @@ class Model(IModel):
         @rtype: None
         """
         jobs = self._jenkins.list_jobs()
-        filtered = self._jobs_filter.filter(jobs)
+        filtered = self._jobs_filter.filter_jobs(jobs)
         if self._jobs != filtered:
             self._jobs = filtered
             self._jobs_updated_event.fire(jobs)
@@ -100,7 +100,7 @@ class IgnoreJobsFilter(IFilter):
 
         self._ignores = set()
 
-    def filter(self, jobs):
+    def filter_jobs(self, jobs):
 
         return [job for job in jobs if job.name not in self._ignores]
 
