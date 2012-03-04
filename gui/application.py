@@ -14,6 +14,7 @@ from pyjenkins.job import JobStatus
 from pyjenkins.server import Server
 from trayjenkins import __version__
 
+
 class TrayIcon(object):
 
     def __init__(self,
@@ -121,14 +122,14 @@ class Application(QtGui.QDialog):
         jenkins_host = self._parse_options()
         media_files = gui.media.MediaFiles(self._executable_path())
 
-        window = MainWindow(jenkins_host, media_files)
+        window = MainWindow(jenkins_host, media_files)  # @UnusedVariable
 
         return self._application.exec_()
 
     def _parse_options(self):
 
         parser = OptionParser(usage='usage: %prog [options] host')
-        (options, args) = parser.parse_args()
+        (options, args) = parser.parse_args()  # @UnusedVariable
 
         if len(args) is 1:
             jenkins_host = args[0]
@@ -142,7 +143,7 @@ class Application(QtGui.QDialog):
 
         path = ''
         try:
-            path = sys._MEIPASS
+            path = sys._MEIPASS  # @UndefinedVariable
         except AttributeError:
             path = os.path.abspath(".")
 

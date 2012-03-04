@@ -3,7 +3,8 @@ from unittest import TestCase
 
 from trayjenkins.event import Event, IEvent
 from trayjenkins.jobs import IModel as JobsModel, IFilter
-from trayjenkins.status import *
+from trayjenkins.status import IModel, IView, Presenter, IMessageComposer,\
+    IStatusReader, Model, StatusReader, DefaultMessageComposer
 from pyjenkins.job import Job, JobStatus
 
 
@@ -22,7 +23,7 @@ class StatusPresenterTests(TestCase):
 
         mocks.ReplayAll()
 
-        presenter = Presenter(model, view)
+        presenter = Presenter(model, view)  # @UnusedVariable
         event.fire('some status string', 'status message')
 
         mox.Verify(view)
@@ -49,7 +50,11 @@ class StatusModelTests(TestCase):
         self.statusReader.status(self.jobs).AndReturn(JobStatus.UNKNOWN)
         self.mocks.ReplayAll()
 
-        model = Model(self.jobsModel, self.jobs_filter, self.messageComposer, self.statusReader, self.statusEvent)
+        model = Model(self.jobsModel,  # @UnusedVariable
+                      self.jobs_filter,
+                      self.messageComposer,
+                      self.statusReader,
+                      self.statusEvent)
 
         self.jobsEvent.fire(self.jobs)
 
@@ -63,7 +68,11 @@ class StatusModelTests(TestCase):
         self.statusEvent.fire(JobStatus.FAILING, 'message')
         self.mocks.ReplayAll()
 
-        model = Model(self.jobsModel, self.jobs_filter, self.messageComposer, self.statusReader, self.statusEvent)
+        model = Model(self.jobsModel,  # @UnusedVariable
+                      self.jobs_filter,
+                      self.messageComposer,
+                      self.statusReader,
+                      self.statusEvent)
 
         self.jobsEvent.fire(self.jobs)
 
@@ -80,7 +89,11 @@ class StatusModelTests(TestCase):
         self.statusEvent.fire(JobStatus.FAILING, 'message')
         self.mocks.ReplayAll()
 
-        model = Model(self.jobsModel, self.jobs_filter, self.messageComposer, self.statusReader, self.statusEvent)
+        model = Model(self.jobsModel,  # @UnusedVariable
+                      self.jobs_filter,
+                      self.messageComposer,
+                      self.statusReader,
+                      self.statusEvent)
 
         self.jobsEvent.fire(self.jobs)
         self.jobsEvent.fire(self.jobs)
@@ -99,7 +112,11 @@ class StatusModelTests(TestCase):
         self.statusEvent.fire(JobStatus.OK, 'message')
         self.mocks.ReplayAll()
 
-        model = Model(self.jobsModel, self.jobs_filter, self.messageComposer, self.statusReader, self.statusEvent)
+        model = Model(self.jobsModel,  # @UnusedVariable
+                      self.jobs_filter,
+                      self.messageComposer,
+                      self.statusReader,
+                      self.statusEvent)
 
         self.jobsEvent.fire(self.jobs)
         self.jobsEvent.fire(self.jobs)
@@ -118,7 +135,11 @@ class StatusModelTests(TestCase):
         self.statusEvent.fire(JobStatus.FAILING, 'message two')
         self.mocks.ReplayAll()
 
-        model = Model(self.jobsModel, self.jobs_filter, self.messageComposer, self.statusReader, self.statusEvent)
+        model = Model(self.jobsModel,  # @UnusedVariable
+                      self.jobs_filter,
+                      self.messageComposer,
+                      self.statusReader,
+                      self.statusEvent)
 
         self.jobsEvent.fire(self.jobs)
         self.jobsEvent.fire(self.jobs)
@@ -134,7 +155,11 @@ class StatusModelTests(TestCase):
         self.statusEvent.fire(JobStatus.OK, 'message')
         self.mocks.ReplayAll()
 
-        model = Model(self.jobsModel, self.jobs_filter, self.messageComposer, self.statusReader, self.statusEvent)
+        model = Model(self.jobsModel,  # @UnusedVariable
+                      self.jobs_filter,
+                      self.messageComposer,
+                      self.statusReader,
+                      self.statusEvent)
 
         self.jobsEvent.fire(self.jobs)
 

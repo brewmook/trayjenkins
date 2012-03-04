@@ -1,11 +1,12 @@
 import mox
 from unittest import TestCase
+
 from pyjenkins.interfaces import IJenkinsFactory
 from pyjenkins.jenkins import Jenkins
 from pyjenkins.job import Job, JobStatus
-
+from pyjenkins.server import Server
 from trayjenkins.event import Event, IEvent
-from trayjenkins.jobs import *
+from trayjenkins.jobs import IModel, IView, IFilter, Presenter, Model, NoFilter, IgnoreJobsFilter
 
 
 class JobsPresenterTests(TestCase):
@@ -24,7 +25,7 @@ class JobsPresenterTests(TestCase):
 
         mocks.ReplayAll()
 
-        presenter = Presenter(model, view)
+        presenter = Presenter(model, view)  # @UnusedVariable
         event.fire(jobs)
 
         mox.Verify(view)

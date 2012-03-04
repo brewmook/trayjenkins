@@ -1,6 +1,4 @@
-from pyjenkins.backend.http import Http
-from pyjenkins.jenkins import Jenkins, JenkinsFactory
-from pyjenkins.server import Server
+from pyjenkins.jenkins import JenkinsFactory
 from trayjenkins.event import Event
 
 
