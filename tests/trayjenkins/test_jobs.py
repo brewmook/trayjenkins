@@ -35,7 +35,7 @@ class JobsModelTests(TestCase):
     def setUp(self):
 
         self.mocks = mox.Mox()
-        self.filter = self.mocks.CreateMock(IFilter)
+        self.jobs_filter = self.mocks.CreateMock(IFilter)
         self.jenkins = self.mocks.CreateMock(Jenkins)
         self.factory = self.mocks.CreateMock(IJenkinsFactory)
         self.event = self.mocks.CreateMock(IEvent)
@@ -44,13 +44,13 @@ class JobsModelTests(TestCase):
     def test__update_jobs__FirstCall_FireJobsUpdatedEventWithRetrievedJobs(self):
 
         jobs = [Job('job1', JobStatus.OK), Job('job2', JobStatus.FAILING)]
-        self.filter.filter_jobs(mox.IgnoreArg()).AndReturn(jobs)
+        self.jobs_filter.filter_jobs(mox.IgnoreArg()).AndReturn(jobs)
         self.factory.create(self.server).AndReturn(self.jenkins)
         self.jenkins.list_jobs().AndReturn(jobs)
         self.event.fire(jobs)
         self.mocks.ReplayAll()
 
-        model = Model(self.server, self.filter, self.factory, self.event)
+        model = Model(self.server, self.jobs_filter, self.factory, self.event)
         model.update_jobs()
 
         mox.Verify(self.event)
@@ -58,15 +58,15 @@ class JobsModelTests(TestCase):
     def test__update_jobs__SecondCallReturnsSameJobs_JobsUpdatedEventNotFiredOnceOnly(self):
 
         jobs = [Job('job1', JobStatus.OK), Job('job2', JobStatus.FAILING)]
-        self.filter.filter_jobs(mox.IgnoreArg()).AndReturn(jobs)
-        self.filter.filter_jobs(mox.IgnoreArg()).AndReturn(jobs)
+        self.jobs_filter.filter_jobs(mox.IgnoreArg()).AndReturn(jobs)
+        self.jobs_filter.filter_jobs(mox.IgnoreArg()).AndReturn(jobs)
         self.factory.create(self.server).AndReturn(self.jenkins)
         self.jenkins.list_jobs().AndReturn(jobs)
         self.jenkins.list_jobs().AndReturn(jobs)
         self.event.fire(jobs)
         self.mocks.ReplayAll()
 
-        model = Model(self.server, self.filter, self.factory, self.event)
+        model = Model(self.server, self.jobs_filter, self.factory, self.event)
         model.update_jobs()
         model.update_jobs()
 
@@ -76,8 +76,8 @@ class JobsModelTests(TestCase):
 
         jobsOne = [Job('job1', JobStatus.OK), Job('job2', JobStatus.FAILING)]
         jobsTwo = [Job('job1', JobStatus.OK), Job('job2', JobStatus.OK)]
-        self.filter.filter_jobs(jobsOne).AndReturn(jobsOne)
-        self.filter.filter_jobs(jobsTwo).AndReturn(jobsTwo)
+        self.jobs_filter.filter_jobs(jobsOne).AndReturn(jobsOne)
+        self.jobs_filter.filter_jobs(jobsTwo).AndReturn(jobsTwo)
         self.factory.create(self.server).AndReturn(self.jenkins)
         self.jenkins.list_jobs().AndReturn(jobsOne)
         self.jenkins.list_jobs().AndReturn(jobsTwo)
@@ -85,7 +85,7 @@ class JobsModelTests(TestCase):
         self.event.fire(jobsTwo)
         self.mocks.ReplayAll()
 
-        model = Model(self.server, self.filter, self.factory, self.event)
+        model = Model(self.server, self.jobs_filter, self.factory, self.event)
         model.update_jobs()
         model.update_jobs()
 
@@ -95,8 +95,8 @@ class JobsModelTests(TestCase):
 
         real_jobs = [Job('job1', JobStatus.OK), Job('job2', JobStatus.FAILING)]
         filtered_jobs = [Job('job1', JobStatus.OK)]
-        self.filter.filter_jobs(real_jobs).AndReturn(real_jobs)
-        self.filter.filter_jobs(real_jobs).AndReturn(filtered_jobs)
+        self.jobs_filter.filter_jobs(real_jobs).AndReturn(real_jobs)
+        self.jobs_filter.filter_jobs(real_jobs).AndReturn(filtered_jobs)
         self.factory.create(self.server).AndReturn(self.jenkins)
         self.jenkins.list_jobs().AndReturn(real_jobs)
         self.jenkins.list_jobs().AndReturn(real_jobs)
@@ -104,7 +104,7 @@ class JobsModelTests(TestCase):
         self.event.fire(real_jobs)
         self.mocks.ReplayAll()
 
-        model = Model(self.server, self.filter, self.factory, self.event)
+        model = Model(self.server, self.jobs_filter, self.factory, self.event)
         model.update_jobs()
         model.update_jobs()
 
@@ -115,7 +115,7 @@ class JobsModelTests(TestCase):
         self.factory.create(mox.IgnoreArg()).AndReturn(None)
         self.mocks.ReplayAll()
 
-        model = Model(self.server, self.filter, self.factory, self.event)
+        model = Model(self.server, self.jobs_filter, self.factory, self.event)
 
         self.assertTrue(self.event is model.jobs_updated_event())
 
@@ -125,8 +125,8 @@ class NoFilterTests(TestCase):
     def test_filter_ReturnUnmodifiedList(self):
 
         jobs = ['list', 'of', 'jobs']
-        filter = NoFilter()
-        result = filter.filter_jobs(jobs)
+        no_filter = NoFilter()
+        result = no_filter.filter_jobs(jobs)
 
         self.assertTrue(jobs is result)
 
@@ -138,8 +138,8 @@ class IgnoreJobsFilterTests(TestCase):
         jobs = [Job('eric', JobStatus.FAILING),
                 Job('terry', JobStatus.FAILING)]
 
-        filter = IgnoreJobsFilter()
-        result = filter.filter_jobs(jobs)
+        jobs_filter = IgnoreJobsFilter()
+        result = jobs_filter.filter_jobs(jobs)
 
         self.assertEqual(jobs, result)
 
@@ -148,11 +148,11 @@ class IgnoreJobsFilterTests(TestCase):
         jobs = [Job('eric', JobStatus.FAILING),
                 Job('terry', JobStatus.FAILING)]
 
-        filter = IgnoreJobsFilter()
-        filter.ignore('terry')
+        jobs_filter = IgnoreJobsFilter()
+        jobs_filter.ignore('terry')
 
         expected = [Job('eric', JobStatus.FAILING)]
-        result = filter.filter_jobs(jobs)
+        result = jobs_filter.filter_jobs(jobs)
 
         self.assertEqual(expected, result)
 
@@ -161,12 +161,12 @@ class IgnoreJobsFilterTests(TestCase):
         jobs = [Job('eric', JobStatus.FAILING),
                 Job('terry', JobStatus.FAILING)]
 
-        filter = IgnoreJobsFilter()
-        filter.ignore('eric')
-        filter.ignore('terry')
+        jobs_filter = IgnoreJobsFilter()
+        jobs_filter.ignore('eric')
+        jobs_filter.ignore('terry')
 
         expected = []
-        result = filter.filter_jobs(jobs)
+        result = jobs_filter.filter_jobs(jobs)
 
         self.assertEqual(expected, result)
 
@@ -175,27 +175,27 @@ class IgnoreJobsFilterTests(TestCase):
         jobs = [Job('eric', JobStatus.FAILING),
                 Job('terry', JobStatus.FAILING)]
 
-        filter = IgnoreJobsFilter()
-        filter.ignore('terry')
-        filter.unignore('terry')
+        jobs_filter = IgnoreJobsFilter()
+        jobs_filter.ignore('terry')
+        jobs_filter.unignore('terry')
 
-        result = filter.filter_jobs(jobs)
+        result = jobs_filter.filter_jobs(jobs)
 
         self.assertEqual(jobs, result)
 
     def test_ignoring_JobNotIgnored_ReturnFalse(self):
 
-        filter = IgnoreJobsFilter()
+        jobs_filter = IgnoreJobsFilter()
 
-        result = filter.ignoring('norwegian blue')
+        result = jobs_filter.ignoring('norwegian blue')
 
         self.assertEqual(False, result)
 
     def test_ignoring_JobIsIgnored_ReturnTrue(self):
 
-        filter = IgnoreJobsFilter()
-        filter.ignore('norwegian blue')
+        jobs_filter = IgnoreJobsFilter()
+        jobs_filter.ignore('norwegian blue')
 
-        result = filter.ignoring('norwegian blue')
+        result = jobs_filter.ignoring('norwegian blue')
 
         self.assertEqual(True, result)
