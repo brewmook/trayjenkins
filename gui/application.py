@@ -113,7 +113,7 @@ class Application(QtGui.QDialog):
 
     def __init__(self):
 
-        self._application= QtGui.QApplication(sys.argv)
+        self._application = QtGui.QApplication(sys.argv)
         self._application.setApplicationName('Trayjenkins')
 
     def run(self):
@@ -145,5 +145,5 @@ class Application(QtGui.QDialog):
             path = sys._MEIPASS
         except AttributeError:
             path = os.path.abspath(".")
-            
+
         return path

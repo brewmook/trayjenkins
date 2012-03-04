@@ -1,14 +1,15 @@
 import mox
 from unittest import TestCase
-from PySide import QtGui
 
 import gui.jobs
 import gui.qmock
 import trayjenkins.jobs
 
+
 class MockQMenu(object):
     def addAction(self, parameter):
         pass
+
 
 class ContextMenuFactoryTests(TestCase):
 
@@ -49,7 +50,7 @@ class ContextMenuFactoryTests(TestCase):
                                               self.ignoreJobsFilter,
                                               self.qtgui)
 
-        result = factory.create('job')
+        factory.create('job')
 
         mox.Verify(self.menu)
 
@@ -64,7 +65,6 @@ class ContextMenuFactoryTests(TestCase):
                                               self.ignoreJobsFilter,
                                               self.qtgui)
 
-        result = factory.create('job')
+        factory.create('job')
 
         mox.Verify(self.menu)
-

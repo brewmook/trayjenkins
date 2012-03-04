@@ -10,6 +10,7 @@ class IEvent(object):
         Calls all registered handlers with given arguments.
         """
 
+
 class Event(IEvent):
 
     def __init__(self):
@@ -21,5 +22,3 @@ class Event(IEvent):
     def fire(self, *args, **kargs):
         for handler in self.handlers:
             handler(*args, **kargs)
-
-

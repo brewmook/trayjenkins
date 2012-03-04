@@ -3,13 +3,14 @@ from PySide.phonon import Phonon
 from pyjenkins.job import JobStatus
 from trayjenkins.status import IView
 
+
 class TrayIconView(object):
 
     def __init__(self, trayIcon):
         """
         @type trayIcon: QtGui.QSystemTrayIcon
         """
-        self._trayIcon= trayIcon
+        self._trayIcon = trayIcon
 
     def setIcon(self, trayIcon, tooltip, messageTitle, messageText, messageIcon):
         """
@@ -76,7 +77,7 @@ class SoundView(IView):
 
         self._sounds = {
             JobStatus.FAILING: Phonon.MediaSource(mediaFiles.failing_sound_path()),
-            JobStatus.OK:      Phonon.MediaSource(mediaFiles.ok_sound_path()),
+            JobStatus.OK: Phonon.MediaSource(mediaFiles.ok_sound_path()),
             }
 
     def set_status(self, status, message):

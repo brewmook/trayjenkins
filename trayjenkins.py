@@ -3,6 +3,6 @@
 import sys
 from gui.application import Application
 
-app= Application()
+app = Application()
 
 sys.exit(app.run())

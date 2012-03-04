@@ -3,11 +3,13 @@ from trayjenkins.jobs import IView
 from pyjenkins.job import JobStatus
 from gui.qmock import QtGuiFactory
 
+
 class ContextMenuActions(object):
 
     def __init__(self, ignore, cancel_ignore):
         self.ignore = ignore
         self.cancel_ignore = cancel_ignore
+
 
 class ContextMenuFactory(object):
 
@@ -44,7 +46,6 @@ class ListView(QtGui.QGroupBox, IView):
         """
         QtGui.QGroupBox.__init__(self, "Jobs")
 
-
         self._jobs = QtGui.QListWidget(self)
         self._jobs.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self._jobs.customContextMenuRequested.connect(self._on_custom_context_menu_requested)
@@ -57,9 +58,9 @@ class ListView(QtGui.QGroupBox, IView):
 
         self._icons = {
             JobStatus.DISABLED: media_files.disabled_icon(),
-            JobStatus.FAILING:  media_files.failing_icon(),
-            JobStatus.OK:       media_files.ok_icon(),
-            JobStatus.UNKNOWN:  media_files.unknown_icon(),
+            JobStatus.FAILING: media_files.failing_icon(),
+            JobStatus.OK: media_files.ok_icon(),
+            JobStatus.UNKNOWN: media_files.unknown_icon(),
             }
         self._ignored_icon = media_files.ignored_icon()
 
@@ -82,14 +83,14 @@ class ListView(QtGui.QGroupBox, IView):
         if item is not None:
             self._ignore_jobs_filter.ignore(item.text())
             item.setIcon(self._ignored_icon)
-        
+
     def _unignore_job(self):
 
         item = self._jobs.currentItem()
         if item is not None:
             self._ignore_jobs_filter.unignore(item.text())
             item.setIcon(self._icons[JobStatus.UNKNOWN])
-        
+
     def set_jobs(self, jobs):
         """
         @type jobs: [pyjenkins.job.Job]
@@ -101,6 +102,7 @@ class ListView(QtGui.QGroupBox, IView):
             else:
                 icon = self._icons[job.status]
             self._jobs.addItem(QtGui.QListWidgetItem(icon, job.name))
+
 
 class UpdateTimer(QtCore.QObject):
 

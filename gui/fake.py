@@ -2,6 +2,7 @@ from trayjenkins.event import Event
 from trayjenkins.jobs import IModel
 from pyjenkins.job import Job, JobStatus
 
+
 class JobsModel(IModel):
 
     def __init__(self):
@@ -26,7 +27,7 @@ class JobsModel(IModel):
         self._next_jobs = self._next_jobs + 1
         if self._next_jobs is len(self._jobs_rota):
             self._next_jobs = 0
-            
+
     def jobs_updated_event(self):
         """
         Listeners receive Event.fire([pyjenkins.job.Job])

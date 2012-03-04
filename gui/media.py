@@ -1,6 +1,7 @@
 import os
 from PySide import QtGui
 
+
 class MediaFiles(object):
 
     def __init__(self, executable_path):

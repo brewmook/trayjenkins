@@ -2,6 +2,7 @@ from trayjenkins.event import Event
 from trayjenkins.jobs import NoFilter
 from pyjenkins.job import JobStatus
 
+
 class IModel(object):
 
     def status_changed_event(self):
@@ -10,6 +11,7 @@ class IModel(object):
         @rtype: trayjenkins.event.IEvent
         """
 
+
 class IView(object):
 
     def set_status(self, status, message):
@@ -17,6 +19,7 @@ class IView(object):
         @type status: str
         @type message: str
         """
+
 
 class IStatusReader(object):
 
@@ -27,6 +30,7 @@ class IStatusReader(object):
         @rtype: str
         """
 
+
 class IMessageComposer(object):
 
     def message(self, jobs):
@@ -36,6 +40,7 @@ class IMessageComposer(object):
         @rtype: str
         """
 
+
 class Presenter(object):
 
     def __init__(self, model, view):
@@ -43,13 +48,14 @@ class Presenter(object):
         @type model: trayjenkins.status.IModel
         @type view:  trayjenkins.status.IView
         """
-        self._model= model
-        self._view= view
+        self._model = model
+        self._view = view
         model.status_changed_event().register(self._on_model_status_changed)
 
     def _on_model_status_changed(self, status, message):
 
         self._view.set_status(status, message)
+
 
 class DefaultMessageComposer(IMessageComposer):
 
@@ -72,6 +78,7 @@ class DefaultMessageComposer(IMessageComposer):
 
         return result
 
+
 class StatusReader(IStatusReader):
 
     def status(self, jobs):
@@ -80,14 +87,14 @@ class StatusReader(IStatusReader):
         @return String from pyjenkins.job.JobStatus
         @rtype: str
         """
-        result= JobStatus.OK
+        result = JobStatus.OK
 
         if jobs is None:
-            result= JobStatus.UNKNOWN
+            result = JobStatus.UNKNOWN
         else:
             for job in jobs:
                 if job.status is JobStatus.FAILING:
-                    result= JobStatus.FAILING
+                    result = JobStatus.FAILING
                     break
 
         return result
@@ -114,7 +121,7 @@ class Model(IModel):
         self._status_changed_event = status_changed_event
         self._lastStatus = JobStatus.UNKNOWN
         self._lastMessage = None
-        
+
         jobs_model.jobs_updated_event().register(self._on_jobs_updated)
 
     def _on_jobs_updated(self, jobs):

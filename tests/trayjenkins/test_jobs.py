@@ -3,28 +3,28 @@ from unittest import TestCase
 from pyjenkins.interfaces import IJenkinsFactory
 from pyjenkins.jenkins import Jenkins
 from pyjenkins.job import Job, JobStatus
-from pyjenkins.server import Server
 
 from trayjenkins.event import Event, IEvent
 from trayjenkins.jobs import *
+
 
 class JobsPresenterTests(TestCase):
 
     def test_Constructor_ModelFiresJobsUpdatedEvent_ViewSetJobsCalled(self):
 
-        mocks= mox.Mox()
+        mocks = mox.Mox()
 
         jobs = 'list of jobs'
-        model= mocks.CreateMock(IModel)
-        view= mocks.CreateMock(IView)
-        event= Event()
+        model = mocks.CreateMock(IModel)
+        view = mocks.CreateMock(IView)
+        event = Event()
 
         model.jobs_updated_event().AndReturn(event)
         view.set_jobs(jobs)
 
         mocks.ReplayAll()
 
-        presenter= Presenter(model, view)
+        presenter = Presenter(model, view)
         event.fire(jobs)
 
         mox.Verify(view)
@@ -33,7 +33,7 @@ class JobsPresenterTests(TestCase):
 class JobsModelTests(TestCase):
 
     def setUp(self):
-        
+
         self.mocks = mox.Mox()
         self.filter = self.mocks.CreateMock(IFilter)
         self.jenkins = self.mocks.CreateMock(Jenkins)

@@ -7,6 +7,7 @@ from pyjenkins.job import JobStatus
 import gui.media
 import gui.status
 
+
 class TrayIconViewAdapterTests(TestCase):
 
     def setUp(self):

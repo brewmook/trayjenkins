@@ -3,6 +3,7 @@ from pyjenkins.jenkins import Jenkins, JenkinsFactory
 from pyjenkins.server import Server
 from trayjenkins.event import Event
 
+
 class IModel(object):
 
     def update_jobs(self):
@@ -16,12 +17,14 @@ class IModel(object):
         @rtype: trayjenkins.event.IEvent
         """
 
+
 class IView(object):
-    
+
     def set_jobs(self, jobs):
         """
         @type jobs: [pyjenkins.job.Job]
         """
+
 
 class IFilter(object):
 
@@ -31,6 +34,7 @@ class IFilter(object):
         @rtype: [pyjenkins.job.Job]
         """
 
+
 class Presenter(object):
 
     def __init__(self, model, view):
@@ -38,12 +42,12 @@ class Presenter(object):
         @type model: trayjenkins.jobs.IModel
         @type view:  trayjenkins.jobs.IView
         """
-        self._model= model
-        self._view= view
+        self._model = model
+        self._view = view
         model.jobs_updated_event().register(self._on_model_jobs_changed)
 
     def _on_model_jobs_changed(self, jobs):
-        
+
         self._view.set_jobs(jobs)
 
 

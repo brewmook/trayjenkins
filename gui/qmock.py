@@ -1,5 +1,6 @@
 from PySide import QtGui
 
+
 class QtGuiFactory(object):
 
     def QMenu(self, parentWidget):
