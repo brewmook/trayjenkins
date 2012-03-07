@@ -99,17 +99,27 @@ class IgnoreJobsFilter(IFilter):
         self._ignores = set()
 
     def filter_jobs(self, jobs):
-
+        """
+        @type jobs: [pyjenkins.job.Job]
+        @rtype: [pyjenkins.job.Job]
+        """
         return [job for job in jobs if job.name not in self._ignores]
 
-    def ignore(self, jobName):
+    def ignore(self, job_name):
+        """
+        @type job_name: str
+        """
+        self._ignores.add(job_name)
 
-        self._ignores.add(jobName)
+    def unignore(self, job_name):
+        """
+        @type job_name: str
+        """
+        self._ignores.discard(job_name)
 
-    def unignore(self, jobName):
-
-        self._ignores.discard(jobName)
-
-    def ignoring(self, jobName):
-
-        return jobName in self._ignores
+    def ignoring(self, job_name):
+        """
+        @type jobName: str
+        @rtype: bool
+        """
+        return job_name in self._ignores
