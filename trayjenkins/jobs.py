@@ -2,6 +2,31 @@ from pyjenkins.jenkins import JenkinsFactory
 from trayjenkins.event import Event
 
 
+class JobModel(object):
+
+    def __init__(self, job, ignored):
+        """
+        @type job: pyjenkins.job.Job
+        @type ignored: bool
+        """
+        self.job = job
+        self.ignored = ignored
+
+    def __eq__(self, other):
+        """
+        @type other: trayjenkins.jobs.JobModel
+        @rtype: bool
+        """
+        return self.job == other.job \
+           and self.ignored == other.ignored
+
+    def __repr__(self):
+        """
+        @rtype: str
+        """
+        return 'JobModel(job=%r,ignored=%r)' % (self.job, self.ignored)
+
+
 class IModel(object):
 
     def update_jobs(self):

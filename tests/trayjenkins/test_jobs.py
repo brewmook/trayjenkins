@@ -6,7 +6,51 @@ from pyjenkins.jenkins import Jenkins
 from pyjenkins.job import Job, JobStatus
 from pyjenkins.server import Server
 from trayjenkins.event import Event, IEvent
-from trayjenkins.jobs import IModel, IView, IFilter, Presenter, Model, NoFilter, IgnoreJobsFilter
+from trayjenkins.jobs import IModel, IView, IFilter, Presenter, Model, NoFilter, IgnoreJobsFilter,\
+    JobModel
+
+
+class JobModelTests(TestCase):
+
+    def test_constructor_JobAttributeMatchesThatPassedIn(self):
+
+        model = JobModel('job instance', 'whatever')
+        self.assertEqual('job instance', model.job)
+
+    def test_constructor_IgnoredAttributeMatchesThatPassedIn(self):
+
+        model = JobModel('whatever', 'job is ignored')
+        self.assertEqual('job is ignored', model.ignored)
+
+    def test_equalityop_TwoEquivalentObjects_ReturnTrue(self):
+
+        job = Job('something', JobStatus.FAILING)
+        modelOne = JobModel(job, False)
+        modelTwo = JobModel(job, False)
+
+        self.assertTrue(modelOne == modelTwo)
+
+    def test_equalityop_JobsDiffer_ReturnFalse(self):
+
+        jobOne = Job('something', JobStatus.FAILING)
+        jobTwo = Job('blah', JobStatus.DISABLED)
+        modelOne = JobModel(jobOne, False)
+        modelTwo = JobModel(jobTwo, False)
+
+        self.assertFalse(modelOne == modelTwo)
+
+    def test_equalityop_IgnoredDiffers_ReturnFalse(self):
+
+        job = Job('something', JobStatus.FAILING)
+        modelOne = JobModel(job, False)
+        modelTwo = JobModel(job, True)
+
+        self.assertFalse(modelOne == modelTwo)
+
+    def test_repr_ReturnsSensibleResult(self):
+
+        model = JobModel('fake job', False)
+        self.assertEquals("JobModel(job='fake job',ignored=False)", model.__repr__())
 
 
 class JobsPresenterTests(TestCase):
