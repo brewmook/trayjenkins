@@ -77,7 +77,7 @@ class MockEventHandler(object):
         self.argument = argument
 
 
-class ListViewReplacementAdapterTests(TestCase):
+class ListViewAdapterTests(TestCase):
 
     def setUp(self):
 
@@ -99,7 +99,7 @@ class ListViewReplacementAdapterTests(TestCase):
         self.view.set_list([])
         self.mocks.ReplayAll()
 
-        adapter = gui.jobs.ListViewReplacementAdapter(self.view, self.media, self.qtgui)
+        adapter = gui.jobs.ListViewAdapter(self.view, self.media, self.qtgui)
         adapter.set_jobs([])
 
         mox.Verify(self.view)
@@ -125,7 +125,7 @@ class ListViewReplacementAdapterTests(TestCase):
         self.view.set_list(['item for eric', 'item for john', 'item for terry', 'item for graham'])
         self.mocks.ReplayAll()
 
-        adapter = gui.jobs.ListViewReplacementAdapter(self.view, self.media, self.qtgui)
+        adapter = gui.jobs.ListViewAdapter(self.view, self.media, self.qtgui)
         adapter.set_jobs(jobs)
 
         mox.Verify(self.view)
@@ -145,12 +145,12 @@ class ListViewReplacementAdapterTests(TestCase):
         self.view.set_list(['item for john', 'item for terry'])
         self.mocks.ReplayAll()
 
-        adapter = gui.jobs.ListViewReplacementAdapter(self.view, self.media, self.qtgui)
+        adapter = gui.jobs.ListViewAdapter(self.view, self.media, self.qtgui)
         adapter.set_jobs(jobs)
 
         mox.Verify(self.view)
 
-    def test___constructor___View_fires_job_ignored___fire_job_ignored_event(self):
+    def test___job_ignored_event___View_fires_job_ignored___fire_job_ignored_event(self):
 
         view_event = Event()
         self.view.job_ignored_event().InAnyOrder().AndReturn(view_event)
@@ -159,13 +159,13 @@ class ListViewReplacementAdapterTests(TestCase):
 
         mock_event_handler = MockEventHandler()
 
-        adapter = gui.jobs.ListViewReplacementAdapter(self.view, self.media, self.qtgui)  # @UnusedVariable
+        adapter = gui.jobs.ListViewAdapter(self.view, self.media, self.qtgui)  # @UnusedVariable
         adapter.job_ignored_event().register(mock_event_handler)
         view_event.fire('some job name')
 
         self.assertEqual('some job name', mock_event_handler.argument)
 
-    def test___constructor___View_fires_job_unignored___fire_job_unignored_event(self):
+    def test___job_unignored_event___View_fires_job_unignored___fire_job_unignored_event(self):
 
         view_event = Event()
         self.view.job_ignored_event().InAnyOrder().AndReturn(Event())
@@ -174,75 +174,8 @@ class ListViewReplacementAdapterTests(TestCase):
 
         mock_event_handler = MockEventHandler()
 
-        adapter = gui.jobs.ListViewReplacementAdapter(self.view, self.media, self.qtgui)  # @UnusedVariable
+        adapter = gui.jobs.ListViewAdapter(self.view, self.media, self.qtgui)  # @UnusedVariable
         adapter.job_unignored_event().register(mock_event_handler)
         view_event.fire('some job name')
 
         self.assertEqual('some job name', mock_event_handler.argument)
-
-
-class ListViewAdapterTests(TestCase):
-
-    def setUp(self):
-
-        self.mocks = mox.Mox()
-        self.view = self.mocks.CreateMock(gui.jobs.ListView)
-        self.media = self.mocks.CreateMock(gui.media.MediaFiles)
-        self.ignore_jobs_filter = self.mocks.CreateMock(trayjenkins.jobs.IgnoreJobsFilter)
-        self.qtgui = self.mocks.CreateMock(gui.qmock.QtGuiFactory)
-
-        self.media.disabled_icon().InAnyOrder().AndReturn('disabled icon')
-        self.media.failing_icon().InAnyOrder().AndReturn('failing icon')
-        self.media.ignored_icon().InAnyOrder().AndReturn('ignored icon')
-        self.media.ok_icon().InAnyOrder().AndReturn('ok icon')
-        self.media.unknown_icon().InAnyOrder().AndReturn('unknown icon')
-
-    def test___set_jobs___Empty_list___Empty_list_passed_to_view_set_list(self):
-
-        self.view.set_list([])
-        self.mocks.ReplayAll()
-
-        adapter = gui.jobs.ListViewAdapter(self.view, self.media, self.ignore_jobs_filter, self.qtgui)
-        adapter.set_jobs([])
-
-        mox.Verify(self.view)
-
-    def test___set_jobs___Four_jobs___List_with_correct_names_and_statuses_passed_to_view(self):
-
-        jobs = [pyjenkins.job.Job('eric', pyjenkins.job.JobStatus.DISABLED),
-                pyjenkins.job.Job('john', pyjenkins.job.JobStatus.FAILING),
-                pyjenkins.job.Job('terry', pyjenkins.job.JobStatus.OK),
-                pyjenkins.job.Job('graham', pyjenkins.job.JobStatus.UNKNOWN)]
-
-        self.ignore_jobs_filter.ignoring(mox.IgnoreArg()).AndReturn(False)
-        self.ignore_jobs_filter.ignoring(mox.IgnoreArg()).AndReturn(False)
-        self.ignore_jobs_filter.ignoring(mox.IgnoreArg()).AndReturn(False)
-        self.ignore_jobs_filter.ignoring(mox.IgnoreArg()).AndReturn(False)
-        self.qtgui.QListWidgetItem('disabled icon', 'eric').AndReturn('item for eric')
-        self.qtgui.QListWidgetItem('failing icon', 'john').AndReturn('item for john')
-        self.qtgui.QListWidgetItem('ok icon', 'terry').AndReturn('item for terry')
-        self.qtgui.QListWidgetItem('unknown icon', 'graham').AndReturn('item for graham')
-        self.view.set_list(['item for eric', 'item for john', 'item for terry', 'item for graham'])
-        self.mocks.ReplayAll()
-
-        adapter = gui.jobs.ListViewAdapter(self.view, self.media, self.ignore_jobs_filter, self.qtgui)
-        adapter.set_jobs(jobs)
-
-        mox.Verify(self.view)
-
-    def test___set_jobs___Ignored_job___Ignored_job_gets_ignored_icon(self):
-
-        jobs = [pyjenkins.job.Job('john', pyjenkins.job.JobStatus.FAILING),
-                pyjenkins.job.Job('terry', pyjenkins.job.JobStatus.OK)]
-
-        self.ignore_jobs_filter.ignoring('john').AndReturn(False)
-        self.ignore_jobs_filter.ignoring('terry').AndReturn(True)
-        self.qtgui.QListWidgetItem('failing icon', 'john').AndReturn('item for john')
-        self.qtgui.QListWidgetItem('ignored icon', 'terry').AndReturn('item for terry')
-        self.view.set_list(['item for john', 'item for terry'])
-        self.mocks.ReplayAll()
-
-        adapter = gui.jobs.ListViewAdapter(self.view, self.media, self.ignore_jobs_filter, self.qtgui)
-        adapter.set_jobs(jobs)
-
-        mox.Verify(self.view)

@@ -124,8 +124,8 @@ class Model(IModel):
 
         jobs_model.jobs_updated_event().register(self._on_jobs_updated)
 
-    def _on_jobs_updated(self, jobs):
-
+    def _on_jobs_updated(self, job_models):
+        jobs = [model.job for model in job_models]
         jobs = self._jobs_filter.filter_jobs(jobs)
         status = self._status_reader.status(jobs)
         message = self._message_composer.message(jobs)

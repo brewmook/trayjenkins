@@ -1,6 +1,6 @@
 from PySide import QtCore, QtGui
 from trayjenkins.event import Event
-from trayjenkins.jobs import IView, IViewReplacement
+from trayjenkins.jobs import IView
 from pyjenkins.job import JobStatus
 from gui.qmock import QtGuiFactory
 
@@ -44,15 +44,15 @@ class ListView(QtGui.QGroupBox):
         """
         Listeners receive Event.fire(job_name:str)
         @rtype: trayjenkins.event.IEvent
-        @todo: implement me
         """
+        return self._job_ignored_event
 
     def job_unignored_event(self):
         """
         Listeners receive Event.fire(job_name:str)
         @rtype: trayjenkins.event.IEvent
-        @todo: implement me
         """
+        return self._job_unignored_event
 
     def __init__(self, media_files, ignore_jobs_filter):
         """
@@ -60,6 +60,9 @@ class ListView(QtGui.QGroupBox):
         @type ignore_jobs_filter: trayjenkins.jobs.IgnoreJobsFilter
         """
         QtGui.QGroupBox.__init__(self, "Jobs")
+
+        self._job_ignored_event = Event()
+        self._job_unignored_event = Event()
 
         self._jobs = QtGui.QListWidget(self)
         self._jobs.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
@@ -115,7 +118,7 @@ class ListView(QtGui.QGroupBox):
             self._jobs.addItem(item)
 
 
-class ListViewReplacementAdapter(IViewReplacement):
+class ListViewAdapter(IView):
 
     def job_ignored_event(self):
         """
@@ -177,40 +180,6 @@ class ListViewReplacementAdapter(IViewReplacement):
     def _on_view_unignored(self, job_name):
 
         self._unignored_event.fire(job_name)
-
-
-class ListViewAdapter(IView):
-
-    def __init__(self, view, media_files, ignore_jobs_filter, qtgui=QtGuiFactory()):
-        """
-        @type view: gui.jobs.ListView
-        @type media_files: gui.media.MediaFiles
-        @type ignore_jobs_filter: trayjenkins.jobs.IgnoreJobsFilter
-        @type qtgui: QtGuiFactory
-        """
-        self._view = view
-        self._qtgui = qtgui
-        self._ignore_jobs_filter = ignore_jobs_filter
-
-        self._ignored_icon = media_files.ignored_icon()
-        self._status_icons = {JobStatus.DISABLED: media_files.disabled_icon(),
-                              JobStatus.FAILING: media_files.failing_icon(),
-                              JobStatus.OK: media_files.ok_icon(),
-                              JobStatus.UNKNOWN: media_files.unknown_icon()}
-
-    def set_jobs(self, jobs):
-        """
-        @type jobs: [pyjenkins.job.Job]
-        """
-        items = []
-        for job in jobs:
-            if self._ignore_jobs_filter.ignoring(job.name):
-                icon = self._ignored_icon
-            else:
-                icon = self._status_icons[job.status]
-            items.append(self._qtgui.QListWidgetItem(icon, job.name))
-
-        self._view.set_list(items)
 
 
 class UpdateTimer(QtCore.QObject):

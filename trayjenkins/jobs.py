@@ -52,7 +52,7 @@ class IModel(object):
         """
 
 
-class IViewReplacement(object):
+class IView(object):
 
     def job_ignored_event(self):
         """
@@ -69,14 +69,6 @@ class IViewReplacement(object):
     def set_jobs(self, jobs):
         """
         @type jobs: [trayjenkins.jobs.JobModel]
-        """
-
-
-class IView(object):
-
-    def set_jobs(self, jobs):
-        """
-        @type jobs: [pyjenkins.job.Job]
         """
 
 
@@ -112,7 +104,7 @@ class NoFilter(IFilter):
         return jobs
 
 
-class ModelReplacement(IModel):
+class Model(IModel):
 
     def __init__(self, jenkins, jobs_updated_event=Event()):
 
@@ -161,42 +153,6 @@ class ModelReplacement(IModel):
         if models != self._models:
             self._jobs_updated_event.fire(models)
             self._models = models
-
-
-class Model(IModel):
-
-    def __init__(self,
-                 server,
-                 jobs_filter=NoFilter(),
-                 jenkins_factory=JenkinsFactory(),
-                 event=Event()):
-        """
-        @type server: pyjenkins.server.Server
-        @type jobs_filter: trayjenkins.jobs.IFilter
-        @type jenkins_factory: pyjenkins.interfaces.IJenkinsFactory
-        @type event: trayjenkins.event.IEvent
-        """
-        self._jobs_filter = jobs_filter
-        self._jenkins = jenkins_factory.create(server)
-        self._jobs_updated_event = event
-        self._jobs = None
-
-    def update_jobs(self):
-        """
-        @rtype: None
-        """
-        jobs = self._jenkins.list_jobs()
-        filtered = self._jobs_filter.filter_jobs(jobs)
-        if self._jobs != filtered:
-            self._jobs = filtered
-            self._jobs_updated_event.fire(jobs)
-
-    def jobs_updated_event(self):
-        """
-        Listeners receive Event.fire([pyjenkins.job.Job])
-        @rtype: trayjenkins.event.IEvent
-        """
-        return self._jobs_updated_event
 
 
 class IgnoreJobsFilter(IFilter):

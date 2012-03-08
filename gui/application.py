@@ -13,6 +13,7 @@ from trayjenkins.status import Model as StatusModel, Presenter as StatusPresente
 from pyjenkins.job import JobStatus
 from pyjenkins.server import Server
 from trayjenkins import __version__
+from pyjenkins.jenkins import JenkinsFactory
 
 
 class TrayIcon(object):
@@ -87,14 +88,16 @@ class MainWindow(QtGui.QDialog):
     def _create_jobs_mvp(self, jenkins_host, media_files, ignore_jobs_filter):
 
         if jenkins_host == 'FAKE':
-            self._jobs_model = gui.fake.JobsModel()
+            jenkins = gui.fake.Jenkins()
             self._jenkins_url = QtCore.QUrl('https://github.com/coolhandmook/trayjenkins')
         else:
-            self._jobs_model = JobsModel(Server(jenkins_host, '', ''), ignore_jobs_filter)
+            server = Server(jenkins_host, '', '')
+            jenkins = JenkinsFactory().create(server)
             self._jenkins_url = QtCore.QUrl(jenkins_host)
 
+        self._jobs_model = JobsModel(jenkins)
         self._jobs_view = gui.jobs.ListView(media_files, ignore_jobs_filter)
-        view_adapter = gui.jobs.ListViewAdapter(self._jobs_view, media_files, ignore_jobs_filter)
+        view_adapter = gui.jobs.ListViewAdapter(self._jobs_view, media_files)
         self._jobs_presenter = JobsPresenter(self._jobs_model, view_adapter)
 
     def _create_actions(self):

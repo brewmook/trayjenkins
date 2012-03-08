@@ -1,13 +1,11 @@
 import mox
 from unittest import TestCase
 
-from pyjenkins.interfaces import IJenkinsFactory
 from pyjenkins.jenkins import Jenkins
 from pyjenkins.job import Job, JobStatus
-from pyjenkins.server import Server
 from trayjenkins.event import Event, IEvent
-from trayjenkins.jobs import IModel, IView, IFilter, Presenter, Model, NoFilter, IgnoreJobsFilter,\
-    JobModel, ModelReplacement
+from trayjenkins.jobs import IModel, IView, Presenter, Model, NoFilter, IgnoreJobsFilter,\
+    JobModel
 
 
 class JobModelTests(TestCase):
@@ -75,7 +73,7 @@ class JobsPresenterTests(TestCase):
         mox.Verify(view)
 
 
-class JobsModelReplacementTests(TestCase):
+class JobsModelTests(TestCase):
 
     def setUp(self):
 
@@ -91,7 +89,7 @@ class JobsModelReplacementTests(TestCase):
         self.event.fire([JobModel(jobOne, False), JobModel(jobTwo, False)])
         self.mocks.ReplayAll()
 
-        model = ModelReplacement(self.jenkins, self.event)
+        model = Model(self.jenkins, self.event)
         model.update_jobs()
 
         mox.Verify(self.event)
@@ -105,7 +103,7 @@ class JobsModelReplacementTests(TestCase):
         self.event.fire([JobModel(jobOne, False), JobModel(jobTwo, False)])
         self.mocks.ReplayAll()
 
-        model = ModelReplacement(self.jenkins, self.event)
+        model = Model(self.jenkins, self.event)
         model.update_jobs()
         model.update_jobs()
 
@@ -119,7 +117,7 @@ class JobsModelReplacementTests(TestCase):
         self.event.fire([JobModel(jobOne, False), JobModel(jobTwo, True)])
         self.mocks.ReplayAll()
 
-        model = ModelReplacement(self.jenkins, self.event)
+        model = Model(self.jenkins, self.event)
         model.ignore_job('job2')
         model.update_jobs()
 
@@ -135,7 +133,7 @@ class JobsModelReplacementTests(TestCase):
         self.event.fire([JobModel(jobOne, False), JobModel(jobTwo, True)])
         self.mocks.ReplayAll()
 
-        model = ModelReplacement(self.jenkins, self.event)
+        model = Model(self.jenkins, self.event)
         model.update_jobs()
         model.ignore_job('job2')
 
@@ -149,7 +147,7 @@ class JobsModelReplacementTests(TestCase):
         self.event.fire([JobModel(jobOne, False), JobModel(jobTwo, False)])
         self.mocks.ReplayAll()
 
-        model = ModelReplacement(self.jenkins, self.event)
+        model = Model(self.jenkins, self.event)
         model.ignore_job('job2')
         model.unignore_job('job2')
         model.update_jobs()
@@ -166,7 +164,7 @@ class JobsModelReplacementTests(TestCase):
         self.event.fire([JobModel(jobOne, False), JobModel(jobTwo, False)])
         self.mocks.ReplayAll()
 
-        model = ModelReplacement(self.jenkins, self.event)
+        model = Model(self.jenkins, self.event)
         model.ignore_job('job2')
         model.update_jobs()
         model.unignore_job('job2')
@@ -177,97 +175,7 @@ class JobsModelReplacementTests(TestCase):
 
         self.mocks.ReplayAll()
 
-        model = ModelReplacement(self.jenkins, self.event)
-
-        self.assertTrue(self.event is model.jobs_updated_event())
-
-
-class JobsModelTests(TestCase):
-
-    def setUp(self):
-
-        self.mocks = mox.Mox()
-        self.jobs_filter = self.mocks.CreateMock(IFilter)
-        self.jenkins = self.mocks.CreateMock(Jenkins)
-        self.factory = self.mocks.CreateMock(IJenkinsFactory)
-        self.event = self.mocks.CreateMock(IEvent)
-        self.server = Server('host', 'uname', 'pw')
-
-    def test__update_jobs__FirstCall_FireJobsUpdatedEventWithRetrievedJobs(self):
-
-        jobs = [Job('job1', JobStatus.OK), Job('job2', JobStatus.FAILING)]
-        self.jobs_filter.filter_jobs(mox.IgnoreArg()).AndReturn(jobs)
-        self.factory.create(self.server).AndReturn(self.jenkins)
-        self.jenkins.list_jobs().AndReturn(jobs)
-        self.event.fire(jobs)
-        self.mocks.ReplayAll()
-
-        model = Model(self.server, self.jobs_filter, self.factory, self.event)
-        model.update_jobs()
-
-        mox.Verify(self.event)
-
-    def test__update_jobs__SecondCallReturnsSameJobs_JobsUpdatedEventNotFiredOnceOnly(self):
-
-        jobs = [Job('job1', JobStatus.OK), Job('job2', JobStatus.FAILING)]
-        self.jobs_filter.filter_jobs(mox.IgnoreArg()).AndReturn(jobs)
-        self.jobs_filter.filter_jobs(mox.IgnoreArg()).AndReturn(jobs)
-        self.factory.create(self.server).AndReturn(self.jenkins)
-        self.jenkins.list_jobs().AndReturn(jobs)
-        self.jenkins.list_jobs().AndReturn(jobs)
-        self.event.fire(jobs)
-        self.mocks.ReplayAll()
-
-        model = Model(self.server, self.jobs_filter, self.factory, self.event)
-        model.update_jobs()
-        model.update_jobs()
-
-        mox.Verify(self.event)
-
-    def test__update_jobs__SecondCallReturnsDifferentJobs_JobsUpdatedEventFiredForEachResult(self):
-
-        jobsOne = [Job('job1', JobStatus.OK), Job('job2', JobStatus.FAILING)]
-        jobsTwo = [Job('job1', JobStatus.OK), Job('job2', JobStatus.OK)]
-        self.jobs_filter.filter_jobs(jobsOne).AndReturn(jobsOne)
-        self.jobs_filter.filter_jobs(jobsTwo).AndReturn(jobsTwo)
-        self.factory.create(self.server).AndReturn(self.jenkins)
-        self.jenkins.list_jobs().AndReturn(jobsOne)
-        self.jenkins.list_jobs().AndReturn(jobsTwo)
-        self.event.fire(jobsOne)
-        self.event.fire(jobsTwo)
-        self.mocks.ReplayAll()
-
-        model = Model(self.server, self.jobs_filter, self.factory, self.event)
-        model.update_jobs()
-        model.update_jobs()
-
-        mox.Verify(self.event)
-
-    def test__update_jobs__SameJobsButFilterAltersList_JobsUpdatedEventFiredForEachUpdate(self):
-
-        real_jobs = [Job('job1', JobStatus.OK), Job('job2', JobStatus.FAILING)]
-        filtered_jobs = [Job('job1', JobStatus.OK)]
-        self.jobs_filter.filter_jobs(real_jobs).AndReturn(real_jobs)
-        self.jobs_filter.filter_jobs(real_jobs).AndReturn(filtered_jobs)
-        self.factory.create(self.server).AndReturn(self.jenkins)
-        self.jenkins.list_jobs().AndReturn(real_jobs)
-        self.jenkins.list_jobs().AndReturn(real_jobs)
-        self.event.fire(real_jobs)
-        self.event.fire(real_jobs)
-        self.mocks.ReplayAll()
-
-        model = Model(self.server, self.jobs_filter, self.factory, self.event)
-        model.update_jobs()
-        model.update_jobs()
-
-        mox.Verify(self.event)
-
-    def test__jobs_updated__event_ReturnsEventFromConstructor(self):
-
-        self.factory.create(mox.IgnoreArg()).AndReturn(None)
-        self.mocks.ReplayAll()
-
-        model = Model(self.server, self.jobs_filter, self.factory, self.event)
+        model = Model(self.jenkins, self.event)
 
         self.assertTrue(self.event is model.jobs_updated_event())
 

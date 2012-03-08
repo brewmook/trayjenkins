@@ -2,7 +2,7 @@ import mox
 from unittest import TestCase
 
 from trayjenkins.event import Event, IEvent
-from trayjenkins.jobs import IModel as JobsModel, IFilter
+from trayjenkins.jobs import IModel as JobsModel, IFilter, JobModel
 from trayjenkins.status import IModel, IView, Presenter, IMessageComposer,\
     IStatusReader, Model, StatusReader, DefaultMessageComposer
 from pyjenkins.job import Job, JobStatus
@@ -42,6 +42,7 @@ class StatusModelTests(TestCase):
         self.jobsEvent = Event()
         self.jobsModel.jobs_updated_event().AndReturn(self.jobsEvent)
         self.jobs = [Job('who', 'cares?')]
+        self.job_models = [JobModel(self.jobs[0], False)]
 
     def test_updateStatus_JobsModelFiresFirstUpdateEventStatusUnknownAndMessageNone_StatusChangedEventNotFired(self):
 
@@ -56,7 +57,7 @@ class StatusModelTests(TestCase):
                       self.statusReader,
                       self.statusEvent)
 
-        self.jobsEvent.fire(self.jobs)
+        self.jobsEvent.fire(self.job_models)
 
         mox.Verify(self.statusEvent)
 
@@ -74,7 +75,7 @@ class StatusModelTests(TestCase):
                       self.statusReader,
                       self.statusEvent)
 
-        self.jobsEvent.fire(self.jobs)
+        self.jobsEvent.fire(self.job_models)
 
         mox.Verify(self.statusEvent)
 
@@ -95,8 +96,8 @@ class StatusModelTests(TestCase):
                       self.statusReader,
                       self.statusEvent)
 
-        self.jobsEvent.fire(self.jobs)
-        self.jobsEvent.fire(self.jobs)
+        self.jobsEvent.fire(self.job_models)
+        self.jobsEvent.fire(self.job_models)
 
         mox.Verify(self.statusEvent)
 
@@ -118,8 +119,8 @@ class StatusModelTests(TestCase):
                       self.statusReader,
                       self.statusEvent)
 
-        self.jobsEvent.fire(self.jobs)
-        self.jobsEvent.fire(self.jobs)
+        self.jobsEvent.fire(self.job_models)
+        self.jobsEvent.fire(self.job_models)
 
         mox.Verify(self.statusEvent)
 
@@ -141,8 +142,8 @@ class StatusModelTests(TestCase):
                       self.statusReader,
                       self.statusEvent)
 
-        self.jobsEvent.fire(self.jobs)
-        self.jobsEvent.fire(self.jobs)
+        self.jobsEvent.fire(self.job_models)
+        self.jobsEvent.fire(self.job_models)
 
         mox.Verify(self.statusEvent)
 
@@ -161,7 +162,7 @@ class StatusModelTests(TestCase):
                       self.statusReader,
                       self.statusEvent)
 
-        self.jobsEvent.fire(self.jobs)
+        self.jobsEvent.fire(self.job_models)
 
         mox.Verify(self.statusEvent)
 
