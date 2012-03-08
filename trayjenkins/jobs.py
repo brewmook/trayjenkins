@@ -52,6 +52,26 @@ class IModel(object):
         """
 
 
+class IViewReplacement(object):
+
+    def job_ignored_event(self):
+        """
+        Listeners receive Event.fire(job_name:str)
+        @rtype: trayjenkins.event.IEvent
+        """
+
+    def job_unignored_event(self):
+        """
+        Listeners receive Event.fire(job_name:str)
+        @rtype: trayjenkins.event.IEvent
+        """
+
+    def set_jobs(self, jobs):
+        """
+        @type jobs: [trayjenkins.jobs.JobModel]
+        """
+
+
 class IView(object):
 
     def set_jobs(self, jobs):

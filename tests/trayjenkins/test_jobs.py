@@ -178,7 +178,7 @@ class JobsModelReplacementTests(TestCase):
         self.mocks.ReplayAll()
 
         model = ModelReplacement(self.jenkins, self.event)
-        
+
         self.assertTrue(self.event is model.jobs_updated_event())
 
 
