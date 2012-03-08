@@ -1,5 +1,6 @@
 from pyjenkins.jenkins import JenkinsFactory
 from trayjenkins.event import Event
+import copy
 
 
 class JobModel(object):
@@ -32,6 +33,16 @@ class IModel(object):
     def update_jobs(self):
         """
         @rtype: None
+        """
+
+    def ignore_job(self, job_name):
+        """
+        @type job_name: str
+        """
+
+    def unignore_job(self, job_name):
+        """
+        @type job_name: str
         """
 
     def jobs_updated_event(self):
@@ -79,6 +90,57 @@ class NoFilter(IFilter):
     def filter_jobs(self, jobs):
 
         return jobs
+
+
+class ModelReplacement(IModel):
+
+    def __init__(self, jenkins, jobs_updated_event=Event()):
+
+        self._jenkins = jenkins
+        self._jobs_updated_event = jobs_updated_event
+        self._models = []
+        self._ignore = set()
+
+    def update_jobs(self):
+        """
+        @rtype: None
+        """
+        jobs = self._jenkins.list_jobs()
+        models = [JobModel(job, job.name in self._ignore) for job in jobs]
+        self._update_models(models)
+
+    def ignore_job(self, job_name):
+        """
+        @type job_name: str
+        """
+        self._ignore.add(job_name)
+        self._set_ignore_status(job_name, True)
+
+    def unignore_job(self, job_name):
+        """
+        @type job_name: str
+        """
+        self._ignore.remove(job_name)
+        self._set_ignore_status(job_name, False)
+
+    def jobs_updated_event(self):
+        """
+        Listeners receive Event.fire([pyjenkins.job.Job])
+        @rtype: trayjenkins.event.IEvent
+        """
+        return self._jobs_updated_event
+
+    def _set_ignore_status(self, job_name, ignored):
+        models = copy.deepcopy(self._models)
+        for model in models:
+            if model.job.name == job_name:
+                model.ignored = ignored
+        self._update_models(models)
+
+    def _update_models(self, models):
+        if models != self._models:
+            self._jobs_updated_event.fire(models)
+            self._models = models
 
 
 class Model(IModel):
