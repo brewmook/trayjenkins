@@ -91,10 +91,20 @@ class Presenter(object):
         self._model = model
         self._view = view
         model.jobs_updated_event().register(self._on_model_jobs_changed)
+        view.job_ignored_event().register(self._on_view_job_ignored)
+        view.job_unignored_event().register(self._on_view_job_unignored)
 
     def _on_model_jobs_changed(self, jobs):
 
         self._view.set_jobs(jobs)
+
+    def _on_view_job_ignored(self, job_name):
+
+        self._model.ignore_job(job_name)
+
+    def _on_view_job_unignored(self, job_name):
+
+        self._model.unignore_job(job_name)
 
 
 class NoFilter(IFilter):

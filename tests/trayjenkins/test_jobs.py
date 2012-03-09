@@ -60,17 +60,59 @@ class JobsPresenterTests(TestCase):
         jobs = 'list of jobs'
         model = mocks.CreateMock(IModel)
         view = mocks.CreateMock(IView)
-        event = Event()
+        jobs_updated_event = Event()
 
-        model.jobs_updated_event().AndReturn(event)
+        model.jobs_updated_event().AndReturn(jobs_updated_event)
+        view.job_ignored_event().AndReturn(Event())
+        view.job_unignored_event().AndReturn(Event())
         view.set_jobs(jobs)
 
         mocks.ReplayAll()
 
         presenter = Presenter(model, view)  # @UnusedVariable
-        event.fire(jobs)
+        jobs_updated_event.fire(jobs)
 
         mox.Verify(view)
+
+    def test_Constructor___View_fires_job_ignored_event___Model_ignore_job_called(self):
+
+        mocks = mox.Mox()
+
+        model = mocks.CreateMock(IModel)
+        view = mocks.CreateMock(IView)
+        job_ignored_event = Event()
+
+        model.jobs_updated_event().AndReturn(Event())
+        view.job_ignored_event().AndReturn(job_ignored_event)
+        view.job_unignored_event().AndReturn(Event())
+        model.ignore_job('spam')
+
+        mocks.ReplayAll()
+
+        presenter = Presenter(model, view)  # @UnusedVariable
+        job_ignored_event.fire('spam')
+
+        mox.Verify(model)
+
+    def test_Constructor___View_fires_job_unignored_event___Model_unignore_job_called(self):
+
+        mocks = mox.Mox()
+
+        model = mocks.CreateMock(IModel)
+        view = mocks.CreateMock(IView)
+        job_unignored_event = Event()
+
+        model.jobs_updated_event().AndReturn(Event())
+        view.job_ignored_event().AndReturn(Event())
+        view.job_unignored_event().AndReturn(job_unignored_event)
+        model.unignore_job('eggs')
+
+        mocks.ReplayAll()
+
+        presenter = Presenter(model, view)  # @UnusedVariable
+        job_unignored_event.fire('eggs')
+
+        mox.Verify(model)
 
 
 class JobsModelTests(TestCase):
