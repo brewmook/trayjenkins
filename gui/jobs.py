@@ -54,9 +54,8 @@ class ListView(QtGui.QGroupBox):
         """
         return self._job_unignored_event
 
-    def __init__(self, media_files, ignore_jobs_filter):
+    def __init__(self, ignore_jobs_filter):
         """
-        @type media_files: gui.media.MediaFiles
         @type ignore_jobs_filter: trayjenkins.jobs.IgnoreJobsFilter
         """
         QtGui.QGroupBox.__init__(self, "Jobs")
@@ -73,14 +72,6 @@ class ListView(QtGui.QGroupBox):
         actions = ContextMenuActions(QtGui.QAction('Ignore', self, triggered=self._ignore_job),
                                      QtGui.QAction('Cancel ignore', self, triggered=self._unignore_job))
         self._menu_factory = ContextMenuFactory(self._jobs, actions, ignore_jobs_filter)
-
-        self._icons = {
-            JobStatus.DISABLED: media_files.disabled_icon(),
-            JobStatus.FAILING: media_files.failing_icon(),
-            JobStatus.OK: media_files.ok_icon(),
-            JobStatus.UNKNOWN: media_files.unknown_icon(),
-            }
-        self._ignored_icon = media_files.ignored_icon()
 
         layout = QtGui.QVBoxLayout()
         layout.addWidget(self._jobs)
@@ -99,15 +90,13 @@ class ListView(QtGui.QGroupBox):
 
         item = self._jobs.currentItem()
         if item is not None:
-            self._ignore_jobs_filter.ignore(item.text())
-            item.setIcon(self._ignored_icon)
+            self._job_ignored_event.fire(item.text())
 
     def _unignore_job(self):
 
         item = self._jobs.currentItem()
         if item is not None:
-            self._ignore_jobs_filter.unignore(item.text())
-            item.setIcon(self._icons[JobStatus.UNKNOWN])
+            self._job_unignored_event.fire(item.text())
 
     def set_list(self, items):
         """

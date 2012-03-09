@@ -96,7 +96,7 @@ class MainWindow(QtGui.QDialog):
             self._jenkins_url = QtCore.QUrl(jenkins_host)
 
         self._jobs_model = JobsModel(jenkins)
-        self._jobs_view = gui.jobs.ListView(media_files, ignore_jobs_filter)
+        self._jobs_view = gui.jobs.ListView(ignore_jobs_filter)
         view_adapter = gui.jobs.ListViewAdapter(self._jobs_view, media_files)
         self._jobs_presenter = JobsPresenter(self._jobs_model, view_adapter)
 
