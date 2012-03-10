@@ -144,6 +144,7 @@ class ListViewAdapter(IView):
         self._menu_factory = menu_factory
         self._ignored_event = Event()
         self._unignored_event = Event()
+        self._job_models = []
 
         view.job_ignored_event().register(self._on_view_ignored)
         view.job_unignored_event().register(self._on_view_unignored)
@@ -168,6 +169,7 @@ class ListViewAdapter(IView):
             items.append(self._qtgui.QListWidgetItem(icon, model.job.name))
 
         self._view.set_list(items)
+        self._job_models = job_models
 
     def _on_view_ignored(self, job_name):
 
@@ -183,8 +185,18 @@ class ListViewAdapter(IView):
         @param pos: Absolute screen coordinates
         @type pos: PySide.QtCore.QPoint
         """
-        menu = self._menu_factory.create('whatever', 'blah', 'blah')
+        menu = self._menu_factory.create(self._find_model(job_name),
+                                         lambda: self._ignored_event.fire(job_name),
+                                         lambda: self._unignored_event.fire(job_name))
         menu.popup(pos)
+
+    def _find_model(self, job_name):
+        result = None
+        for model in self._job_models:
+            if model.job.name == job_name:
+                result = model
+                break
+        return result
 
 
 class UpdateTimer(QtCore.QObject):

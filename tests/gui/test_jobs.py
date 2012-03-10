@@ -68,8 +68,25 @@ class ContextMenuFactoryTests(TestCase):
 
 
 class MockEventHandler(object):
+
+    def __init__(self):
+        self.argument = None
+
     def __call__(self, argument):
         self.argument = argument
+
+
+class MockMenuFactory(object):
+
+    def __init__(self, menu):
+        self._menu = menu
+        self.ignore_callback = None
+        self.unignore_callback = None
+
+    def create(self, model, ignore_callback, unignore_callback):
+        self.ignore_callback = ignore_callback
+        self.unignore_callback = unignore_callback
+        return self._menu
 
 
 class ListViewAdapterTests(TestCase):
@@ -103,15 +120,10 @@ class ListViewAdapterTests(TestCase):
 
     def test___set_jobs___Four_jobs___List_with_correct_names_and_statuses_passed_to_view(self):
 
-        jobs = [trayjenkins.jobs.JobModel(pyjenkins.job.Job('eric', pyjenkins.job.JobStatus.DISABLED),
-                                          False),
-                trayjenkins.jobs.JobModel(pyjenkins.job.Job('john', pyjenkins.job.JobStatus.FAILING),
-                                          False),
-                trayjenkins.jobs.JobModel(pyjenkins.job.Job('terry', pyjenkins.job.JobStatus.OK),
-                                          False),
-                trayjenkins.jobs.JobModel(pyjenkins.job.Job('graham', pyjenkins.job.JobStatus.UNKNOWN),
-                                          False)
-                ]
+        jobs = [JobModel(Job('eric', pyjenkins.job.JobStatus.DISABLED), False),
+                JobModel(Job('john', pyjenkins.job.JobStatus.FAILING), False),
+                JobModel(Job('terry', pyjenkins.job.JobStatus.OK), False),
+                JobModel(Job('graham', pyjenkins.job.JobStatus.UNKNOWN), False)]
 
         self.qtgui.QListWidgetItem('disabled icon', 'eric').AndReturn('item for eric')
         self.qtgui.QListWidgetItem('failing icon', 'john').AndReturn('item for john')
@@ -130,11 +142,8 @@ class ListViewAdapterTests(TestCase):
 
     def test___set_jobs___Ignored_job___Ignored_job_gets_ignored_icon(self):
 
-        jobs = [trayjenkins.jobs.JobModel(pyjenkins.job.Job('john', pyjenkins.job.JobStatus.FAILING),
-                                          False),
-                trayjenkins.jobs.JobModel(pyjenkins.job.Job('terry', pyjenkins.job.JobStatus.OK),
-                                          True),
-                ]
+        jobs = [JobModel(Job('john', pyjenkins.job.JobStatus.FAILING), False),
+                JobModel(Job('terry', pyjenkins.job.JobStatus.OK), True)]
 
         self.qtgui.QListWidgetItem('failing icon', 'john').AndReturn('item for john')
         self.qtgui.QListWidgetItem('ignored icon', 'terry').AndReturn('item for terry')
@@ -187,16 +196,72 @@ class ListViewAdapterTests(TestCase):
         menu = self.mocks.CreateMock(MockQMenu)
         menu.popup('screen coordinates')
 
-        self.menu_factory.create(mox.IgnoreArg(), mox.IgnoreArg(), mox.IgnoreArg()).AndReturn(menu)
-        self.qtgui.QMenu(self.view).AndReturn(menu)
+        job_models = [JobModel(Job('eric', pyjenkins.job.JobStatus.DISABLED), False),
+                      JobModel(Job('john', pyjenkins.job.JobStatus.FAILING), False),
+                      JobModel(Job('terry', pyjenkins.job.JobStatus.OK), False)]
+
+        self._stub_out_set_jobs()
+        self.menu_factory.create(job_models[1], mox.IgnoreArg(), mox.IgnoreArg()).AndReturn(menu)
         self.view.job_ignored_event().InAnyOrder().AndReturn(Event())
         self.view.job_unignored_event().InAnyOrder().AndReturn(Event())
         self.view.right_click_event().InAnyOrder().AndReturn(right_click_event)
-        self.view.set_list(mox.IgnoreArg()).InAnyOrder()
         self.mocks.ReplayAll()
 
         adapter = gui.jobs.ListViewAdapter(self.view, self.media, self.menu_factory, self.qtgui)  # @UnusedVariable
-
-        right_click_event.fire('job name', 'screen coordinates')
+        adapter.set_jobs(job_models)
+        right_click_event.fire('john', 'screen coordinates')
 
         mox.Verify(menu)
+
+    def test_constructor___User_clicks_ignore_menu_item___Fire_job_ignored_event(self):
+
+        job_models = [JobModel(Job('eric', pyjenkins.job.JobStatus.DISABLED), False)]
+        right_click_event = Event()
+        menu = self.mocks.CreateMock(MockQMenu)
+        menu_factory = MockMenuFactory(menu)
+        mock_event_handler = MockEventHandler()
+
+        self.view.job_ignored_event().InAnyOrder().AndReturn(Event())
+        self.view.job_unignored_event().InAnyOrder().AndReturn(Event())
+        self.view.right_click_event().InAnyOrder().AndReturn(right_click_event)
+        self._stub_out_set_jobs()
+        menu.popup(mox.IgnoreArg())
+        self.mocks.ReplayAll()
+
+        adapter = gui.jobs.ListViewAdapter(self.view, self.media, menu_factory, self.qtgui)  # @UnusedVariable
+        adapter.job_ignored_event().register(mock_event_handler)
+        adapter.set_jobs(job_models)
+        right_click_event.fire('eric', 'screen coordinates')
+        menu_factory.ignore_callback()
+
+        self.assertEqual('eric', mock_event_handler.argument)
+
+    def test_constructor___User_clicks_unignore_menu_item___Fire_job_unignored_event(self):
+
+        job_models = [JobModel(Job('eric', pyjenkins.job.JobStatus.DISABLED), False)]
+        right_click_event = Event()
+        menu = self.mocks.CreateMock(MockQMenu)
+        menu_factory = MockMenuFactory(menu)
+        mock_event_handler = MockEventHandler()
+
+        self.view.job_ignored_event().InAnyOrder().AndReturn(Event())
+        self.view.job_unignored_event().InAnyOrder().AndReturn(Event())
+        self.view.right_click_event().InAnyOrder().AndReturn(right_click_event)
+        self._stub_out_set_jobs()
+        menu.popup(mox.IgnoreArg())
+        self.mocks.ReplayAll()
+
+        adapter = gui.jobs.ListViewAdapter(self.view, self.media, menu_factory, self.qtgui)  # @UnusedVariable
+        adapter.job_unignored_event().register(mock_event_handler)
+        adapter.set_jobs(job_models)
+        right_click_event.fire('eric', 'screen coordinates')
+        menu_factory.unignore_callback()
+
+        self.assertEqual('eric', mock_event_handler.argument)
+
+    def _stub_out_set_jobs(self):
+
+        self.qtgui.QListWidgetItem(mox.IgnoreArg(), mox.IgnoreArg()).AndReturn('whatever')
+        self.qtgui.QListWidgetItem(mox.IgnoreArg(), mox.IgnoreArg()).AndReturn('whatever')
+        self.qtgui.QListWidgetItem(mox.IgnoreArg(), mox.IgnoreArg()).AndReturn('whatever')
+        self.view.set_list(mox.IgnoreArg()).InAnyOrder()
