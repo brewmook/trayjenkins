@@ -3,7 +3,7 @@ from PySide import QtGui
 
 class QtGuiFactory(object):
 
-    def QAction(self, **kwargs):
+    def QAction(self, text, parent, **kwargs):
         """
         @rtype: Pyside.QtGui.QAction
         """
