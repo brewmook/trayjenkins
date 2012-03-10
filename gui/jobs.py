@@ -54,6 +54,13 @@ class ListView(QtGui.QGroupBox):
         """
         return self._job_unignored_event
 
+    def right_click_event(self):
+        """
+        Listeners receive Event.fire(job_name:str, pos:PySide.QtCore.QPoint)
+        @rtype: trayjenkins.event.IEvent
+        """
+        return self._right_click_event
+
     def __init__(self, ignore_jobs_filter):
         """
         @type ignore_jobs_filter: trayjenkins.jobs.IgnoreJobsFilter
@@ -62,12 +69,11 @@ class ListView(QtGui.QGroupBox):
 
         self._job_ignored_event = Event()
         self._job_unignored_event = Event()
+        self._right_click_event = Event()
 
         self._jobs = QtGui.QListWidget(self)
         self._jobs.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self._jobs.customContextMenuRequested.connect(self._on_custom_context_menu_requested)
-
-        self._ignore_jobs_filter = ignore_jobs_filter
 
         actions = ContextMenuActions(QtGui.QAction('Ignore', self, triggered=self._ignore_job),
                                      QtGui.QAction('Cancel ignore', self, triggered=self._unignore_job))
@@ -141,6 +147,7 @@ class ListViewAdapter(IView):
 
         view.job_ignored_event().register(self._on_view_ignored)
         view.job_unignored_event().register(self._on_view_unignored)
+        view.right_click_event().register(self._on_view_right_click)
 
         self._ignored_icon = media_files.ignored_icon()
         self._status_icons = {JobStatus.DISABLED: media_files.disabled_icon(),
@@ -169,6 +176,16 @@ class ListViewAdapter(IView):
     def _on_view_unignored(self, job_name):
 
         self._unignored_event.fire(job_name)
+
+    def _on_view_right_click(self, job_name, pos):
+        """
+        @type job_name: str
+        @param pos: Absolute screen coordinates
+        @type pos: PySide.QtCore.QPoint
+        """
+        menu = self._qtgui.QMenu(self._view)
+        menu.addAction('pies')
+        menu.popup(pos)
 
 
 class UpdateTimer(QtCore.QObject):

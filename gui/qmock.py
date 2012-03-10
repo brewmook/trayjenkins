@@ -3,6 +3,11 @@ from PySide import QtGui
 
 class QtGuiFactory(object):
 
+    def QAction(self, **kwargs):
+        """
+        @rtype: Pyside.QtGui.QAction
+        """
+
     def QListWidgetItem(self, icon, name):
         """
         @type icon: PySide.QtGui.QIcon

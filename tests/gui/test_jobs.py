@@ -5,11 +5,15 @@ import gui.jobs
 import gui.qmock
 import trayjenkins.jobs
 import pyjenkins.job
-from trayjenkins.event import IEvent, Event
+from trayjenkins.event import Event
 
 
 class MockQMenu(object):
+
     def addAction(self, parameter):
+        pass
+
+    def popup(self, coordinates):
         pass
 
 
@@ -96,6 +100,7 @@ class ListViewAdapterTests(TestCase):
 
         self.view.job_ignored_event().InAnyOrder().AndReturn(Event())
         self.view.job_unignored_event().InAnyOrder().AndReturn(Event())
+        self.view.right_click_event().InAnyOrder().AndReturn(Event())
         self.view.set_list([])
         self.mocks.ReplayAll()
 
@@ -122,6 +127,7 @@ class ListViewAdapterTests(TestCase):
         self.qtgui.QListWidgetItem('unknown icon', 'graham').AndReturn('item for graham')
         self.view.job_ignored_event().InAnyOrder().AndReturn(Event())
         self.view.job_unignored_event().InAnyOrder().AndReturn(Event())
+        self.view.right_click_event().InAnyOrder().AndReturn(Event())
         self.view.set_list(['item for eric', 'item for john', 'item for terry', 'item for graham'])
         self.mocks.ReplayAll()
 
@@ -142,6 +148,7 @@ class ListViewAdapterTests(TestCase):
         self.qtgui.QListWidgetItem('ignored icon', 'terry').AndReturn('item for terry')
         self.view.job_ignored_event().InAnyOrder().AndReturn(Event())
         self.view.job_unignored_event().InAnyOrder().AndReturn(Event())
+        self.view.right_click_event().InAnyOrder().AndReturn(Event())
         self.view.set_list(['item for john', 'item for terry'])
         self.mocks.ReplayAll()
 
@@ -155,6 +162,7 @@ class ListViewAdapterTests(TestCase):
         view_event = Event()
         self.view.job_ignored_event().InAnyOrder().AndReturn(view_event)
         self.view.job_unignored_event().InAnyOrder().AndReturn(Event())
+        self.view.right_click_event().InAnyOrder().AndReturn(Event())
         self.mocks.ReplayAll()
 
         mock_event_handler = MockEventHandler()
@@ -170,6 +178,7 @@ class ListViewAdapterTests(TestCase):
         view_event = Event()
         self.view.job_ignored_event().InAnyOrder().AndReturn(Event())
         self.view.job_unignored_event().InAnyOrder().AndReturn(view_event)
+        self.view.right_click_event().InAnyOrder().AndReturn(Event())
         self.mocks.ReplayAll()
 
         mock_event_handler = MockEventHandler()
@@ -179,3 +188,23 @@ class ListViewAdapterTests(TestCase):
         view_event.fire('some job name')
 
         self.assertEqual('some job name', mock_event_handler.argument)
+
+    def test_constructor___View_fires_right_click_event___Show_menu_at_correct_coordinates(self):
+
+        right_click_event = Event()
+        menu = self.mocks.CreateMock(MockQMenu)
+        menu.addAction(mox.IgnoreArg())
+        menu.popup('screen coordinates')
+
+        self.qtgui.QMenu(self.view).AndReturn(menu)
+        self.view.job_ignored_event().InAnyOrder().AndReturn(Event())
+        self.view.job_unignored_event().InAnyOrder().AndReturn(Event())
+        self.view.right_click_event().InAnyOrder().AndReturn(right_click_event)
+        self.view.set_list(mox.IgnoreArg()).InAnyOrder()
+        self.mocks.ReplayAll()
+
+        adapter = gui.jobs.ListViewAdapter(self.view, self.media, self.qtgui)  # @UnusedVariable
+
+        right_click_event.fire('job name', 'screen coordinates')
+
+        mox.Verify(menu)
