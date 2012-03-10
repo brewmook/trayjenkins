@@ -80,6 +80,7 @@ class ListViewAdapterTests(TestCase):
         self.view = self.mocks.CreateMock(gui.jobs.ListView)
         self.media = self.mocks.CreateMock(gui.media.MediaFiles)
         self.qtgui = self.mocks.CreateMock(gui.qmock.QtGuiFactory)
+        self.menu_factory = self.mocks.CreateMock(gui.jobs.ContextMenuFactory)
 
         self.media.disabled_icon().InAnyOrder().AndReturn('disabled icon')
         self.media.failing_icon().InAnyOrder().AndReturn('failing icon')
@@ -95,7 +96,7 @@ class ListViewAdapterTests(TestCase):
         self.view.set_list([])
         self.mocks.ReplayAll()
 
-        adapter = gui.jobs.ListViewAdapter(self.view, self.media, self.qtgui)
+        adapter = gui.jobs.ListViewAdapter(self.view, self.media, self.menu_factory, self.qtgui)
         adapter.set_jobs([])
 
         mox.Verify(self.view)
@@ -122,7 +123,7 @@ class ListViewAdapterTests(TestCase):
         self.view.set_list(['item for eric', 'item for john', 'item for terry', 'item for graham'])
         self.mocks.ReplayAll()
 
-        adapter = gui.jobs.ListViewAdapter(self.view, self.media, self.qtgui)
+        adapter = gui.jobs.ListViewAdapter(self.view, self.media, self.menu_factory, self.qtgui)
         adapter.set_jobs(jobs)
 
         mox.Verify(self.view)
@@ -143,7 +144,7 @@ class ListViewAdapterTests(TestCase):
         self.view.set_list(['item for john', 'item for terry'])
         self.mocks.ReplayAll()
 
-        adapter = gui.jobs.ListViewAdapter(self.view, self.media, self.qtgui)
+        adapter = gui.jobs.ListViewAdapter(self.view, self.media, self.menu_factory, self.qtgui)
         adapter.set_jobs(jobs)
 
         mox.Verify(self.view)
@@ -158,7 +159,7 @@ class ListViewAdapterTests(TestCase):
 
         mock_event_handler = MockEventHandler()
 
-        adapter = gui.jobs.ListViewAdapter(self.view, self.media, self.qtgui)  # @UnusedVariable
+        adapter = gui.jobs.ListViewAdapter(self.view, self.media, self.menu_factory, self.qtgui)  # @UnusedVariable
         adapter.job_ignored_event().register(mock_event_handler)
         view_event.fire('some job name')
 
@@ -174,7 +175,7 @@ class ListViewAdapterTests(TestCase):
 
         mock_event_handler = MockEventHandler()
 
-        adapter = gui.jobs.ListViewAdapter(self.view, self.media, self.qtgui)  # @UnusedVariable
+        adapter = gui.jobs.ListViewAdapter(self.view, self.media, self.menu_factory, self.qtgui)  # @UnusedVariable
         adapter.job_unignored_event().register(mock_event_handler)
         view_event.fire('some job name')
 
@@ -184,9 +185,9 @@ class ListViewAdapterTests(TestCase):
 
         right_click_event = Event()
         menu = self.mocks.CreateMock(MockQMenu)
-        menu.addAction(mox.IgnoreArg())
         menu.popup('screen coordinates')
 
+        self.menu_factory.create(mox.IgnoreArg(), mox.IgnoreArg(), mox.IgnoreArg()).AndReturn(menu)
         self.qtgui.QMenu(self.view).AndReturn(menu)
         self.view.job_ignored_event().InAnyOrder().AndReturn(Event())
         self.view.job_unignored_event().InAnyOrder().AndReturn(Event())
@@ -194,7 +195,7 @@ class ListViewAdapterTests(TestCase):
         self.view.set_list(mox.IgnoreArg()).InAnyOrder()
         self.mocks.ReplayAll()
 
-        adapter = gui.jobs.ListViewAdapter(self.view, self.media, self.qtgui)  # @UnusedVariable
+        adapter = gui.jobs.ListViewAdapter(self.view, self.media, self.menu_factory, self.qtgui)  # @UnusedVariable
 
         right_click_event.fire('job name', 'screen coordinates')
 

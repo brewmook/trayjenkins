@@ -131,16 +131,17 @@ class ListViewAdapter(IView):
     def __init__(self,
                  view,
                  media_files,
+                 menu_factory,
                  qtgui=QtGuiFactory()):
         """
         @type view: gui.jobs.ListView
         @type media_files: gui.media.MediaFiles
+        @type menu_factory: gui.jobs.ContextMenuFactory
         @type qtgui: QtGuiFactory
-        @type ignored_event: trayjenkins.event.IEvent
-        @type unignored_event: trayjenkins.event.IEvent
         """
         self._view = view
         self._qtgui = qtgui
+        self._menu_factory = menu_factory
         self._ignored_event = Event()
         self._unignored_event = Event()
 
@@ -182,8 +183,7 @@ class ListViewAdapter(IView):
         @param pos: Absolute screen coordinates
         @type pos: PySide.QtCore.QPoint
         """
-        menu = self._qtgui.QMenu(self._view)
-        menu.addAction('pies')
+        menu = self._menu_factory.create('whatever', 'blah', 'blah')
         menu.popup(pos)
 
 
