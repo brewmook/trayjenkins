@@ -39,20 +39,6 @@ class ContextMenuFactory(object):
 
 class ListView(QtGui.QGroupBox):
 
-    def job_ignored_event(self):
-        """
-        Listeners receive Event.fire(job_name:str)
-        @rtype: trayjenkins.event.IEvent
-        """
-        return self._job_ignored_event
-
-    def job_unignored_event(self):
-        """
-        Listeners receive Event.fire(job_name:str)
-        @rtype: trayjenkins.event.IEvent
-        """
-        return self._job_unignored_event
-
     def right_click_event(self):
         """
         Listeners receive Event.fire(job_name:str, pos:PySide.QtCore.QPoint)
@@ -66,8 +52,6 @@ class ListView(QtGui.QGroupBox):
         """
         QtGui.QGroupBox.__init__(self, "Jobs")
 
-        self._job_ignored_event = Event()
-        self._job_unignored_event = Event()
         self._right_click_event = Event()
 
         self._jobs = QtGui.QListWidget(self)
@@ -146,8 +130,6 @@ class ListViewAdapter(IView):
         self._unignored_event = Event()
         self._job_models = []
 
-        view.job_ignored_event().register(self._on_view_ignored)
-        view.job_unignored_event().register(self._on_view_unignored)
         view.right_click_event().register(self._on_view_right_click)
 
         self._ignored_icon = media_files.ignored_icon()

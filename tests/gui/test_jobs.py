@@ -107,8 +107,6 @@ class ListViewAdapterTests(TestCase):
 
     def test___set_jobs___Empty_list___Empty_list_passed_to_view_set_list(self):
 
-        self.view.job_ignored_event().InAnyOrder().AndReturn(Event())
-        self.view.job_unignored_event().InAnyOrder().AndReturn(Event())
         self.view.right_click_event().InAnyOrder().AndReturn(Event())
         self.view.set_list([])
         self.mocks.ReplayAll()
@@ -129,8 +127,6 @@ class ListViewAdapterTests(TestCase):
         self.qtgui.QListWidgetItem('failing icon', 'john').AndReturn('item for john')
         self.qtgui.QListWidgetItem('ok icon', 'terry').AndReturn('item for terry')
         self.qtgui.QListWidgetItem('unknown icon', 'graham').AndReturn('item for graham')
-        self.view.job_ignored_event().InAnyOrder().AndReturn(Event())
-        self.view.job_unignored_event().InAnyOrder().AndReturn(Event())
         self.view.right_click_event().InAnyOrder().AndReturn(Event())
         self.view.set_list(['item for eric', 'item for john', 'item for terry', 'item for graham'])
         self.mocks.ReplayAll()
@@ -147,8 +143,6 @@ class ListViewAdapterTests(TestCase):
 
         self.qtgui.QListWidgetItem('failing icon', 'john').AndReturn('item for john')
         self.qtgui.QListWidgetItem('ignored icon', 'terry').AndReturn('item for terry')
-        self.view.job_ignored_event().InAnyOrder().AndReturn(Event())
-        self.view.job_unignored_event().InAnyOrder().AndReturn(Event())
         self.view.right_click_event().InAnyOrder().AndReturn(Event())
         self.view.set_list(['item for john', 'item for terry'])
         self.mocks.ReplayAll()
@@ -157,38 +151,6 @@ class ListViewAdapterTests(TestCase):
         adapter.set_jobs(jobs)
 
         mox.Verify(self.view)
-
-    def test___job_ignored_event___View_fires_job_ignored___fire_job_ignored_event(self):
-
-        view_event = Event()
-        self.view.job_ignored_event().InAnyOrder().AndReturn(view_event)
-        self.view.job_unignored_event().InAnyOrder().AndReturn(Event())
-        self.view.right_click_event().InAnyOrder().AndReturn(Event())
-        self.mocks.ReplayAll()
-
-        mock_event_handler = MockEventHandler()
-
-        adapter = gui.jobs.ListViewAdapter(self.view, self.media, self.menu_factory, self.qtgui)  # @UnusedVariable
-        adapter.job_ignored_event().register(mock_event_handler)
-        view_event.fire('some job name')
-
-        self.assertEqual('some job name', mock_event_handler.argument)
-
-    def test___job_unignored_event___View_fires_job_unignored___fire_job_unignored_event(self):
-
-        view_event = Event()
-        self.view.job_ignored_event().InAnyOrder().AndReturn(Event())
-        self.view.job_unignored_event().InAnyOrder().AndReturn(view_event)
-        self.view.right_click_event().InAnyOrder().AndReturn(Event())
-        self.mocks.ReplayAll()
-
-        mock_event_handler = MockEventHandler()
-
-        adapter = gui.jobs.ListViewAdapter(self.view, self.media, self.menu_factory, self.qtgui)  # @UnusedVariable
-        adapter.job_unignored_event().register(mock_event_handler)
-        view_event.fire('some job name')
-
-        self.assertEqual('some job name', mock_event_handler.argument)
 
     def test_constructor___View_fires_right_click_event___Show_menu_at_correct_coordinates(self):
 
@@ -202,8 +164,6 @@ class ListViewAdapterTests(TestCase):
 
         self._stub_out_set_jobs()
         self.menu_factory.create(job_models[1], mox.IgnoreArg(), mox.IgnoreArg()).AndReturn(menu)
-        self.view.job_ignored_event().InAnyOrder().AndReturn(Event())
-        self.view.job_unignored_event().InAnyOrder().AndReturn(Event())
         self.view.right_click_event().InAnyOrder().AndReturn(right_click_event)
         self.mocks.ReplayAll()
 
@@ -221,8 +181,6 @@ class ListViewAdapterTests(TestCase):
         menu_factory = MockMenuFactory(menu)
         mock_event_handler = MockEventHandler()
 
-        self.view.job_ignored_event().InAnyOrder().AndReturn(Event())
-        self.view.job_unignored_event().InAnyOrder().AndReturn(Event())
         self.view.right_click_event().InAnyOrder().AndReturn(right_click_event)
         self._stub_out_set_jobs()
         menu.popup(mox.IgnoreArg())
@@ -244,8 +202,6 @@ class ListViewAdapterTests(TestCase):
         menu_factory = MockMenuFactory(menu)
         mock_event_handler = MockEventHandler()
 
-        self.view.job_ignored_event().InAnyOrder().AndReturn(Event())
-        self.view.job_unignored_event().InAnyOrder().AndReturn(Event())
         self.view.right_click_event().InAnyOrder().AndReturn(right_click_event)
         self._stub_out_set_jobs()
         menu.popup(mox.IgnoreArg())
