@@ -91,7 +91,8 @@ class MainWindow(QtGui.QDialog):
             jenkins = JenkinsFactory().create(server)
             self._jenkins_url = QtCore.QUrl(settings.host)
 
-        self._jobs_model = JobsModel(jenkins)
+        error_logger = gui.jobs.ErrorLogger(self)
+        self._jobs_model = JobsModel(jenkins, error_logger)
         self._jobs_view = gui.jobs.ListView()
         menu_factory = gui.jobs.ContextMenuFactory(self._jobs_view)
         view_adapter = gui.jobs.ListViewAdapter(self._jobs_view, media_files, menu_factory)

@@ -4,8 +4,8 @@ from unittest import TestCase
 from pyjenkins.jenkins import Jenkins
 from pyjenkins.job import Job, JobStatus
 from trayjenkins.event import Event, IEvent
-from trayjenkins.jobs import IModel, IView, Presenter, Model, IgnoreJobsFilter,\
-    JobModel
+from trayjenkins.jobs import IModel, IView, Presenter, Model, IgnoreJobsFilter, \
+    JobModel, IErrorLogger
 
 
 class JobModelTests(TestCase):
@@ -172,6 +172,7 @@ class JobsModelTests(TestCase):
         self.mocks = mox.Mox()
         self.jenkins = self.mocks.CreateMock(Jenkins)
         self.event = self.mocks.CreateMock(IEvent)
+        self.logger = self.mocks.CreateMock(IErrorLogger)
 
     def test__update_jobs__First_call__Fire_jobs_updated_event_with_no_ignores(self):
 
@@ -181,7 +182,7 @@ class JobsModelTests(TestCase):
         self.event.fire([JobModel(jobOne, False), JobModel(jobTwo, False)])
         self.mocks.ReplayAll()
 
-        model = Model(self.jenkins, self.event)
+        model = Model(self.jenkins, self.logger, self.event)
         model.update_jobs()
 
         mox.Verify(self.event)
@@ -195,7 +196,7 @@ class JobsModelTests(TestCase):
         self.event.fire([JobModel(jobOne, False), JobModel(jobTwo, False)])
         self.mocks.ReplayAll()
 
-        model = Model(self.jenkins, self.event)
+        model = Model(self.jenkins, self.logger, self.event)
         model.update_jobs()
         model.update_jobs()
 
@@ -209,7 +210,7 @@ class JobsModelTests(TestCase):
         self.event.fire([JobModel(jobOne, False), JobModel(jobTwo, True)])
         self.mocks.ReplayAll()
 
-        model = Model(self.jenkins, self.event)
+        model = Model(self.jenkins, self.logger, self.event)
         model.ignore_job('job2')
         model.update_jobs()
 
@@ -225,7 +226,7 @@ class JobsModelTests(TestCase):
         self.event.fire([JobModel(jobOne, False), JobModel(jobTwo, True)])
         self.mocks.ReplayAll()
 
-        model = Model(self.jenkins, self.event)
+        model = Model(self.jenkins, self.logger, self.event)
         model.update_jobs()
         model.ignore_job('job2')
 
@@ -239,7 +240,7 @@ class JobsModelTests(TestCase):
         self.event.fire([JobModel(jobOne, False), JobModel(jobTwo, False)])
         self.mocks.ReplayAll()
 
-        model = Model(self.jenkins, self.event)
+        model = Model(self.jenkins, self.logger, self.event)
         model.ignore_job('job2')
         model.unignore_job('job2')
         model.update_jobs()
@@ -256,38 +257,60 @@ class JobsModelTests(TestCase):
         self.event.fire([JobModel(jobOne, False), JobModel(jobTwo, False)])
         self.mocks.ReplayAll()
 
-        model = Model(self.jenkins, self.event)
+        model = Model(self.jenkins, self.logger, self.event)
         model.ignore_job('job2')
         model.update_jobs()
         model.unignore_job('job2')
 
         mox.Verify(self.event)
 
-    def test_enable_job___Return_whatever_is_returned_from_jenkins_enable(self):
+    def test_enable_job___Jenkins_returns_false___Log_error(self):
 
-        self.jenkins.enable_job('spam').AndReturn('sausage')
+        self.jenkins.enable_job('spam').AndReturn(False)
+        self.logger.log_error("Failed to enable job 'spam', check username and/or password")
         self.mocks.ReplayAll()
 
-        model = Model(self.jenkins)
-        result = model.enable_job('spam')
+        model = Model(self.jenkins, self.logger)
+        model.enable_job('spam')
 
-        self.assertEquals('sausage', result)
+        mox.Verify(self.logger)
 
-    def test_disable_job___Return_whatever_is_returned_from_jenkins_disable(self):
+    def test_enable_job___Jenkins_returns_true___Dont_log_error(self):
 
-        self.jenkins.disable_job('baked beans').AndReturn('eggs')
+        self.jenkins.enable_job('spam').AndReturn(True)
         self.mocks.ReplayAll()
 
-        model = Model(self.jenkins)
-        result = model.disable_job('baked beans')
+        model = Model(self.jenkins, self.logger)
+        model.enable_job('spam')
 
-        self.assertEquals('eggs', result)
+        mox.Verify(self.logger)
+
+    def test_disable_job___Jenkins_returns_false___Log_error(self):
+
+        self.jenkins.disable_job('baked beans').AndReturn(False)
+        self.logger.log_error("Failed to disable job 'baked beans', check username and/or password")
+        self.mocks.ReplayAll()
+
+        model = Model(self.jenkins, self.logger)
+        model.disable_job('baked beans')
+
+        mox.Verify(self.logger)
+
+    def test_disable_job___Jenkins_returns_true___Dont_log_error(self):
+
+        self.jenkins.disable_job('baked beans').AndReturn(True)
+        self.mocks.ReplayAll()
+
+        model = Model(self.jenkins, self.logger)
+        model.disable_job('baked beans')
+
+        mox.Verify(self.logger)
 
     def test_jobs_updated___ReturnsEventFromConstructor(self):
 
         self.mocks.ReplayAll()
 
-        model = Model(self.jenkins, self.event)
+        model = Model(self.jenkins, self.logger, self.event)
 
         self.assertTrue(self.event is model.jobs_updated_event())
 

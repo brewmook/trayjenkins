@@ -1,6 +1,6 @@
 from PySide import QtCore, QtGui
 from trayjenkins.event import Event
-from trayjenkins.jobs import IView
+from trayjenkins.jobs import IView, IErrorLogger
 from pyjenkins.job import JobStatus
 from gui.qmock import QtGuiFactory
 
@@ -210,3 +210,17 @@ class UpdateTimer(QtCore.QObject):
 
         if event.timerId() == self._jobs_timer_id:
             self._jobs_model.update_jobs()
+
+
+class ErrorLogger(IErrorLogger):
+
+    def __init__(self, parent):
+        self._message_box = QtGui.QMessageBox(parent)
+
+    def log_error(self, error):
+        """
+        @type error: str
+        """
+        self._message_box.setText(error)
+        self._message_box.setIcon(QtGui.QMessageBox.Critical)
+        self._message_box.exec_()

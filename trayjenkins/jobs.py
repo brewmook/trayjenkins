@@ -28,6 +28,14 @@ class JobModel(object):
         return 'JobModel(job=%r,ignored=%r)' % (self.job, self.ignored)
 
 
+class IErrorLogger(object):
+
+    def log_error(self, error):
+        """
+        @type error: str
+        """
+
+
 class IModel(object):
 
     def update_jobs(self):
@@ -141,9 +149,10 @@ class Presenter(object):
 
 class Model(IModel):
 
-    def __init__(self, jenkins, jobs_updated_event=Event()):
+    def __init__(self, jenkins, error_logger, jobs_updated_event=Event()):
 
         self._jenkins = jenkins
+        self._error_logger = error_logger
         self._jobs_updated_event = jobs_updated_event
         self._models = []
         self._ignore = set()
@@ -160,13 +169,15 @@ class Model(IModel):
         """
         @type job_name: str
         """
-        return self._jenkins.enable_job(job_name)
+        if not self._jenkins.enable_job(job_name):
+            self._error_logger.log_error("Failed to enable job '%s', check username and/or password" % job_name)
 
     def disable_job(self, job_name):
         """
         @type job_name: str
         """
-        return self._jenkins.disable_job(job_name)
+        if not self._jenkins.disable_job(job_name):
+            self._error_logger.log_error("Failed to disable job '%s', check username and/or password" % job_name)
 
     def ignore_job(self, job_name):
         """

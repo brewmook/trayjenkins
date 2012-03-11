@@ -25,21 +25,17 @@ class Jenkins(object):
 
     def enable_job(self, job_name):
 
-        result = False
         job = self._find_job(job_name)
         if job:
             job.status = JobStatus.OK
-            result = True
-        return result
+        return True
 
     def disable_job(self, job_name):
 
-        result = False
         job = self._find_job(job_name)
         if job:
             job.status = JobStatus.DISABLED
-            result = True
-        return result
+        return False
 
     def _find_job(self, job_name):
 
