@@ -1,5 +1,4 @@
 from trayjenkins.event import Event
-from trayjenkins.jobs import NoFilter
 from pyjenkins.job import JobStatus
 
 
@@ -104,7 +103,7 @@ class Model(IModel):
 
     def __init__(self,
                  jobs_model,
-                 jobs_filter=NoFilter(),
+                 jobs_filter,
                  message_composer=DefaultMessageComposer(),
                  status_reader=StatusReader(),
                  status_changed_event=Event()):

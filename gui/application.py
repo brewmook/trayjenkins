@@ -24,8 +24,7 @@ class TrayIcon(object):
                  show_controls_action,
                  show_jenkins_action,
                  quit_action,
-                 jobs_model,
-                 ignore_jobs_filter):
+                 jobs_model):
 
         self._show_controls_action = show_controls_action
         self._show_jenkins_action = show_jenkins_action
@@ -44,7 +43,7 @@ class TrayIcon(object):
         tray_icon_view_adapter = gui.status.TrayIconViewAdapter(tray_icon_view, media_files)
         status_view = gui.status.MultiView([tray_icon_view_adapter,
                                             gui.status.SoundView(parent, media_files)])
-        self.status_model = StatusModel(jobs_model, jobs_filter=ignore_jobs_filter)
+        self.status_model = StatusModel(jobs_model, IgnoreJobsFilter())
         self.status_presenter = StatusPresenter(self.status_model, status_view)
         status_view.set_status(JobStatus.UNKNOWN, None)
 
@@ -63,18 +62,15 @@ class MainWindow(QtGui.QDialog):
     def __init__(self, jenkins_host, media_files):
         super(MainWindow, self).__init__()
 
-        self._ignore_jobs_filter = IgnoreJobsFilter()
-
         self._create_actions()
-        self._create_jobs_mvp(jenkins_host, media_files, self._ignore_jobs_filter)
+        self._create_jobs_mvp(jenkins_host, media_files)
 
         self._trayIcon = TrayIcon(self,
                                   media_files,
                                   self._show_controls_action,
                                   self._show_jenkins_action,
                                   self._quitAction,
-                                  self._jobs_model,
-                                  self._ignore_jobs_filter)
+                                  self._jobs_model)
 
         main_layout = QtGui.QVBoxLayout()
         main_layout.addWidget(self._jobs_view)
@@ -85,7 +81,7 @@ class MainWindow(QtGui.QDialog):
         self.setWindowTitle("TrayJenkins (%s)" % __version__)
         self.resize(640, 480)
 
-    def _create_jobs_mvp(self, jenkins_host, media_files, ignore_jobs_filter):
+    def _create_jobs_mvp(self, jenkins_host, media_files):
 
         if jenkins_host == 'FAKE':
             jenkins = gui.fake.Jenkins()
@@ -96,7 +92,7 @@ class MainWindow(QtGui.QDialog):
             self._jenkins_url = QtCore.QUrl(jenkins_host)
 
         self._jobs_model = JobsModel(jenkins)
-        self._jobs_view = gui.jobs.ListView(ignore_jobs_filter)
+        self._jobs_view = gui.jobs.ListView()
         menu_factory = gui.jobs.ContextMenuFactory(self._jobs_view)
         view_adapter = gui.jobs.ListViewAdapter(self._jobs_view, media_files, menu_factory)
         self._jobs_presenter = JobsPresenter(self._jobs_model, view_adapter)

@@ -107,16 +107,6 @@ class Presenter(object):
         self._model.unignore_job(job_name)
 
 
-class NoFilter(IFilter):
-
-    def filter_jobs(self, job_models):
-        """
-        @type jobs: [trayyjenkins.jobs.JobModel]
-        @rtype: [tryyjenkins.jobs.JobModel]
-        """
-        return job_models
-
-
 class Model(IModel):
 
     def __init__(self, jenkins, jobs_updated_event=Event()):

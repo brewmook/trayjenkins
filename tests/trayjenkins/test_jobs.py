@@ -4,7 +4,7 @@ from unittest import TestCase
 from pyjenkins.jenkins import Jenkins
 from pyjenkins.job import Job, JobStatus
 from trayjenkins.event import Event, IEvent
-from trayjenkins.jobs import IModel, IView, Presenter, Model, NoFilter, IgnoreJobsFilter,\
+from trayjenkins.jobs import IModel, IView, Presenter, Model, IgnoreJobsFilter,\
     JobModel
 
 
@@ -220,17 +220,6 @@ class JobsModelTests(TestCase):
         model = Model(self.jenkins, self.event)
 
         self.assertTrue(self.event is model.jobs_updated_event())
-
-
-class NoFilterTests(TestCase):
-
-    def test_filter_ReturnUnmodifiedList(self):
-
-        job_models = ['list', 'of', 'jobs']
-        no_filter = NoFilter()
-        result = no_filter.filter_jobs(job_models)
-
-        self.assertTrue(job_models is result)
 
 
 class IgnoreJobsFilterTests(TestCase):

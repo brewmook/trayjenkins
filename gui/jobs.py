@@ -39,10 +39,7 @@ class ListView(QtGui.QGroupBox):
         """
         return self._right_click_event
 
-    def __init__(self, ignore_jobs_filter):
-        """
-        @type ignore_jobs_filter: trayjenkins.jobs.IgnoreJobsFilter
-        """
+    def __init__(self):
         QtGui.QGroupBox.__init__(self, "Jobs")
 
         self._right_click_event = Event()
