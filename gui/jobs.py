@@ -27,15 +27,22 @@ class ContextMenuFactory(object):
         @type enable_callback: callable
         """
         menu = self._qtgui.QMenu(self._parent)
+        menu.addAction(self._ignore_action(job_model, ignore_callback, unignore_callback))
+        menu.addAction(self._enable_action(job_model, enable_callback))
+        return menu
+
+    def _ignore_action(self, job_model, ignore_callback, unignore_callback):
+
         if job_model.ignored:
             action = self._qtgui.QAction('Cancel ignore', self._parent, triggered=unignore_callback)
         else:
             action = self._qtgui.QAction('Ignore', self._parent, triggered=ignore_callback)
-        menu.addAction(action)
-        if job_model.job.status == JobStatus.DISABLED:
-            action = self._qtgui.QAction('Enable', self._parent, triggered=enable_callback)
-            menu.addAction(action)
-        return menu
+        return action
+
+    def _enable_action(self, job_model, enable_callback):
+
+        #if job_model.job.status == JobStatus.DISABLED:
+        return self._qtgui.QAction('Enable', self._parent, triggered=enable_callback)
 
 
 class ListView(QtGui.QGroupBox):

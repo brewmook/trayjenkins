@@ -33,8 +33,10 @@ class ContextMenuFactoryTests(TestCase):
     def test_create_AnyJob_ReturnMenu(self):
 
         job_model = JobModel(Job('name', 'status'), False)
-        self.qtgui.QAction(mox.IgnoreArg(), mox.IgnoreArg(), triggered=mox.IgnoreArg()).AndReturn('ignore action')
-        self.menu.addAction(mox.IgnoreArg())
+        self.qtgui.QAction(mox.IgnoreArg(), mox.IgnoreArg(), triggered=mox.IgnoreArg()).InAnyOrder().AndReturn('ignore/unignore action')
+        self.qtgui.QAction(mox.IgnoreArg(), mox.IgnoreArg(), triggered=mox.IgnoreArg()).InAnyOrder().AndReturn('enable/disable action')
+        self.menu.addAction(mox.IgnoreArg()).InAnyOrder()
+        self.menu.addAction(mox.IgnoreArg()).InAnyOrder()
         self.mocks.ReplayAll()
 
         factory = gui.jobs.ContextMenuFactory(self.parent, self.qtgui)
@@ -45,8 +47,10 @@ class ContextMenuFactoryTests(TestCase):
     def test_create_JobIsNotIgnored_AddIgnoreAction(self):
 
         job_model = JobModel(Job('name', 'status'), False)
-        self.qtgui.QAction('Ignore', self.parent, triggered='ignore callback').AndReturn('ignore action')
-        self.menu.addAction('ignore action')
+        self.qtgui.QAction('Ignore', self.parent, triggered='ignore callback').InAnyOrder().AndReturn('ignore action')
+        self.qtgui.QAction(mox.IgnoreArg(), mox.IgnoreArg(), triggered=mox.IgnoreArg()).InAnyOrder().AndReturn('enable/disable action')
+        self.menu.addAction('ignore action').InAnyOrder()
+        self.menu.addAction(mox.IgnoreArg()).InAnyOrder()
         self.mocks.ReplayAll()
 
         factory = gui.jobs.ContextMenuFactory(self.parent, self.qtgui)
@@ -57,8 +61,10 @@ class ContextMenuFactoryTests(TestCase):
     def test_create_JobIsIgnored_AddCancelIgnoreAction(self):
 
         job_model = JobModel(Job('name', 'status'), True)
-        self.qtgui.QAction('Cancel ignore', self.parent, triggered='unignore callback').AndReturn('unignore action')
-        self.menu.addAction('unignore action')
+        self.qtgui.QAction('Cancel ignore', self.parent, triggered='unignore callback').InAnyOrder().AndReturn('unignore action')
+        self.qtgui.QAction(mox.IgnoreArg(), mox.IgnoreArg(), triggered=mox.IgnoreArg()).InAnyOrder().AndReturn('enable/disable action')
+        self.menu.addAction('unignore action').InAnyOrder()
+        self.menu.addAction(mox.IgnoreArg()).InAnyOrder()
         self.mocks.ReplayAll()
 
         factory = gui.jobs.ContextMenuFactory(self.parent, self.qtgui)
@@ -69,8 +75,8 @@ class ContextMenuFactoryTests(TestCase):
     def test_create_JobIsDisabled_AddEnableAction(self):
 
         job_model = JobModel(Job('name', JobStatus.DISABLED), True)
-        self.qtgui.QAction(mox.IgnoreArg(), mox.IgnoreArg(), triggered=mox.IgnoreArg()).InAnyOrder().AndReturn('other action')
-        self.qtgui.QAction('Enable', self.parent, triggered='enable callback').AndReturn('enable action')
+        self.qtgui.QAction(mox.IgnoreArg(), mox.IgnoreArg(), triggered=mox.IgnoreArg()).InAnyOrder().AndReturn('ignore/unignore action')
+        self.qtgui.QAction('Enable', self.parent, triggered='enable callback').InAnyOrder().AndReturn('enable action')
         self.menu.addAction(mox.IgnoreArg()).InAnyOrder()
         self.menu.addAction('enable action').InAnyOrder()
         self.mocks.ReplayAll()
