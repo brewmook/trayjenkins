@@ -7,7 +7,7 @@ import trayjenkins.jobs
 import pyjenkins.job
 from trayjenkins.event import Event
 from trayjenkins.jobs import JobModel
-from pyjenkins.job import Job
+from pyjenkins.job import Job, JobStatus
 
 
 class MockQMenu(object):
@@ -38,7 +38,7 @@ class ContextMenuFactoryTests(TestCase):
         self.mocks.ReplayAll()
 
         factory = gui.jobs.ContextMenuFactory(self.parent, self.qtgui)
-        result = factory.create(job_model, 'ignore callback', 'unignore callback')
+        result = factory.create(job_model, 'ignore callback', 'unignore callback', 'enable callback')
 
         self.assertTrue(self.menu is result)
 
@@ -50,7 +50,7 @@ class ContextMenuFactoryTests(TestCase):
         self.mocks.ReplayAll()
 
         factory = gui.jobs.ContextMenuFactory(self.parent, self.qtgui)
-        factory.create(job_model, 'ignore callback', 'unignore callback')
+        factory.create(job_model, 'ignore callback', 'unignore callback', 'enable callback')
 
         mox.Verify(self.menu)
 
@@ -62,7 +62,21 @@ class ContextMenuFactoryTests(TestCase):
         self.mocks.ReplayAll()
 
         factory = gui.jobs.ContextMenuFactory(self.parent, self.qtgui)
-        factory.create(job_model, 'ignore callback', 'unignore callback')
+        factory.create(job_model, 'ignore callback', 'unignore callback', 'enable callback')
+
+        mox.Verify(self.menu)
+
+    def test_create_JobIsDisabled_AddEnableAction(self):
+
+        job_model = JobModel(Job('name', JobStatus.DISABLED), True)
+        self.qtgui.QAction(mox.IgnoreArg(), mox.IgnoreArg(), triggered=mox.IgnoreArg()).InAnyOrder().AndReturn('other action')
+        self.qtgui.QAction('Enable', self.parent, triggered='enable callback').AndReturn('enable action')
+        self.menu.addAction(mox.IgnoreArg()).InAnyOrder()
+        self.menu.addAction('enable action').InAnyOrder()
+        self.mocks.ReplayAll()
+
+        factory = gui.jobs.ContextMenuFactory(self.parent, self.qtgui)
+        factory.create(job_model, 'ignore callback', 'unignore callback', 'enable callback')
 
         mox.Verify(self.menu)
 
@@ -83,9 +97,10 @@ class MockMenuFactory(object):
         self.ignore_callback = None
         self.unignore_callback = None
 
-    def create(self, model, ignore_callback, unignore_callback):
+    def create(self, model, ignore_callback, unignore_callback, enable_callback):
         self.ignore_callback = ignore_callback
         self.unignore_callback = unignore_callback
+        self.enable_callback = enable_callback
         return self._menu
 
 
@@ -163,7 +178,7 @@ class ListViewAdapterTests(TestCase):
                       JobModel(Job('terry', pyjenkins.job.JobStatus.OK), False)]
 
         self._stub_out_set_jobs()
-        self.menu_factory.create(job_models[1], mox.IgnoreArg(), mox.IgnoreArg()).AndReturn(menu)
+        self.menu_factory.create(job_models[1], mox.IgnoreArg(), mox.IgnoreArg(), mox.IgnoreArg()).AndReturn(menu)
         self.view.right_click_event().InAnyOrder().AndReturn(right_click_event)
         self.mocks.ReplayAll()
 

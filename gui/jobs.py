@@ -15,11 +15,16 @@ class ContextMenuFactory(object):
         self._parent = parent
         self._qtgui = qtgui
 
-    def create(self, job_model, ignore_callback, unignore_callback):
+    def create(self,
+               job_model,
+               ignore_callback,
+               unignore_callback,
+               enable_callback):
         """
         @type job_model: trayjenkins.jobs.JobModel
         @type ignore_callback: callable
         @type unignore_callback: callable
+        @type enable_callback: callable
         """
         menu = self._qtgui.QMenu(self._parent)
         if job_model.ignored:
@@ -27,6 +32,9 @@ class ContextMenuFactory(object):
         else:
             action = self._qtgui.QAction('Ignore', self._parent, triggered=ignore_callback)
         menu.addAction(action)
+        if job_model.job.status == JobStatus.DISABLED:
+            action = self._qtgui.QAction('Enable', self._parent, triggered=enable_callback)
+            menu.addAction(action)
         return menu
 
 
@@ -142,7 +150,8 @@ class ListViewAdapter(IView):
         """
         menu = self._menu_factory.create(self._find_model(job_name),
                                          lambda: self._ignored_event.fire(job_name),
-                                         lambda: self._unignored_event.fire(job_name))
+                                         lambda: self._unignored_event.fire(job_name),
+                                         'whatever')
         menu.popup(pos)
 
     def _find_model(self, job_name):
