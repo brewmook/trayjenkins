@@ -63,8 +63,10 @@ class JobsPresenterTests(TestCase):
         jobs_updated_event = Event()
 
         model.jobs_updated_event().AndReturn(jobs_updated_event)
-        view.job_ignored_event().AndReturn(Event())
-        view.job_unignored_event().AndReturn(Event())
+        view.job_ignored_event().InAnyOrder().AndReturn(Event())
+        view.job_unignored_event().InAnyOrder().AndReturn(Event())
+        view.job_enabled_event().InAnyOrder().AndReturn(Event())
+        view.job_disabled_event().InAnyOrder().AndReturn(Event())
         view.set_jobs(jobs)
 
         mocks.ReplayAll()
@@ -83,8 +85,10 @@ class JobsPresenterTests(TestCase):
         job_ignored_event = Event()
 
         model.jobs_updated_event().AndReturn(Event())
-        view.job_ignored_event().AndReturn(job_ignored_event)
-        view.job_unignored_event().AndReturn(Event())
+        view.job_ignored_event().InAnyOrder().AndReturn(job_ignored_event)
+        view.job_unignored_event().InAnyOrder().AndReturn(Event())
+        view.job_enabled_event().InAnyOrder().AndReturn(Event())
+        view.job_disabled_event().InAnyOrder().AndReturn(Event())
         model.ignore_job('spam')
 
         mocks.ReplayAll()
@@ -103,14 +107,60 @@ class JobsPresenterTests(TestCase):
         job_unignored_event = Event()
 
         model.jobs_updated_event().AndReturn(Event())
-        view.job_ignored_event().AndReturn(Event())
-        view.job_unignored_event().AndReturn(job_unignored_event)
+        view.job_ignored_event().InAnyOrder().AndReturn(Event())
+        view.job_unignored_event().InAnyOrder().AndReturn(job_unignored_event)
+        view.job_enabled_event().InAnyOrder().AndReturn(Event())
+        view.job_disabled_event().InAnyOrder().AndReturn(Event())
         model.unignore_job('eggs')
 
         mocks.ReplayAll()
 
         presenter = Presenter(model, view)  # @UnusedVariable
         job_unignored_event.fire('eggs')
+
+        mox.Verify(model)
+
+    def test_Constructor___View_fires_job_enabled_event___Model_enable_job_called(self):
+
+        mocks = mox.Mox()
+
+        model = mocks.CreateMock(IModel)
+        view = mocks.CreateMock(IView)
+        job_enabled_event = Event()
+
+        model.jobs_updated_event().AndReturn(Event())
+        view.job_ignored_event().InAnyOrder().AndReturn(Event())
+        view.job_unignored_event().InAnyOrder().AndReturn(Event())
+        view.job_enabled_event().InAnyOrder().AndReturn(job_enabled_event)
+        view.job_disabled_event().InAnyOrder().AndReturn(Event())
+        model.enable_job('eggs')
+
+        mocks.ReplayAll()
+
+        presenter = Presenter(model, view)  # @UnusedVariable
+        job_enabled_event.fire('eggs')
+
+        mox.Verify(model)
+
+    def test_Constructor___View_fires_job_disabled_event___Model_disable_job_called(self):
+
+        mocks = mox.Mox()
+
+        model = mocks.CreateMock(IModel)
+        view = mocks.CreateMock(IView)
+        job_disabled_event = Event()
+
+        model.jobs_updated_event().AndReturn(Event())
+        view.job_ignored_event().InAnyOrder().AndReturn(Event())
+        view.job_unignored_event().InAnyOrder().AndReturn(Event())
+        view.job_enabled_event().InAnyOrder().AndReturn(Event())
+        view.job_disabled_event().InAnyOrder().AndReturn(job_disabled_event)
+        model.disable_job('eggs')
+
+        mocks.ReplayAll()
+
+        presenter = Presenter(model, view)  # @UnusedVariable
+        job_disabled_event.fire('eggs')
 
         mox.Verify(model)
 

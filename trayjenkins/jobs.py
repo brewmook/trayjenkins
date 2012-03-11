@@ -35,6 +35,16 @@ class IModel(object):
         @rtype: None
         """
 
+    def disable_job(self, job_name):
+        """
+        @type job_name: str
+        """
+
+    def enable_job(self, job_name):
+        """
+        @type job_name: str
+        """
+
     def ignore_job(self, job_name):
         """
         @type job_name: str
@@ -53,6 +63,18 @@ class IModel(object):
 
 
 class IView(object):
+
+    def job_enabled_event(self):
+        """
+        Listeners receive Event.fire(job_name:str)
+        @rtype: trayjenkins.event.IEvent
+        """
+
+    def job_disabled_event(self):
+        """
+        Listeners receive Event.fire(job_name:str)
+        @rtype: trayjenkins.event.IEvent
+        """
 
     def job_ignored_event(self):
         """
@@ -93,6 +115,8 @@ class Presenter(object):
         model.jobs_updated_event().register(self._on_model_jobs_changed)
         view.job_ignored_event().register(self._on_view_job_ignored)
         view.job_unignored_event().register(self._on_view_job_unignored)
+        view.job_enabled_event().register(self._on_view_job_enabled)
+        view.job_disabled_event().register(self._on_view_job_disabled)
 
     def _on_model_jobs_changed(self, jobs):
 
@@ -105,6 +129,14 @@ class Presenter(object):
     def _on_view_job_unignored(self, job_name):
 
         self._model.unignore_job(job_name)
+
+    def _on_view_job_enabled(self, job_name):
+
+        self._model.enable_job(job_name)
+
+    def _on_view_job_disabled(self, job_name):
+
+        self._model.disable_job(job_name)
 
 
 class Model(IModel):
