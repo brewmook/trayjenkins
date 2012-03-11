@@ -280,6 +280,48 @@ class ListViewAdapterTests(TestCase):
 
         self.assertEqual('eric', mock_event_handler.argument)
 
+    def test_constructor___User_clicks_enable_menu_item___Fire_job_enabled_event(self):
+
+        job_models = [JobModel(Job('eric', pyjenkins.job.JobStatus.DISABLED), False)]
+        right_click_event = Event()
+        menu = self.mocks.CreateMock(MockQMenu)
+        menu_factory = MockMenuFactory(menu)
+        mock_event_handler = MockEventHandler()
+
+        self.view.right_click_event().InAnyOrder().AndReturn(right_click_event)
+        self._stub_out_set_jobs()
+        menu.popup(mox.IgnoreArg())
+        self.mocks.ReplayAll()
+
+        adapter = gui.jobs.ListViewAdapter(self.view, self.media, menu_factory, self.qtgui)  # @UnusedVariable
+        adapter.job_enabled_event().register(mock_event_handler)
+        adapter.set_jobs(job_models)
+        right_click_event.fire('eric', 'screen coordinates')
+        menu_factory.enable_callback()
+
+        self.assertEqual('eric', mock_event_handler.argument)
+
+    def test_constructor___User_clicks_disable_menu_item___Fire_job_disabled_event(self):
+
+        job_models = [JobModel(Job('eric', pyjenkins.job.JobStatus.FAILING), False)]
+        right_click_event = Event()
+        menu = self.mocks.CreateMock(MockQMenu)
+        menu_factory = MockMenuFactory(menu)
+        mock_event_handler = MockEventHandler()
+
+        self.view.right_click_event().InAnyOrder().AndReturn(right_click_event)
+        self._stub_out_set_jobs()
+        menu.popup(mox.IgnoreArg())
+        self.mocks.ReplayAll()
+
+        adapter = gui.jobs.ListViewAdapter(self.view, self.media, menu_factory, self.qtgui)  # @UnusedVariable
+        adapter.job_disabled_event().register(mock_event_handler)
+        adapter.set_jobs(job_models)
+        right_click_event.fire('eric', 'screen coordinates')
+        menu_factory.disable_callback()
+
+        self.assertEqual('eric', mock_event_handler.argument)
+
     def _stub_out_set_jobs(self):
 
         self.qtgui.QListWidgetItem(mox.IgnoreArg(), mox.IgnoreArg()).AndReturn('whatever')

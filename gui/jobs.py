@@ -105,6 +105,20 @@ class ListViewAdapter(IView):
         """
         return self._unignored_event
 
+    def job_enabled_event(self):
+        """
+        Listeners receive Event.fire(job_name:str)
+        @rtype: trayjenkins.event.IEvent
+        """
+        return self._enabled_event
+
+    def job_disabled_event(self):
+        """
+        Listeners receive Event.fire(job_name:str)
+        @rtype: trayjenkins.event.IEvent
+        """
+        return self._disabled_event
+
     def __init__(self,
                  view,
                  media_files,
@@ -121,6 +135,8 @@ class ListViewAdapter(IView):
         self._menu_factory = menu_factory
         self._ignored_event = Event()
         self._unignored_event = Event()
+        self._enabled_event = Event()
+        self._disabled_event = Event()
         self._job_models = []
 
         view.right_click_event().register(self._on_view_right_click)
@@ -163,8 +179,8 @@ class ListViewAdapter(IView):
         menu = self._menu_factory.create(self._find_model(job_name),
                                          lambda: self._ignored_event.fire(job_name),
                                          lambda: self._unignored_event.fire(job_name),
-                                         'whatever',
-                                         'whatever')
+                                         lambda: self._enabled_event.fire(job_name),
+                                         lambda: self._disabled_event.fire(job_name))
         menu.popup(pos)
 
     def _find_model(self, job_name):
