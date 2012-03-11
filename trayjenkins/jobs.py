@@ -156,6 +156,18 @@ class Model(IModel):
         models = [JobModel(job, job.name in self._ignore) for job in jobs]
         self._update_models(models)
 
+    def enable_job(self, job_name):
+        """
+        @type job_name: str
+        """
+        return self._jenkins.enable_job(job_name)
+
+    def disable_job(self, job_name):
+        """
+        @type job_name: str
+        """
+        return self._jenkins.disable_job(job_name)
+
     def ignore_job(self, job_name):
         """
         @type job_name: str

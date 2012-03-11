@@ -263,6 +263,26 @@ class JobsModelTests(TestCase):
 
         mox.Verify(self.event)
 
+    def test_enable_job___Return_whatever_is_returned_from_jenkins_enable(self):
+
+        self.jenkins.enable_job('spam').AndReturn('sausage')
+        self.mocks.ReplayAll()
+
+        model = Model(self.jenkins)
+        result = model.enable_job('spam')
+
+        self.assertEquals('sausage', result)
+
+    def test_disable_job___Return_whatever_is_returned_from_jenkins_disable(self):
+
+        self.jenkins.disable_job('baked beans').AndReturn('eggs')
+        self.mocks.ReplayAll()
+
+        model = Model(self.jenkins)
+        result = model.disable_job('baked beans')
+
+        self.assertEquals('eggs', result)
+
     def test_jobs_updated___ReturnsEventFromConstructor(self):
 
         self.mocks.ReplayAll()

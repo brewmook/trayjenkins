@@ -22,3 +22,29 @@ class Jenkins(object):
             self._next_jobs = 0
 
         return result
+
+    def enable_job(self, job_name):
+
+        result = False
+        job = self._find_job(job_name)
+        if job:
+            job.status = JobStatus.OK
+            result = True
+        return result
+
+    def disable_job(self, job_name):
+
+        result = False
+        job = self._find_job(job_name)
+        if job:
+            job.status = JobStatus.DISABLED
+            result = True
+        return result
+
+    def _find_job(self, job_name):
+
+        result = None
+        jobs = [job for job in self._jobs_rota[self._next_jobs] if job.name == job_name]
+        if jobs != []:
+            result = jobs[0]
+        return result
