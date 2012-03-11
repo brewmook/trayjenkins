@@ -86,6 +86,47 @@ class ContextMenuFactoryTests(TestCase):
 
         mox.Verify(self.menu)
 
+    def test_create___Job_status_is_OK___Add_disable_action(self):
+
+        job_model = JobModel(Job('name', JobStatus.OK), True)
+        self.qtgui.QAction(mox.IgnoreArg(), mox.IgnoreArg(), triggered=mox.IgnoreArg()).InAnyOrder().AndReturn('ignore/unignore action')
+        self.qtgui.QAction('Disable', self.parent, triggered='disable callback').InAnyOrder().AndReturn('disable action')
+        self.menu.addAction(mox.IgnoreArg()).InAnyOrder()
+        self.menu.addAction('disable action').InAnyOrder()
+        self.mocks.ReplayAll()
+
+        factory = gui.jobs.ContextMenuFactory(self.parent, self.qtgui)
+        factory.create(job_model, 'ignore callback', 'unignore callback', 'enable callback', 'disable callback')
+
+        mox.Verify(self.menu)
+
+    def test_create___Job_status_is_failing___Add_disable_action(self):
+
+        job_model = JobModel(Job('name', JobStatus.FAILING), True)
+        self.qtgui.QAction(mox.IgnoreArg(), mox.IgnoreArg(), triggered=mox.IgnoreArg()).InAnyOrder().AndReturn('ignore/unignore action')
+        self.qtgui.QAction('Disable', self.parent, triggered='disable callback').InAnyOrder().AndReturn('disable action')
+        self.menu.addAction(mox.IgnoreArg()).InAnyOrder()
+        self.menu.addAction('disable action').InAnyOrder()
+        self.mocks.ReplayAll()
+
+        factory = gui.jobs.ContextMenuFactory(self.parent, self.qtgui)
+        factory.create(job_model, 'ignore callback', 'unignore callback', 'enable callback', 'disable callback')
+
+        mox.Verify(self.menu)
+
+    def test_create___Job_status_is_unknown___No_enable_or_disable_added(self):
+
+        job_model = JobModel(Job('name', JobStatus.UNKNOWN), False)
+        self.qtgui.QAction(mox.IgnoreArg(), mox.IgnoreArg(), triggered='ignore callback').InAnyOrder().AndReturn('ignore/unignore action')
+        self.qtgui.QAction(mox.IgnoreArg(), mox.IgnoreArg(), triggered='unignore callback').InAnyOrder().AndReturn('ignore/unignore action')
+        self.menu.addAction('ignore/unignore action')
+        self.mocks.ReplayAll()
+
+        factory = gui.jobs.ContextMenuFactory(self.parent, self.qtgui)
+        factory.create(job_model, 'ignore callback', 'unignore callback', 'enable callback', 'disable callback')
+
+        mox.Verify(self.menu)
+
 
 class MockEventHandler(object):
 
