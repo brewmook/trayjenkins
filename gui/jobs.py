@@ -19,12 +19,14 @@ class ContextMenuFactory(object):
                job_model,
                ignore_callback,
                unignore_callback,
-               enable_callback):
+               enable_callback,
+               disable_callback):
         """
         @type job_model: trayjenkins.jobs.JobModel
         @type ignore_callback: callable
         @type unignore_callback: callable
         @type enable_callback: callable
+        @type disable_callback: callable
         """
         menu = self._qtgui.QMenu(self._parent)
         menu.addAction(self._ignore_action(job_model, ignore_callback, unignore_callback))
@@ -158,6 +160,7 @@ class ListViewAdapter(IView):
         menu = self._menu_factory.create(self._find_model(job_name),
                                          lambda: self._ignored_event.fire(job_name),
                                          lambda: self._unignored_event.fire(job_name),
+                                         'whatever',
                                          'whatever')
         menu.popup(pos)
 
