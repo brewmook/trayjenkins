@@ -7,6 +7,7 @@ class QtGuiFactory(object):
         """
         @rtype: Pyside.QtGui.QAction
         """
+        return QtGui.QAction(text, parent, **kwargs)
 
     def QListWidgetItem(self, icon, name):
         """

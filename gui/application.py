@@ -97,7 +97,8 @@ class MainWindow(QtGui.QDialog):
 
         self._jobs_model = JobsModel(jenkins)
         self._jobs_view = gui.jobs.ListView(ignore_jobs_filter)
-        view_adapter = gui.jobs.ListViewAdapter(self._jobs_view, media_files)
+        menu_factory = gui.jobs.ContextMenuFactory(self._jobs_view)
+        view_adapter = gui.jobs.ListViewAdapter(self._jobs_view, media_files, menu_factory)
         self._jobs_presenter = JobsPresenter(self._jobs_model, view_adapter)
 
     def _create_actions(self):

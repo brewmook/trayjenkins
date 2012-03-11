@@ -5,13 +5,6 @@ from pyjenkins.job import JobStatus
 from gui.qmock import QtGuiFactory
 
 
-class ContextMenuActions(object):
-
-    def __init__(self, ignore, cancel_ignore):
-        self.ignore = ignore
-        self.cancel_ignore = cancel_ignore
-
-
 class ContextMenuFactory(object):
 
     def __init__(self, parent, qtgui=QtGuiFactory()):
@@ -58,10 +51,6 @@ class ListView(QtGui.QGroupBox):
         self._jobs.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self._jobs.customContextMenuRequested.connect(self._on_custom_context_menu_requested)
 
-        actions = ContextMenuActions(QtGui.QAction('Ignore', self, triggered=self._ignore_job),
-                                     QtGui.QAction('Cancel ignore', self, triggered=self._unignore_job))
-        self._menu_factory = ContextMenuFactory(self._jobs, actions, ignore_jobs_filter)
-
         layout = QtGui.QVBoxLayout()
         layout.addWidget(self._jobs)
         self.setLayout(layout)
@@ -72,20 +61,7 @@ class ListView(QtGui.QGroupBox):
         """
         item = self._jobs.itemAt(point)
         if item is not None:
-            menu = self._menu_factory.create(item.text())
-            menu.popup(self._jobs.mapToGlobal(point))
-
-    def _ignore_job(self):
-
-        item = self._jobs.currentItem()
-        if item is not None:
-            self._job_ignored_event.fire(item.text())
-
-    def _unignore_job(self):
-
-        item = self._jobs.currentItem()
-        if item is not None:
-            self._job_unignored_event.fire(item.text())
+            self._right_click_event.fire(item.text(), self._jobs.mapToGlobal(point))
 
     def set_list(self, items):
         """
