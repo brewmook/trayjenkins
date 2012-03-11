@@ -74,10 +74,10 @@ class IView(object):
 
 class IFilter(object):
 
-    def filter_jobs(self, jobs):
+    def filter_jobs(self, job_models):
         """
-        @type jobs: [pyjenkins.job.Job]
-        @rtype: [pyjenkins.job.Job]
+        @type jobs: [trayyjenkins.jobs.JobModel]
+        @rtype: [tryyjenkins.jobs.JobModel]
         """
 
 
@@ -109,9 +109,12 @@ class Presenter(object):
 
 class NoFilter(IFilter):
 
-    def filter_jobs(self, jobs):
-
-        return jobs
+    def filter_jobs(self, job_models):
+        """
+        @type jobs: [trayyjenkins.jobs.JobModel]
+        @rtype: [tryyjenkins.jobs.JobModel]
+        """
+        return job_models
 
 
 class Model(IModel):
@@ -167,32 +170,9 @@ class Model(IModel):
 
 class IgnoreJobsFilter(IFilter):
 
-    def __init__(self):
-
-        self._ignores = set()
-
-    def filter_jobs(self, jobs):
+    def filter_jobs(self, job_models):
         """
-        @type jobs: [pyjenkins.job.Job]
-        @rtype: [pyjenkins.job.Job]
+        @type jobs: [trayyjenkins.jobs.JobModel]
+        @rtype: [tryyjenkins.jobs.JobModel]
         """
-        return [job for job in jobs if job.name not in self._ignores]
-
-    def ignore(self, job_name):
-        """
-        @type job_name: str
-        """
-        self._ignores.add(job_name)
-
-    def unignore(self, job_name):
-        """
-        @type job_name: str
-        """
-        self._ignores.discard(job_name)
-
-    def ignoring(self, job_name):
-        """
-        @type jobName: str
-        @rtype: bool
-        """
-        return job_name in self._ignores
+        return [model for model in job_models if not model.ignored]

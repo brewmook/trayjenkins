@@ -226,78 +226,31 @@ class NoFilterTests(TestCase):
 
     def test_filter_ReturnUnmodifiedList(self):
 
-        jobs = ['list', 'of', 'jobs']
+        job_models = ['list', 'of', 'jobs']
         no_filter = NoFilter()
-        result = no_filter.filter_jobs(jobs)
+        result = no_filter.filter_jobs(job_models)
 
-        self.assertTrue(jobs is result)
+        self.assertTrue(job_models is result)
 
 
 class IgnoreJobsFilterTests(TestCase):
 
-    def test_filter_NothingIgnored_ReturnUnmodifiedList(self):
+    def test___filter_jobs___Nothing_ignored___Return_unmodified_list(self):
 
-        jobs = [Job('eric', JobStatus.FAILING),
-                Job('terry', JobStatus.FAILING)]
-
-        jobs_filter = IgnoreJobsFilter()
-        result = jobs_filter.filter_jobs(jobs)
-
-        self.assertEqual(jobs, result)
-
-    def test_filter_EricIgnored_ReturnFilteredList(self):
-
-        jobs = [Job('eric', JobStatus.FAILING),
-                Job('terry', JobStatus.FAILING)]
+        job_models = [JobModel(Job('eric', JobStatus.FAILING), False),
+                      JobModel(Job('terry', JobStatus.FAILING), False)]
 
         jobs_filter = IgnoreJobsFilter()
-        jobs_filter.ignore('terry')
+        result = jobs_filter.filter_jobs(job_models)
 
-        expected = [Job('eric', JobStatus.FAILING)]
-        result = jobs_filter.filter_jobs(jobs)
+        self.assertEqual(job_models, result)
 
-        self.assertEqual(expected, result)
+    def test___filter_jobs___One_ignored___Return_non_ignored_jobs(self):
 
-    def test_filter_EricAndTerryIgnored_ReturnEmptyList(self):
-
-        jobs = [Job('eric', JobStatus.FAILING),
-                Job('terry', JobStatus.FAILING)]
+        non_ignored = JobModel(Job('eric', JobStatus.FAILING), False)
+        ignored = JobModel(Job('terry', JobStatus.FAILING), True)
 
         jobs_filter = IgnoreJobsFilter()
-        jobs_filter.ignore('eric')
-        jobs_filter.ignore('terry')
+        result = jobs_filter.filter_jobs([non_ignored, ignored])
 
-        expected = []
-        result = jobs_filter.filter_jobs(jobs)
-
-        self.assertEqual(expected, result)
-
-    def test_filter_EricIgnoredThenUnignored_ReturnFilteredList(self):
-
-        jobs = [Job('eric', JobStatus.FAILING),
-                Job('terry', JobStatus.FAILING)]
-
-        jobs_filter = IgnoreJobsFilter()
-        jobs_filter.ignore('terry')
-        jobs_filter.unignore('terry')
-
-        result = jobs_filter.filter_jobs(jobs)
-
-        self.assertEqual(jobs, result)
-
-    def test_ignoring_JobNotIgnored_ReturnFalse(self):
-
-        jobs_filter = IgnoreJobsFilter()
-
-        result = jobs_filter.ignoring('norwegian blue')
-
-        self.assertEqual(False, result)
-
-    def test_ignoring_JobIsIgnored_ReturnTrue(self):
-
-        jobs_filter = IgnoreJobsFilter()
-        jobs_filter.ignore('norwegian blue')
-
-        result = jobs_filter.ignoring('norwegian blue')
-
-        self.assertEqual(True, result)
+        self.assertEqual([non_ignored], result)
