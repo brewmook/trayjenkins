@@ -46,7 +46,7 @@ class StatusModelTests(TestCase):
 
     def test_updateStatus_JobsModelFiresFirstUpdateEventStatusUnknownAndMessageNone_StatusChangedEventNotFired(self):
 
-        self.jobs_filter.filter_jobs(self.jobs).AndReturn(self.jobs)
+        self.jobs_filter.filter_jobs(self.job_models).AndReturn(self.job_models)
         self.messageComposer.message(self.jobs).AndReturn(None)
         self.statusReader.status(self.jobs).AndReturn(JobStatus.UNKNOWN)
         self.mocks.ReplayAll()
@@ -63,7 +63,7 @@ class StatusModelTests(TestCase):
 
     def test_updateStatus_JobsModelFiresFirstUpdateEvent_StatusChangedEventFired(self):
 
-        self.jobs_filter.filter_jobs(self.jobs).AndReturn(self.jobs)
+        self.jobs_filter.filter_jobs(self.job_models).AndReturn(self.job_models)
         self.messageComposer.message(self.jobs).AndReturn('message')
         self.statusReader.status(self.jobs).AndReturn(JobStatus.FAILING)
         self.statusEvent.fire(JobStatus.FAILING, 'message')
@@ -81,8 +81,8 @@ class StatusModelTests(TestCase):
 
     def test_updateStatus_TwoJobsModelUpdatesWithSameStatusAndMessage_StatusChangedEventFiredOnce(self):
 
-        self.jobs_filter.filter_jobs(self.jobs).AndReturn(self.jobs)
-        self.jobs_filter.filter_jobs(self.jobs).AndReturn(self.jobs)
+        self.jobs_filter.filter_jobs(self.job_models).AndReturn(self.job_models)
+        self.jobs_filter.filter_jobs(self.job_models).AndReturn(self.job_models)
         self.messageComposer.message(self.jobs).AndReturn('message')
         self.messageComposer.message(self.jobs).AndReturn('message')
         self.statusReader.status(self.jobs).AndReturn(JobStatus.FAILING)
@@ -103,8 +103,8 @@ class StatusModelTests(TestCase):
 
     def test_updateStatus_TwoJobsModelUpdatesWithDifferentStatus_StatusChangedEventFiredTwice(self):
 
-        self.jobs_filter.filter_jobs(self.jobs).AndReturn(self.jobs)
-        self.jobs_filter.filter_jobs(self.jobs).AndReturn(self.jobs)
+        self.jobs_filter.filter_jobs(self.job_models).AndReturn(self.job_models)
+        self.jobs_filter.filter_jobs(self.job_models).AndReturn(self.job_models)
         self.messageComposer.message(self.jobs).AndReturn('message')
         self.messageComposer.message(self.jobs).AndReturn('message')
         self.statusReader.status(self.jobs).AndReturn(JobStatus.FAILING)
@@ -126,8 +126,8 @@ class StatusModelTests(TestCase):
 
     def test_updateStatus_TwoJobsModelUpdatesWithDifferentMessage_StatusChangedEventFiredTwice(self):
 
-        self.jobs_filter.filter_jobs(self.jobs).AndReturn(self.jobs)
-        self.jobs_filter.filter_jobs(self.jobs).AndReturn(self.jobs)
+        self.jobs_filter.filter_jobs(self.job_models).AndReturn(self.job_models)
+        self.jobs_filter.filter_jobs(self.job_models).AndReturn(self.job_models)
         self.messageComposer.message(self.jobs).AndReturn('message one')
         self.messageComposer.message(self.jobs).AndReturn('message two')
         self.statusReader.status(self.jobs).AndReturn(JobStatus.FAILING)
@@ -149,10 +149,11 @@ class StatusModelTests(TestCase):
 
     def test_updateStatus_JobsFilterReturnsModifiedList_ModifiedListPassedTo(self):
 
-        filtered = [Job('completely', 'different')]
-        self.jobs_filter.filter_jobs(self.jobs).AndReturn(filtered)
-        self.messageComposer.message(filtered).AndReturn('message')
-        self.statusReader.status(filtered).AndReturn(JobStatus.OK)
+        filtered_jobs = [Job('completely', 'different')]
+        filtered_models = [JobModel(filtered_jobs[0], True)]
+        self.jobs_filter.filter_jobs(self.job_models).AndReturn(filtered_models)
+        self.messageComposer.message(filtered_jobs).AndReturn('message')
+        self.statusReader.status(filtered_jobs).AndReturn(JobStatus.OK)
         self.statusEvent.fire(JobStatus.OK, 'message')
         self.mocks.ReplayAll()
 

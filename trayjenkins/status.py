@@ -125,8 +125,8 @@ class Model(IModel):
         jobs_model.jobs_updated_event().register(self._on_jobs_updated)
 
     def _on_jobs_updated(self, job_models):
+        job_models = self._jobs_filter.filter_jobs(job_models)
         jobs = [model.job for model in job_models]
-        jobs = self._jobs_filter.filter_jobs(jobs)
         status = self._status_reader.status(jobs)
         message = self._message_composer.message(jobs)
         if self._lastStatus != status or self._lastMessage != message:
