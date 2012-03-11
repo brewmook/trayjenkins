@@ -1,6 +1,5 @@
 import os
 import sys
-from optparse import OptionParser
 from PySide import QtCore, QtGui
 
 import gui.fake
@@ -14,6 +13,7 @@ from pyjenkins.job import JobStatus
 from pyjenkins.server import Server
 from trayjenkins import __version__
 from pyjenkins.jenkins import JenkinsFactory
+from trayjenkins.settings import CommandLineSettingsParser
 
 
 class TrayIcon(object):
@@ -59,11 +59,11 @@ class TrayIcon(object):
 
 class MainWindow(QtGui.QDialog):
 
-    def __init__(self, jenkins_host, media_files):
+    def __init__(self, settings, media_files):
         super(MainWindow, self).__init__()
 
         self._create_actions()
-        self._create_jobs_mvp(jenkins_host, media_files)
+        self._create_jobs_mvp(settings, media_files)
 
         self._trayIcon = TrayIcon(self,
                                   media_files,
@@ -81,15 +81,15 @@ class MainWindow(QtGui.QDialog):
         self.setWindowTitle("TrayJenkins (%s)" % __version__)
         self.resize(640, 480)
 
-    def _create_jobs_mvp(self, jenkins_host, media_files):
+    def _create_jobs_mvp(self, settings, media_files):
 
-        if jenkins_host == 'FAKE':
+        if settings.host == 'FAKE':
             jenkins = gui.fake.Jenkins()
             self._jenkins_url = QtCore.QUrl('https://github.com/coolhandmook/trayjenkins')
         else:
-            server = Server(jenkins_host, '', '')
+            server = Server(settings.host, settings.username, settings.password)
             jenkins = JenkinsFactory().create(server)
-            self._jenkins_url = QtCore.QUrl(jenkins_host)
+            self._jenkins_url = QtCore.QUrl(settings.host)
 
         self._jobs_model = JobsModel(jenkins)
         self._jobs_view = gui.jobs.ListView()
@@ -120,25 +120,23 @@ class Application(QtGui.QDialog):
 
     def run(self):
 
-        jenkins_host = self._parse_options()
+        settings = self._parse_options()
         media_files = gui.media.MediaFiles(self._executable_path())
 
-        window = MainWindow(jenkins_host, media_files)  # @UnusedVariable
+        window = MainWindow(settings, media_files)  # @UnusedVariable
 
         return self._application.exec_()
 
     def _parse_options(self):
 
-        parser = OptionParser(usage='usage: %prog [options] host')
-        (options, args) = parser.parse_args()  # @UnusedVariable
+        parser = CommandLineSettingsParser()
+        settings = parser.parse_args(sys.argv[1:])
 
-        if len(args) is 1:
-            jenkins_host = args[0]
-        else:
+        if settings is None:
             parser.print_help()
             sys.exit(1)
 
-        return jenkins_host
+        return settings
 
     def _executable_path(self):
 

@@ -53,7 +53,7 @@ class CommandLineSettingsParserTests(TestCase):
 
         expected = None
         parser = CommandLineSettingsParser()
-        result = parser.parse([])
+        result = parser.parse_args([])
 
         self.assertEquals(expected, result)
 
@@ -61,7 +61,7 @@ class CommandLineSettingsParserTests(TestCase):
 
         expected = Settings('hostname')
         parser = CommandLineSettingsParser()
-        result = parser.parse(['hostname'])
+        result = parser.parse_args(['hostname'])
 
         self.assertEquals(expected, result)
 
@@ -69,7 +69,7 @@ class CommandLineSettingsParserTests(TestCase):
 
         expected = Settings('hostname', username='sir robin')
         parser = CommandLineSettingsParser()
-        result = parser.parse(['-u', 'sir robin', 'hostname'])
+        result = parser.parse_args(['-u', 'sir robin', 'hostname'])
 
         self.assertEquals(expected, result)
 
@@ -77,7 +77,7 @@ class CommandLineSettingsParserTests(TestCase):
 
         expected = Settings('hostname', username='sir robin')
         parser = CommandLineSettingsParser()
-        result = parser.parse(['--username', 'sir robin', 'hostname'])
+        result = parser.parse_args(['--username', 'sir robin', 'hostname'])
 
         self.assertEquals(expected, result)
 
@@ -85,7 +85,7 @@ class CommandLineSettingsParserTests(TestCase):
 
         expected = Settings('hostname', password='aramathea')
         parser = CommandLineSettingsParser()
-        result = parser.parse(['-p', 'aramathea', 'hostname'])
+        result = parser.parse_args(['-p', 'aramathea', 'hostname'])
 
         self.assertEquals(expected, result)
 
@@ -93,6 +93,6 @@ class CommandLineSettingsParserTests(TestCase):
 
         expected = Settings('hostname', password='aramathea')
         parser = CommandLineSettingsParser()
-        result = parser.parse(['--password', 'aramathea', 'hostname'])
+        result = parser.parse_args(['--password', 'aramathea', 'hostname'])
 
         self.assertEquals(expected, result)

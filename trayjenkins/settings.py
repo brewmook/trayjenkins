@@ -26,18 +26,21 @@ class Settings(object):
 
 class CommandLineSettingsParser(object):
 
-    def parse(self, args):
+    def __init__(self):
 
-        parser = OptionParser(usage='usage: %prog [options] host')
-        parser.add_option('-p', '--password',
-                          dest='password',
-                          default='',
-                          help='password for remote host')
-        parser.add_option('-u', '--username',
-                          dest='username',
-                          default='',
-                          help='username for remote host')
-        (options, args) = parser.parse_args(args)  # @UnusedVariable
+        self._parser = OptionParser(usage='usage: %prog [options] host')
+        self._parser.add_option('-p', '--password',
+                                dest='password',
+                                default='',
+                                help='password for remote host')
+        self._parser.add_option('-u', '--username',
+                                dest='username',
+                                default='',
+                                help='username for remote host')
+
+    def parse_args(self, args):
+
+        (options, args) = self._parser.parse_args(args)  # @UnusedVariable
 
         if len(args) is 1:
             result = Settings(args[0])
@@ -47,3 +50,7 @@ class CommandLineSettingsParser(object):
             result = None
 
         return result
+
+    def print_help(self):
+
+        self._parser.print_help()
