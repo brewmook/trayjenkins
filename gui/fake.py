@@ -1,35 +1,46 @@
-from trayjenkins.event import Event
-from trayjenkins.jobs import IModel
 from pyjenkins.job import Job, JobStatus
 
-class FakeJobsModel(IModel):
+
+class Jenkins(object):
 
     def __init__(self):
-        self._jobsUpdatedEvent = Event()
-        self.jobs = []
-        self.jobsRota = [[Job('spam', JobStatus.OK),
-                          Job('eggs', JobStatus.OK)],
-                         [Job('spam', JobStatus.FAILING),
-                          Job('eggs', JobStatus.OK)],
-                        ]
-        self.nextJobs = 0
+        self._jobs_rota = [[Job('spam', JobStatus.OK),
+                            Job('eggs', JobStatus.OK)],
+                           [Job('spam', JobStatus.FAILING),
+                            Job('eggs', JobStatus.DISABLED)],
+                           ]
+        self._next_jobs = 0
 
-    def updateJobs(self):
+    def list_jobs(self):
         """
         @rtype: None
         """
-        jobs = self.jobsRota[self.nextJobs]
-        if self.jobs != jobs:
-            self.jobs = jobs
-            self._jobsUpdatedEvent.fire(jobs)
+        result = self._jobs_rota[self._next_jobs]
 
-        self.nextJobs = self.nextJobs + 1
-        if self.nextJobs is len(self.jobsRota):
-            self.nextJobs = 0
-            
-    def jobsUpdatedEvent(self):
-        """
-        Listeners receive Event.fire([pyjenkins.job.Job])
-        @rtype: trayjenkins.event.IEvent
-        """
-        return self._jobsUpdatedEvent
+        self._next_jobs = self._next_jobs + 1
+        if self._next_jobs is len(self._jobs_rota):
+            self._next_jobs = 0
+
+        return result
+
+    def enable_job(self, job_name):
+
+        job = self._find_job(job_name)
+        if job:
+            job.status = JobStatus.OK
+        return True
+
+    def disable_job(self, job_name):
+
+        job = self._find_job(job_name)
+        if job:
+            job.status = JobStatus.DISABLED
+        return False
+
+    def _find_job(self, job_name):
+
+        result = None
+        jobs = [job for job in self._jobs_rota[self._next_jobs] if job.name == job_name]
+        if jobs != []:
+            result = jobs[0]
+        return result

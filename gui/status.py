@@ -3,37 +3,65 @@ from PySide.phonon import Phonon
 from pyjenkins.job import JobStatus
 from trayjenkins.status import IView
 
-class TrayIconView(IView):
 
-    def __init__(self, parentWidget, menu, mediaFiles):
+class TrayIconView(object):
+
+    def __init__(self, trayIcon):
         """
-        @type parentWidget: QtGui.QWidget
-        @type menu: QtGui.QMenu
+        @type trayIcon: QtGui.QSystemTrayIcon
+        """
+        self._trayIcon = trayIcon
+
+    def setIcon(self, trayIcon, tooltip, messageTitle, messageText, messageIcon):
+        """
+        @type trayIcon: QtGui.QIcon
+        @type tooltip: str
+        @type messageTitle: unicode
+        @type messageText: unicode
+        @type messageIcon: QtGui.QSystemTrayIcon.MessageIcon
+        """
+        self._trayIcon.setIcon(trayIcon)
+        self._trayIcon.setToolTip(tooltip)
+        self._trayIcon.showMessage(messageTitle, messageText, messageIcon)
+
+
+class TrayIconViewAdapter(IView):
+
+    def __init__(self, view, mediaFiles):
+        """
+        @type view: gui.status.TrayIconView
         @type mediaFiles: gui.media.MediaFiles
         """
-        self._trayIcon= QtGui.QSystemTrayIcon(parentWidget)
-        self._trayIcon.setContextMenu(menu)
+        self._view = view
+        self._media = mediaFiles
 
-        self._icons = {
-            JobStatus.FAILING: QtGui.QIcon(mediaFiles.failingImagePath()),
-            JobStatus.OK:      QtGui.QIcon(mediaFiles.okImagePath()),
-            JobStatus.UNKNOWN: QtGui.QIcon(mediaFiles.unknownImagePath()),
-            }
-
-        self.setStatus(JobStatus.UNKNOWN)
-
-        self._trayIcon.show()
-
-    def setStatus(self, status):
+    def set_status(self, status, message):
         """
         @type status: str
+        @type message: str
         """
-        self._trayIcon.setIcon(self._icons[status])
-        self._trayIcon.setToolTip(status.capitalize())
-        
-        self._trayIcon.showMessage(unicode("Jenkins status change"),
-                                   unicode("Status: %s" % status.capitalize()),
-                                   QtGui.QSystemTrayIcon.Information)
+        messageIcon = QtGui.QSystemTrayIcon.Information
+        if status is JobStatus.FAILING:
+            trayIcon = self._media.failing_icon()
+            messageIcon = QtGui.QSystemTrayIcon.Warning
+        elif status is JobStatus.OK:
+            trayIcon = self._media.ok_icon()
+        else:
+            trayIcon = self._media.unknown_icon()
+
+        if status is None:
+            tooltip = 'None'
+        else:
+            tooltip = status.capitalize()
+
+        if message is None:
+            message = ''
+
+        self._view.setIcon(trayIcon,
+                           tooltip,
+                           unicode('Jenkins status change'),
+                           unicode(message),
+                           messageIcon)
 
 
 class SoundView(IView):
@@ -48,11 +76,11 @@ class SoundView(IView):
         Phonon.createPath(self.mediaObject, self.audioOutput)
 
         self._sounds = {
-            JobStatus.FAILING: Phonon.MediaSource(mediaFiles.failingSoundPath()),
-            JobStatus.OK:      Phonon.MediaSource(mediaFiles.okSoundPath()),
+            JobStatus.FAILING: Phonon.MediaSource(mediaFiles.failing_sound_path()),
+            JobStatus.OK: Phonon.MediaSource(mediaFiles.ok_sound_path()),
             }
 
-    def setStatus(self, status):
+    def set_status(self, status, message):
         """
         @type status: str
         """
@@ -72,9 +100,9 @@ class MultiView(IView):
         """
         self._views = views
 
-    def setStatus(self, status):
+    def set_status(self, status, message):
         """
         @type status: str
         """
         for view in self._views:
-            view.setStatus(status)
+            view.set_status(status, message)
